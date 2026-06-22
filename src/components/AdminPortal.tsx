@@ -1,0 +1,1126 @@
+import React, { useState } from 'react';
+import type { Worker, ClockLog, Announcement, PaymentHistory } from '../types';
+import type { TFunction } from '../data/translations';
+import { 
+  Users, 
+  DollarSign, 
+  Bell, 
+  Settings, 
+  TrendingUp, 
+  FileText, 
+  Clock, 
+  Plus, 
+  Edit, 
+  Trash2, 
+  Check, 
+  AlertTriangle,
+  Smartphone,
+  Send,
+  Upload,
+  Mail,
+  MessageSquare
+} from 'lucide-react';
+import { exportPayrollToPdf, exportPayrollToExcel } from '../utils/reportGenerator';
+
+interface AdminPortalProps {
+  workers: Worker[];
+  logs: ClockLog[];
+  announcements: Announcement[];
+  payments: PaymentHistory[];
+  companyName: string;
+  companyLogo: string;
+  onUpdateCompanyName: (name: string) => void;
+  onUpdateCompanyLogo: (logo: string) => void;
+  onAddWorker: (worker: Omit<Worker, 'id'>) => void;
+  onUpdateWorker: (worker: Worker) => void;
+  onDeleteWorker: (id: string) => void;
+  onAddAnnouncement: (ann: Omit<Announcement, 'id' | 'date'>) => void;
+  onDeleteAnnouncement: (id: string) => void;
+  onProcessPayment: (workerId: string, hours: number, rate: number) => { success: boolean; error?: string };
+  t: TFunction;
+}
+
+export default function AdminPortal({
+  workers,
+  logs,
+  announcements,
+  payments,
+  companyName,
+  companyLogo,
+  onUpdateCompanyName,
+  onUpdateCompanyLogo,
+  onAddWorker,
+  onUpdateWorker,
+  onDeleteWorker,
+  onAddAnnouncement,
+  onDeleteAnnouncement,
+  onProcessPayment,
+  t
+}: AdminPortalProps) {
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'workers' | 'payroll' | 'announcements' | 'settings'>('dashboard');
+
+  // Edit / Add Worker Form states
+  const [isEditingWorker, setIsEditingWorker] = useState<boolean>(false);
+  const [editingWorkerId, setEditingWorkerId] = useState<string | null>(null);
+  const [workerForm, setWorkerForm] = useState({
+    name: '',
+    surname: '',
+    email: '',
+    phone: '',
+    hourlySalary: 450,
+    passportOrNcid: '',
+    department: 'Operations',
+    pin: '',
+    password: '',
+    status: 'active' as 'active' | 'inactive',
+    permitDetails: {
+      workPermitExpiry: '',
+      entryPermitDetails: '',
+      studentPermitDetails: '',
+      contractorAssignment: '',
+      permittedWorkCategories: ''
+    }
+  });
+
+  // Invite Worker Modal/Simulator states
+  const [inviteModalOpen, setInviteModalOpen] = useState<boolean>(false);
+  const [inviteTargetWorker, setInviteTargetWorker] = useState<Worker | null>(null);
+  const [inviteMethod, setInviteMethod] = useState<'sms' | 'whatsapp' | 'email'>('sms');
+  const [inviteSimulated, setInviteSimulated] = useState<boolean>(false);
+
+  // Announcement Form states
+  const [annTitle, setAnnTitle] = useState<string>('');
+  const [annContent, setAnnContent] = useState<string>('');
+  const [annType, setAnnType] = useState<Announcement['type']>('news');
+  const [annSuccessMsg, setAnnSuccessMsg] = useState<string>('');
+
+  // Payment process visual confirmation
+  const [payrollNotice, setPayrollNotice] = useState<string>('');
+
+  // Delete confirmation state for workers
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+
+  // Settings save confirmation
+  const [settingsSaved, setSettingsSaved] = useState<boolean>(false);
+
+  // Calculation helpers
+  const getWorkerTotalHours = (workerId: string) => {
+    return logs
+      .filter(log => log.workerId === workerId && log.clockOut)
+      .reduce((sum, log) => sum + (log.totalHours || 0), 0);
+  };
+
+  const getUnpaidHours = (workerId: string) => {
+    const totalHours = getWorkerTotalHours(workerId);
+    // Find all completed payments for this worker
+    const paidHours = payments
+      .filter(p => p.workerId === workerId && p.status === 'completed')
+      .reduce((sum, p) => sum + p.totalHours, 0);
+    return Math.max(0, totalHours - paidHours);
+  };
+
+  // 30 days expiry checker
+  const getExpiringPermitsList = () => {
+    const today = new Date();
+    return workers.filter(w => {
+      if (!w.permitDetails?.workPermitExpiry || w.status !== 'active') return false;
+      const expiry = new Date(w.permitDetails.workPermitExpiry);
+      const diffTime = expiry.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays <= 30; // Expired or expiring within 30 days
+    });
+  };
+
+  const expiringPermits = getExpiringPermitsList();
+
+  const totalPayrollDue = workers.reduce((sum, w) => {
+    const unpaid = getUnpaidHours(w.id);
+    return sum + (unpaid * w.hourlySalary);
+  }, 0);
+
+  const totalHoursWorked = logs
+    .filter(log => log.clockOut)
+    .reduce((sum, log) => sum + (log.totalHours || 0), 0);
+
+  const totalSalaryPaid = payments
+    .filter(p => p.status === 'completed')
+    .reduce((sum, p) => sum + p.amountPaid, 0);
+
+  // Logo file upload handler
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === 'string') {
+          onUpdateCompanyLogo(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Submit worker form
+  const handleWorkerFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanForm = {
+      ...workerForm,
+      hourlySalary: Number(workerForm.hourlySalary)
+    };
+
+    if (editingWorkerId) {
+      onUpdateWorker({
+        ...cleanForm,
+        id: editingWorkerId
+      });
+    } else {
+      onAddWorker(cleanForm);
+    }
+
+    setIsEditingWorker(false);
+    setEditingWorkerId(null);
+    resetWorkerForm();
+  };
+
+  const startAddWorker = () => {
+    resetWorkerForm();
+    setEditingWorkerId(null);
+    setIsEditingWorker(true);
+  };
+
+  const startEditWorker = (w: Worker) => {
+    setEditingWorkerId(w.id);
+    setWorkerForm({
+      name: w.name,
+      surname: w.surname,
+      email: w.email,
+      phone: w.phone,
+      hourlySalary: w.hourlySalary,
+      passportOrNcid: w.passportOrNcid,
+      department: w.department,
+      pin: w.pin,
+      password: w.password || '',
+      status: w.status,
+      permitDetails: {
+        workPermitExpiry: w.permitDetails?.workPermitExpiry || '',
+        entryPermitDetails: w.permitDetails?.entryPermitDetails || '',
+        studentPermitDetails: w.permitDetails?.studentPermitDetails || '',
+        contractorAssignment: w.permitDetails?.contractorAssignment || '',
+        permittedWorkCategories: w.permitDetails?.permittedWorkCategories || ''
+      }
+    });
+    setIsEditingWorker(true);
+  };
+
+  const resetWorkerForm = () => {
+    setWorkerForm({
+      name: '',
+      surname: '',
+      email: '',
+      phone: '',
+      hourlySalary: 450,
+      passportOrNcid: '',
+      department: 'Operations',
+      pin: Math.floor(1000 + Math.random() * 9000).toString(),
+      password: Math.random().toString(36).substring(2, 10),
+      status: 'active',
+      permitDetails: {
+        workPermitExpiry: '',
+        entryPermitDetails: '',
+        studentPermitDetails: '',
+        contractorAssignment: '',
+        permittedWorkCategories: ''
+      }
+    });
+  };
+
+  // Simulated invitations
+  const triggerInvite = (worker: Worker) => {
+    setInviteTargetWorker(worker);
+    setInviteSimulated(false);
+    setInviteModalOpen(true);
+  };
+
+  const handleSendInviteSim = () => {
+    setInviteSimulated(true);
+    setTimeout(() => {
+      setInviteModalOpen(false);
+      setInviteTargetWorker(null);
+    }, 3500);
+  };
+
+  // Submit announcement
+  const handleAnnouncementSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onAddAnnouncement({
+      title: annTitle,
+      content: annContent,
+      type: annType,
+      sender: 'HR Administrator'
+    });
+    setAnnTitle('');
+    setAnnContent('');
+    setAnnSuccessMsg('Announcement broadcasted successfully to all workers.');
+    setTimeout(() => setAnnSuccessMsg(''), 4000);
+  };
+
+  // Release payment
+  const handlePayWorker = (workerId: string) => {
+    const unpaidHours = getUnpaidHours(workerId);
+    const worker = workers.find(w => w.id === workerId);
+    if (!worker || unpaidHours <= 0) return;
+
+    const res = onProcessPayment(workerId, unpaidHours, worker.hourlySalary);
+    if (res.success) {
+      setPayrollNotice(`${t('paymentSuccess')} ${worker.name} ${worker.surname}!`);
+      setTimeout(() => setPayrollNotice(''), 4000);
+    }
+  };
+
+  return (
+    <div style={{ padding: '0.5rem' }}>
+      
+      {/* Top statistics banners */}
+      <div style={{ display: 'flex', gap: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+        <button onClick={() => setActiveTab('dashboard')} className={`btn ${activeTab === 'dashboard' ? 'btn-primary' : 'btn-outline'}`} style={{ padding: '0.5rem 1.2rem', borderRadius: '8px' }}>
+          <TrendingUp size={16} /> {t('dashboard')}
+        </button>
+        <button onClick={() => setActiveTab('workers')} className={`btn ${activeTab === 'workers' ? 'btn-primary' : 'btn-outline'}`} style={{ padding: '0.5rem 1.2rem', borderRadius: '8px' }}>
+          <Users size={16} /> {t('workers')}
+        </button>
+        <button onClick={() => setActiveTab('payroll')} className={`btn ${activeTab === 'payroll' ? 'btn-primary' : 'btn-outline'}`} style={{ padding: '0.5rem 1.2rem', borderRadius: '8px' }}>
+          <DollarSign size={16} /> {t('payroll')}
+        </button>
+        <button onClick={() => setActiveTab('announcements')} className={`btn ${activeTab === 'announcements' ? 'btn-primary' : 'btn-outline'}`} style={{ padding: '0.5rem 1.2rem', borderRadius: '8px' }}>
+          <Bell size={16} /> {t('announcements')}
+        </button>
+        <button onClick={() => setActiveTab('settings')} className={`btn ${activeTab === 'settings' ? 'btn-primary' : 'btn-outline'}`} style={{ padding: '0.5rem 1.2rem', borderRadius: '8px' }}>
+          <Settings size={16} /> {t('companySettings')}
+        </button>
+      </div>
+
+      {/* DASHBOARD TAB */}
+      {activeTab === 'dashboard' && (
+        <div>
+          {/* HR Warning Center */}
+          {expiringPermits.length > 0 && (
+            <div className="glass-panel" style={{ padding: '1.25rem', marginBottom: '2rem', borderLeft: '4px solid var(--accent-danger)', background: 'rgba(239, 68, 68, 0.05)' }}>
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.1rem', color: 'var(--accent-danger)', fontWeight: 'bold' }}>
+                <AlertTriangle size={20} />
+                Critical Permit Warnings ({expiringPermits.length})
+              </h3>
+              <ul style={{ marginTop: '0.75rem', paddingLeft: '1.25rem', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                {expiringPermits.map(w => {
+                  const expiry = w.permitDetails?.workPermitExpiry;
+                  return (
+                    <li key={w.id} style={{ marginBottom: '0.4rem' }}>
+                      Worker <strong>{w.name} {w.surname}</strong> ({w.passportOrNcid}) - Permit Expires: <span style={{ color: 'var(--accent-danger)', fontWeight: 'bold' }}>{expiry}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+
+          {/* Quick stats cards grid */}
+          <div className="dashboard-grid">
+            <div className="glass-panel stats-card">
+              <div>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{t('activeWorkers')}</span>
+                <h3 style={{ fontSize: '2rem', fontWeight: 'bold', marginTop: '0.5rem' }}>
+                  {workers.filter(w => w.status === 'active').length}
+                </h3>
+              </div>
+              <Users size={32} style={{ color: 'var(--accent-primary)', opacity: 0.8 }} />
+            </div>
+
+            <div className="glass-panel stats-card">
+              <div>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{t('hoursClocked')}</span>
+                <h3 style={{ fontSize: '2rem', fontWeight: 'bold', marginTop: '0.5rem' }}>
+                  {totalHoursWorked.toFixed(1)}h
+                </h3>
+              </div>
+              <Clock size={32} style={{ color: 'var(--accent-info)', opacity: 0.8 }} />
+            </div>
+
+            <div className="glass-panel stats-card">
+              <div>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{t('payrollDue')}</span>
+                <h3 style={{ fontSize: '1.8rem', fontWeight: 'bold', marginTop: '0.5rem', color: 'var(--accent-warning)' }}>
+                  MUR {totalPayrollDue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                </h3>
+              </div>
+              <DollarSign size={32} style={{ color: 'var(--accent-warning)', opacity: 0.8 }} />
+            </div>
+
+            <div className="glass-panel stats-card">
+              <div>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{t('totalSalaryPaid')}</span>
+                <h3 style={{ fontSize: '1.8rem', fontWeight: 'bold', marginTop: '0.5rem', color: 'var(--accent-secondary)' }}>
+                  MUR {totalSalaryPaid.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                </h3>
+              </div>
+              <TrendingUp size={32} style={{ color: 'var(--accent-secondary)', opacity: 0.8 }} />
+            </div>
+          </div>
+
+          {/* Activity Logs & Permit Details feed */}
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem' }}>
+            <div className="glass-panel" style={{ padding: '1.5rem' }}>
+              <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>{t('recentActivity')}</h3>
+              
+              <div className="table-container" style={{ marginTop: '0' }}>
+                <table className="custom-table">
+                  <thead>
+                    <tr>
+                      <th>Employee</th>
+                      <th>Time</th>
+                      <th>Method</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {logs.slice(-6).reverse().map(log => {
+                      const w = workers.find(work => work.id === log.workerId);
+                      return (
+                        <tr key={log.id}>
+                          <td>{w ? `${w.name} ${w.surname}` : 'Unknown'}</td>
+                          <td>
+                            <div style={{ fontSize: '0.85rem' }}>
+                              In: {new Date(log.clockIn).toLocaleTimeString()}
+                              {log.clockOut && ` - Out: ${new Date(log.clockOut).toLocaleTimeString()}`}
+                            </div>
+                          </td>
+                          <td>
+                            <span className="badge badge-info" style={{ fontSize: '0.7rem' }}>
+                              {log.method.replace('_', ' ')}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                    {logs.length === 0 && (
+                      <tr>
+                        <td colSpan={3} style={{ textAlign: 'center', padding: '2rem' }}>{t('noActivity')}</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Quick Permit Alarm Overview */}
+            <div className="glass-panel" style={{ padding: '1.5rem' }}>
+              <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <FileText size={18} style={{ color: 'var(--accent-primary)' }} />
+                Permit Expiry Alarms
+              </h3>
+              {expiringPermits.length === 0 ? (
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  {t('noPermitsExpiring')}
+                </p>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {expiringPermits.map(w => (
+                    <div key={w.id} style={{ background: 'rgba(239, 68, 68, 0.1)', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                      <p style={{ fontWeight: 600, fontSize: '0.85rem' }}>{w.name} {w.surname}</p>
+                      <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.15rem' }}>
+                        Expiry: {w.permitDetails?.workPermitExpiry}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* WORKERS TAB */}
+      {activeTab === 'workers' && (
+        <div>
+          {isEditingWorker ? (
+            /* WORKER FORM (ADD/EDIT) WITH PERMIT TRACKER DETAILS */
+            <form onSubmit={handleWorkerFormSubmit} className="glass-panel" style={{ padding: '2rem' }}>
+              <h3 style={{ fontSize: '1.4rem', marginBottom: '1.5rem' }}>
+                {editingWorkerId ? t('editWorker') : t('addWorker')}
+              </h3>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+                <div>
+                  <h4 style={{ fontSize: '1.05rem', color: 'var(--accent-primary)', marginBottom: '1rem', fontWeight: 600 }}>{t('workerDetails')}</h4>
+                  <div className="form-group">
+                    <label>{t('firstName')}</label>
+                    <input 
+                      type="text" 
+                      value={workerForm.name} 
+                      onChange={e => setWorkerForm({...workerForm, name: e.target.value})} 
+                      className="form-input" 
+                      required 
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('lastName')}</label>
+                    <input 
+                      type="text" 
+                      value={workerForm.surname} 
+                      onChange={e => setWorkerForm({...workerForm, surname: e.target.value})} 
+                      className="form-input" 
+                      required 
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('emailAddress')}</label>
+                    <input 
+                      type="email" 
+                      value={workerForm.email} 
+                      onChange={e => setWorkerForm({...workerForm, email: e.target.value})} 
+                      className="form-input" 
+                      required 
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('phoneNumber')}</label>
+                    <input 
+                      type="text" 
+                      value={workerForm.phone} 
+                      onChange={e => setWorkerForm({...workerForm, phone: e.target.value})} 
+                      className="form-input" 
+                      required 
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('passportOrNcid')}</label>
+                    <input 
+                      type="text" 
+                      value={workerForm.passportOrNcid} 
+                      onChange={e => setWorkerForm({...workerForm, passportOrNcid: e.target.value})} 
+                      className="form-input" 
+                      required 
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('hourlyRate')}</label>
+                    <input 
+                      type="number" 
+                      value={workerForm.hourlySalary} 
+                      onChange={e => setWorkerForm({...workerForm, hourlySalary: Number(e.target.value)})} 
+                      className="form-input" 
+                      required 
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('department')}</label>
+                    <input 
+                      type="text" 
+                      value={workerForm.department} 
+                      onChange={e => setWorkerForm({...workerForm, department: e.target.value})} 
+                      className="form-input" 
+                      required 
+                    />
+                  </div>
+                </div>
+
+                {/* Permit Tracker fields */}
+                <div>
+                  <h4 style={{ fontSize: '1.05rem', color: 'var(--accent-secondary)', marginBottom: '1rem', fontWeight: 600 }}>{t('permitTracker')}</h4>
+                  <div className="form-group">
+                    <label>{t('workPermitExpiry')}</label>
+                    <input 
+                      type="date" 
+                      value={workerForm.permitDetails.workPermitExpiry} 
+                      onChange={e => setWorkerForm({
+                        ...workerForm, 
+                        permitDetails: { ...workerForm.permitDetails, workPermitExpiry: e.target.value }
+                      })} 
+                      className="form-input" 
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('entryPermitDetails')}</label>
+                    <input 
+                      type="text" 
+                      value={workerForm.permitDetails.entryPermitDetails} 
+                      onChange={e => setWorkerForm({
+                        ...workerForm, 
+                        permitDetails: { ...workerForm.permitDetails, entryPermitDetails: e.target.value }
+                      })} 
+                      className="form-input" 
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('studentPermitDetails')}</label>
+                    <input 
+                      type="text" 
+                      value={workerForm.permitDetails.studentPermitDetails} 
+                      onChange={e => setWorkerForm({
+                        ...workerForm, 
+                        permitDetails: { ...workerForm.permitDetails, studentPermitDetails: e.target.value }
+                      })} 
+                      className="form-input" 
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('laborContractor')}</label>
+                    <input 
+                      type="text" 
+                      value={workerForm.permitDetails.contractorAssignment} 
+                      onChange={e => setWorkerForm({
+                        ...workerForm, 
+                        permitDetails: { ...workerForm.permitDetails, contractorAssignment: e.target.value }
+                      })} 
+                      className="form-input" 
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('workCategories')}</label>
+                    <input 
+                      type="text" 
+                      value={workerForm.permitDetails.permittedWorkCategories} 
+                      onChange={e => setWorkerForm({
+                        ...workerForm, 
+                        permitDetails: { ...workerForm.permitDetails, permittedWorkCategories: e.target.value }
+                      })} 
+                      className="form-input" 
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Status</label>
+                    <select 
+                      value={workerForm.status} 
+                      onChange={e => setWorkerForm({...workerForm, status: e.target.value as any})}
+                      className="form-input"
+                    >
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+                <button type="button" onClick={() => setIsEditingWorker(false)} className="btn btn-outline" style={{ flex: 1 }}>
+                  {t('cancel')}
+                </button>
+                <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>
+                  {t('saveWorker')}
+                </button>
+              </div>
+            </form>
+          ) : (
+            /* WORKERS DIRECTORY LISTING */
+            <div className="glass-panel" style={{ padding: '1.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+                <h3 style={{ fontSize: '1.3rem' }}>{t('workers')} Directory</h3>
+                <button onClick={startAddWorker} className="btn btn-primary">
+                  <Plus size={18} /> {t('addWorker')}
+                </button>
+              </div>
+
+              <div className="table-container">
+                <table className="custom-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Passport/NCID</th>
+                      <th>Rate</th>
+                      <th>Department</th>
+                      <th>Work Permit Expiry</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {workers.map(w => {
+                      const today = new Date();
+                      const expiryDate = w.permitDetails?.workPermitExpiry ? new Date(w.permitDetails.workPermitExpiry) : null;
+                      let permitBadgeClass = 'badge-success';
+                      
+                      if (expiryDate) {
+                        const daysLeft = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                        if (daysLeft <= 0) permitBadgeClass = 'badge-danger';
+                        else if (daysLeft <= 30) permitBadgeClass = 'badge-warning';
+                      }
+
+                      return (
+                        <tr key={w.id}>
+                          <td style={{ fontWeight: 600 }}>{w.name} {w.surname}</td>
+                          <td>{w.passportOrNcid}</td>
+                          <td>MUR {w.hourlySalary}/hr</td>
+                          <td>{w.department}</td>
+                          <td>
+                            {w.permitDetails?.workPermitExpiry ? (
+                              <span className={`badge ${permitBadgeClass}`}>
+                                {w.permitDetails.workPermitExpiry}
+                              </span>
+                            ) : (
+                              <span style={{ color: 'var(--text-muted)' }}>-</span>
+                            )}
+                          </td>
+                          <td>
+                            <span className={`badge ${w.status === 'active' ? 'badge-success' : 'badge-danger'}`}>
+                              {w.status}
+                            </span>
+                          </td>
+                          <td>
+                            {confirmDeleteId === w.id ? (
+                              <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                                <span style={{ fontSize: '0.72rem', color: 'var(--accent-danger)', fontWeight: 600, whiteSpace: 'nowrap' }}>Confirm?</span>
+                                <button
+                                  onClick={() => { onDeleteWorker(w.id); setConfirmDeleteId(null); }}
+                                  className="btn btn-danger"
+                                  style={{ padding: '0.3rem 0.6rem', fontSize: '0.72rem', borderRadius: '6px' }}
+                                >
+                                  Yes
+                                </button>
+                                <button
+                                  onClick={() => setConfirmDeleteId(null)}
+                                  className="btn btn-outline"
+                                  style={{ padding: '0.3rem 0.6rem', fontSize: '0.72rem', borderRadius: '6px' }}
+                                >
+                                  No
+                                </button>
+                              </div>
+                            ) : (
+                              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <button onClick={() => startEditWorker(w)} className="btn btn-outline" style={{ padding: '0.4rem', borderRadius: '6px' }}>
+                                  <Edit size={14} />
+                                </button>
+                                <button onClick={() => triggerInvite(w)} className="btn btn-outline" style={{ padding: '0.4rem', borderRadius: '6px', color: 'var(--accent-secondary)' }} title="Send Invite">
+                                  <Send size={14} />
+                                </button>
+                                <button onClick={() => setConfirmDeleteId(w.id)} className="btn btn-outline" style={{ padding: '0.4rem', borderRadius: '6px', color: 'var(--accent-danger)' }}>
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* PAYROLL & PAYMENTS TAB */}
+      {activeTab === 'payroll' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          
+          {/* Process Success alert */}
+          {payrollNotice && (
+            <div className="badge badge-success" style={{ width: '100%', padding: '0.8rem 1.5rem', fontSize: '0.95rem', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Check size={18} />
+              {payrollNotice}
+            </div>
+          )}
+
+          {/* Export & Actions section */}
+          <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+            <div>
+              <h3 style={{ fontSize: '1.3rem' }}>{t('payroll')} Calculations</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '0.2rem' }}>
+                {t('payrollFormula')}
+              </p>
+            </div>
+            
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button 
+                onClick={() => exportPayrollToExcel(workers, logs, companyName)}
+                className="btn btn-outline"
+              >
+                <FileText size={18} /> {t('exportExcel')}
+              </button>
+              
+              <button 
+                onClick={() => exportPayrollToPdf(workers, logs, companyName, companyLogo, t)}
+                className="btn btn-primary"
+              >
+                <FileText size={18} /> {t('exportPdf')}
+              </button>
+            </div>
+          </div>
+
+          <div className="glass-panel" style={{ padding: '1.5rem' }}>
+            <h4 style={{ fontSize: '1.1rem', marginBottom: '1.25rem' }}>Detailed Active Payroll Due</h4>
+            
+            <div className="table-container" style={{ marginTop: '0' }}>
+              <table className="custom-table">
+                <thead>
+                  <tr>
+                    <th>Worker Name</th>
+                    <th>Passport / NCID</th>
+                    <th>Hourly Rate</th>
+                    <th>Hours Worked</th>
+                    <th>Gross Due</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {workers.map(w => {
+                    const unpaidHours = getUnpaidHours(w.id);
+                    const grossDue = unpaidHours * w.hourlySalary;
+
+                    return (
+                      <tr key={w.id}>
+                        <td style={{ fontWeight: 600 }}>{w.name} {w.surname}</td>
+                        <td>{w.passportOrNcid}</td>
+                        <td>MUR {w.hourlySalary}/hr</td>
+                        <td>{unpaidHours.toFixed(2)} hrs</td>
+                        <td style={{ fontWeight: 700, color: grossDue > 0 ? 'var(--accent-warning)' : 'var(--text-muted)' }}>
+                          MUR {grossDue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </td>
+                        <td>
+                          <button 
+                            onClick={() => handlePayWorker(w.id)}
+                            className="btn btn-secondary"
+                            disabled={grossDue <= 0}
+                            style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem', borderRadius: '6px', opacity: grossDue <= 0 ? 0.5 : 1, cursor: grossDue <= 0 ? 'not-allowed' : 'pointer' }}
+                          >
+                            {t('processPayment')}
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Payments History log */}
+          <div className="glass-panel" style={{ padding: '1.5rem' }}>
+            <h4 style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>{t('paymentHistory')}</h4>
+            
+            <div className="table-container" style={{ marginTop: '0' }}>
+              <table className="custom-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Employee Name</th>
+                    <th>Ref ID</th>
+                    <th>Hours Settled</th>
+                    <th>Amount Paid</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {payments.slice().reverse().map(p => (
+                    <tr key={p.id}>
+                      <td>{new Date(p.dateProcessed).toLocaleString()}</td>
+                      <td style={{ fontWeight: 600 }}>{p.workerName}</td>
+                      <td style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{p.referenceId}</td>
+                      <td>{p.totalHours.toFixed(2)} hrs</td>
+                      <td style={{ fontWeight: 700, color: 'var(--accent-secondary)' }}>
+                        MUR {p.amountPaid.toLocaleString()}
+                      </td>
+                      <td>
+                        <span className="badge badge-success">
+                          {p.status.toUpperCase()}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                  {payments.length === 0 && (
+                    <tr>
+                      <td colSpan={6} style={{ textAlign: 'center', padding: '2rem' }}>
+                        {t('noPaymentHistory')}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ANNOUNCEMENTS TAB */}
+      {activeTab === 'announcements' && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+          {/* Create Announcement Form */}
+          <form onSubmit={handleAnnouncementSubmit} className="glass-panel" style={{ padding: '2rem', height: 'fit-content' }}>
+            <h3 style={{ fontSize: '1.3rem', marginBottom: '1.5rem' }}>{t('createAnnouncement')}</h3>
+
+            {annSuccessMsg && (
+              <div className="badge badge-success" style={{ width: '100%', padding: '0.6rem 1rem', marginBottom: '1rem', display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                <Check size={16} />
+                {annSuccessMsg}
+              </div>
+            )}
+
+            <div className="form-group">
+              <label>{t('announcementTitle')}</label>
+              <input 
+                type="text" 
+                value={annTitle} 
+                onChange={e => setAnnTitle(e.target.value)} 
+                className="form-input" 
+                placeholder="E.g. Safety Briefing / Shift Changes"
+                required 
+              />
+            </div>
+
+            <div className="form-group">
+              <label>{t('announcementType')}</label>
+              <select 
+                value={annType} 
+                onChange={e => setAnnType(e.target.value as any)} 
+                className="form-input"
+              >
+                <option value="shift">{t('typeShift')}</option>
+                <option value="news">{t('typeNews')}</option>
+                <option value="safety">{t('typeSafety')}</option>
+                <option value="payroll">{t('typePayroll')}</option>
+                <option value="urgent">{t('typeUrgent')}</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>{t('announcementContent')}</label>
+              <textarea 
+                value={annContent} 
+                onChange={e => setAnnContent(e.target.value)} 
+                className="form-input" 
+                rows={5}
+                placeholder="Write message broadcast details..."
+                required 
+              />
+            </div>
+
+            <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '1rem' }}>
+              <Bell size={18} /> {t('publishBtn')}
+            </button>
+          </form>
+
+          {/* Historical Announcements feed */}
+          <div className="glass-panel" style={{ padding: '1.5rem', maxHeight: '550px', overflowY: 'auto' }}>
+            <h3 style={{ fontSize: '1.2rem', marginBottom: '1.25rem' }}>Broadcast History</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {announcements.slice().reverse().map(ann => (
+                <div key={ann.id} style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
+                    <span className="badge badge-info">{ann.type.toUpperCase()}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      <span>{new Date(ann.date).toLocaleString()}</span>
+                      <button
+                        onClick={() => onDeleteAnnouncement(ann.id)}
+                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--accent-danger)', padding: '0.2rem', borderRadius: '4px', display: 'flex', alignItems: 'center' }}
+                        title="Delete announcement"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  </div>
+                  <h4 style={{ fontSize: '0.95rem', fontWeight: 600 }}>{ann.title}</h4>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.25rem', lineHeight: '1.4' }}>
+                    {ann.content}
+                  </p>
+                  <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>By: {ann.sender}</p>
+                </div>
+              ))}
+              {announcements.length === 0 && (
+                <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>{t('noAnnouncements')}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SETTINGS TAB */}
+      {activeTab === 'settings' && (
+        <div className="glass-panel" style={{ padding: '2rem', maxWidth: '650px' }}>
+          <h3 style={{ fontSize: '1.4rem', marginBottom: '1.5rem' }}>{t('companySettings')}</h3>
+
+          {settingsSaved && (
+            <div className="badge badge-success" style={{ width: '100%', padding: '0.6rem 1rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <Check size={16} /> Settings saved successfully.
+            </div>
+          )}
+
+          <div className="form-group">
+            <label>{t('companyName')}</label>
+            <input
+              type="text"
+              value={companyName}
+              onChange={e => {
+                onUpdateCompanyName(e.target.value);
+                setSettingsSaved(false);
+              }}
+              className="form-input"
+              placeholder="E.g. Mauritius Agro Foods Ltd"
+            />
+          </div>
+
+          <div className="form-group" style={{ marginTop: '1.5rem' }}>
+            <label>{t('companyLogo')}</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginTop: '0.5rem' }}>
+              <div style={{ width: '80px', height: '80px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border-color)', overflow: 'hidden' }}>
+                {companyLogo ? (
+                  <img src={companyLogo} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                ) : (
+                  <Upload size={24} style={{ color: 'var(--text-muted)' }} />
+                )}
+              </div>
+              
+              <div style={{ flex: 1 }}>
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  id="logo-upload-input" 
+                  onChange={handleLogoUpload} 
+                  style={{ display: 'none' }} 
+                />
+                <label htmlFor="logo-upload-input" className="btn btn-outline" style={{ display: 'inline-flex', cursor: 'pointer' }}>
+                  <Upload size={16} /> Choose Image Logo
+                </label>
+                <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.4rem' }}>
+                  Upload a PNG/JPG. This logo will automatically format into your Excel and PDF payroll reports.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={() => {
+              setSettingsSaved(true);
+              setTimeout(() => setSettingsSaved(false), 4000);
+            }}
+            className="btn btn-primary"
+            style={{ marginTop: '2rem' }}
+          >
+            <Check size={16} /> Save Settings
+          </button>
+        </div>
+      )}
+
+      {/* WORKER INVITATION PHONE SIMULATOR MODAL */}
+      {inviteModalOpen && inviteTargetWorker && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
+          <div className="glass-panel" style={{ padding: '2rem', display: 'flex', gap: '2rem', maxWidth: '780px', width: '100%', position: 'relative' }}>
+            <button 
+              onClick={() => { setInviteModalOpen(false); setInviteTargetWorker(null); }}
+              style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer' }}
+            >
+              Close
+            </button>
+
+            {/* Invite options left side */}
+            <div style={{ flex: 1 }}>
+              <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>
+                {t('inviteWorker')}: {inviteTargetWorker.name} {inviteTargetWorker.surname}
+              </h3>
+              
+              <div className="form-group">
+                <label>{t('inviteMethod')}</label>
+                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                  <button 
+                    type="button" 
+                    onClick={() => setInviteMethod('sms')} 
+                    className={`btn ${inviteMethod === 'sms' ? 'btn-primary' : 'btn-outline'}`}
+                    style={{ flex: 1, padding: '0.5rem' }}
+                  >
+                    <Smartphone size={16} /> SMS
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => setInviteMethod('whatsapp')} 
+                    className={`btn ${inviteMethod === 'whatsapp' ? 'btn-primary' : 'btn-outline'}`}
+                    style={{ flex: 1, padding: '0.5rem' }}
+                  >
+                    <MessageSquare size={16} /> WhatsApp
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => setInviteMethod('email')} 
+                    className={`btn ${inviteMethod === 'email' ? 'btn-primary' : 'btn-outline'}`}
+                    style={{ flex: 1, padding: '0.5rem' }}
+                  >
+                    <Mail size={16} /> Email
+                  </button>
+                </div>
+              </div>
+
+              <div className="form-group" style={{ marginTop: '1.5rem' }}>
+                <label>Message Content Template</label>
+                <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1rem', borderRadius: '8px', fontSize: '0.8rem', color: 'var(--text-secondary)', fontFamily: 'monospace' }}>
+                  {t('inviteSmsMsg', { 
+                    Name: inviteTargetWorker.name, 
+                    PIN: inviteTargetWorker.pin, 
+                    Password: inviteTargetWorker.password || '1234',
+                    Link: 'https://chronix.mu/join'
+                  })}
+                </div>
+              </div>
+
+              <button 
+                onClick={handleSendInviteSim} 
+                className="btn btn-secondary" 
+                style={{ width: '100%', marginTop: '1rem' }}
+                disabled={inviteSimulated}
+              >
+                <Send size={16} /> {inviteSimulated ? 'Invitation Dispatched...' : t('sendInvite')}
+              </button>
+            </div>
+
+            {/* Simulated Mauritian smartphone display right side */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div className="phone-mockup">
+                <div className="phone-screen">
+                  <div className="phone-header">
+                    <span>9:41 AM</span>
+                    <span>100% 🔋</span>
+                  </div>
+
+                  {/* WhatsApp/SMS chat wrapper */}
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', paddingBottom: '0.5rem' }}>
+                    {inviteSimulated && (
+                      <div 
+                        style={{
+                          backgroundColor: inviteMethod === 'whatsapp' ? '#075e54' : '#1e293b',
+                          padding: '0.75rem',
+                          borderRadius: '12px',
+                          color: '#fff',
+                          fontSize: '0.75rem',
+                          maxWidth: '90%',
+                          alignSelf: 'flex-start',
+                          boxShadow: '0 2px 5px rgba(0,0,0,0.3)',
+                          borderLeft: inviteMethod === 'whatsapp' ? '4px solid #128c7e' : 'none'
+                        }}
+                      >
+                        <p style={{ fontWeight: 'bold', fontSize: '0.65rem', color: '#38bdf8', marginBottom: '0.2rem' }}>
+                          {inviteMethod === 'whatsapp' ? 'Chronix Mauritius' : 'CHRONIX_PRO'}
+                        </p>
+                        <p style={{ lineHeight: '1.3' }}>
+                          {t('inviteSmsMsg', { 
+                            Name: inviteTargetWorker.name, 
+                            PIN: inviteTargetWorker.pin, 
+                            Password: inviteTargetWorker.password || '1234',
+                            Link: 'https://chronix.mu/join'
+                          })}
+                        </p>
+                      </div>
+                    )}
+
+                    {!inviteSimulated && (
+                      <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.75rem', margin: 'auto' }}>
+                        Waiting to send invitation...
+                      </div>
+                    )}
+                  </div>
+
+                  <div style={{ height: '3px', width: '120px', background: '#fff', borderRadius: '2px', alignSelf: 'center', marginBottom: '4px' }} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+}
