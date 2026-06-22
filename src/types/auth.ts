@@ -17,3 +17,15 @@ export interface AuthSession {
   workerId?: string;
   expiresAt: string;
 }
+
+export interface InviteCode {
+  id: string;
+  code: string;
+  targetRole: 'supervisor' | 'worker';
+  createdBy: string;
+  createdByName: string;
+  used: boolean;
+  usedByName?: string;
+  createdAt: string;
+  expiresAt: string;
+}

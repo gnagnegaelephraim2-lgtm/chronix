@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import type { Worker, ClockLog } from '../types';
+import type { InviteCode } from '../types/auth';
 import type { TFunction } from '../data/translations';
-import { Users, CheckSquare, Square, Check, LogIn, LogOut, Search, AlertTriangle, Key } from 'lucide-react';
+import { getInviteCodes, generateInviteCode, revokeInviteCode } from '../utils/authUtils';
+import { Users, CheckSquare, Square, Check, LogIn, LogOut, Search, AlertTriangle, Key, Plus, Copy, RefreshCw, Trash } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface SupervisorPortalProps {
@@ -12,10 +14,13 @@ interface SupervisorPortalProps {
     actionType: 'clock_in' | 'clock_out'
   ) => { success: boolean; count: number; error?: string };
   onUpdateWorker: (worker: Worker) => void;
+  currentUserId: string;
+  currentUserName: string;
   t: TFunction;
 }
 
-export default function SupervisorPortal({ workers, logs, onBulkClockAction, onUpdateWorker, t }: SupervisorPortalProps) {
+export default function SupervisorPortal({ workers, logs, onBulkClockAction, onUpdateWorker, currentUserId, currentUserName, t }: SupervisorPortalProps) {
+  const [activeTab, setActiveTab] = useState<'crew' | 'access-codes'>('crew');
   const [selectedDept, setSelectedDept] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedWorkerIds, setSelectedWorkerIds] = useState<string[]>([]);
@@ -24,6 +29,28 @@ export default function SupervisorPortal({ workers, logs, onBulkClockAction, onU
 
   // PIN editing states
   const [editingWorkerForPin, setEditingWorkerForPin] = useState<Worker | null>(null);
+
+  // Invite codes
+  const [inviteCodes, setInviteCodes] = useState<InviteCode[]>(() => getInviteCodes());
+  const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
+
+  const refreshCodes = () => setInviteCodes(getInviteCodes());
+
+  const handleGenerateWorkerCode = () => {
+    generateInviteCode('worker', currentUserId, currentUserName);
+    refreshCodes();
+  };
+
+  const handleRevokeCode = (id: string) => {
+    revokeInviteCode(id);
+    refreshCodes();
+  };
+
+  const handleCopyCode = (code: InviteCode) => {
+    navigator.clipboard.writeText(code.code);
+    setCopiedCodeId(code.id);
+    setTimeout(() => setCopiedCodeId(null), 2000);
+  };
   const [newPinValue, setNewPinValue] = useState<string>('');
 
   // Departments list for filtering
@@ -95,7 +122,7 @@ export default function SupervisorPortal({ workers, logs, onBulkClockAction, onU
 
   return (
     <div style={{ padding: '1rem', maxWidth: '1100px', margin: '0 auto' }}>
-      <header style={{ marginBottom: '2rem' }}>
+      <header style={{ marginBottom: '1.25rem' }}>
         <h2 style={{ fontSize: '1.8rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Users size={28} style={{ color: 'var(--accent-primary)' }} />
           {t('supervisorPortal')}
@@ -103,7 +130,80 @@ export default function SupervisorPortal({ workers, logs, onBulkClockAction, onU
         <p style={{ color: 'var(--text-secondary)', marginTop: '0.25rem' }}>{t('supervisorSelectCrew')}</p>
       </header>
 
-      {notificationMsg && (
+      {/* Tab nav */}
+      <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem', marginBottom: '1.5rem' }}>
+        <button onClick={() => setActiveTab('crew')} className={`btn ${activeTab === 'crew' ? 'btn-primary' : 'btn-outline'}`} style={{ padding: '0.45rem 1.1rem', borderRadius: '8px', fontSize: '0.85rem' }}>
+          <Users size={15} /> Crew Management
+        </button>
+        <button onClick={() => { setActiveTab('access-codes'); refreshCodes(); }} className={`btn ${activeTab === 'access-codes' ? 'btn-primary' : 'btn-outline'}`} style={{ padding: '0.45rem 1.1rem', borderRadius: '8px', fontSize: '0.85rem' }}>
+          <Key size={15} /> Access Codes
+        </button>
+      </div>
+
+      {/* ACCESS CODES TAB */}
+      {activeTab === 'access-codes' && (
+        <div style={{ maxWidth: '750px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+            <div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Worker Registration Codes</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.82rem', marginTop: '0.2rem' }}>
+                Generate one-time codes for your employees to self-register. Valid 7 days, single use.
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: '0.6rem' }}>
+              <button onClick={refreshCodes} className="btn btn-outline" style={{ padding: '0.5rem 0.9rem', borderRadius: '8px' }}>
+                <RefreshCw size={15} />
+              </button>
+              <button onClick={handleGenerateWorkerCode} className="btn btn-primary" style={{ padding: '0.5rem 1.1rem', borderRadius: '8px' }}>
+                <Plus size={15} /> Generate Code
+              </button>
+            </div>
+          </div>
+
+          {inviteCodes.filter(c => c.targetRole === 'worker' && c.createdBy === currentUserId).length === 0 ? (
+            <div className="glass-panel" style={{ padding: '2.5rem', textAlign: 'center' }}>
+              <Key size={32} style={{ color: 'var(--text-muted)', marginBottom: '0.75rem' }} />
+              <p style={{ color: 'var(--text-secondary)' }}>No worker codes generated yet.</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.78rem', marginTop: '0.25rem' }}>Click "Generate Code" and share it with your team members.</p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
+              {inviteCodes.filter(c => c.targetRole === 'worker' && c.createdBy === currentUserId).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map(code => {
+                const isExpired = new Date(code.expiresAt).getTime() < Date.now();
+                return (
+                  <div key={code.id} className="glass-panel" style={{ padding: '0.9rem 1.1rem', display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', opacity: code.used || isExpired ? 0.55 : 1 }}>
+                    <code style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '0.15rem', fontFamily: 'monospace', color: code.used ? 'var(--text-muted)' : 'var(--text-primary)', minWidth: '100px' }}>
+                      {code.code}
+                    </code>
+                    <div style={{ flex: 1, minWidth: '120px' }}>
+                      <div style={{ fontSize: '0.73rem', color: 'var(--text-secondary)' }}>
+                        Created {new Date(code.createdAt).toLocaleDateString()} · Expires {new Date(code.expiresAt).toLocaleDateString()}
+                      </div>
+                      {code.used && <div style={{ fontSize: '0.7rem', color: 'var(--accent-secondary)', marginTop: '0.1rem' }}>Registered: {code.usedByName}</div>}
+                    </div>
+                    <span className={`badge ${code.used ? 'badge-info' : isExpired ? 'badge-danger' : 'badge-success'}`} style={{ fontSize: '0.68rem' }}>
+                      {code.used ? 'Used' : isExpired ? 'Expired' : 'Active'}
+                    </span>
+                    {!code.used && !isExpired && (
+                      <button onClick={() => handleCopyCode(code)} className="btn btn-outline" style={{ padding: '0.3rem 0.65rem', borderRadius: '7px', color: copiedCodeId === code.id ? 'var(--accent-secondary)' : undefined }}>
+                        {copiedCodeId === code.id ? <Check size={14} /> : <Copy size={14} />}
+                      </button>
+                    )}
+                    {!code.used && (
+                      <button onClick={() => handleRevokeCode(code.id)} className="btn btn-outline" style={{ padding: '0.3rem 0.65rem', borderRadius: '7px', color: 'var(--accent-danger)', borderColor: 'rgba(239,68,68,0.3)' }}>
+                        <Trash size={14} />
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* CREW MANAGEMENT TAB */}
+      {activeTab === 'crew' && notificationMsg && (
         <div
           className={`badge ${isError ? 'badge-danger' : 'badge-success'}`}
           style={{ width: '100%', padding: '0.8rem 1.5rem', marginBottom: '1.5rem', fontSize: '0.95rem', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
@@ -113,6 +213,7 @@ export default function SupervisorPortal({ workers, logs, onBulkClockAction, onU
         </div>
       )}
 
+      {activeTab === 'crew' && <div>
       {/* Control panel card */}
       <div className="glass-panel" style={{ padding: '1.5rem', marginBottom: '1.5rem', display: 'flex', flexWrap: 'wrap', gap: '1.25rem', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', gap: '1rem', flex: 1, minWidth: '300px' }}>
@@ -267,6 +368,8 @@ export default function SupervisorPortal({ workers, logs, onBulkClockAction, onU
       </div>
 
       {/* Change PIN Modal */}
+      </div>}{/* end activeTab === 'crew' */}
+
       {editingWorkerForPin && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
           <div className="glass-panel" style={{ padding: '2rem', maxWidth: '400px', width: '100%', position: 'relative' }}>

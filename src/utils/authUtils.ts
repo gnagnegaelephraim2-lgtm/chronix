@@ -1,4 +1,4 @@
-import type { AuthUser, AuthSession } from '../types/auth';
+import type { AuthUser, AuthSession, InviteCode } from '../types/auth';
 
 const USERS_KEY = 'chronix_auth_users';
 const SESSION_KEY = 'chronix_auth_session';
@@ -122,13 +122,25 @@ export async function registerUser(
   email: string,
   password: string,
   role: AuthUser['role'],
-  workerId?: string
+  workerId?: string,
+  inviteCode?: string
 ): Promise<{ success: boolean; error?: string }> {
   const users = getStoredUsers();
   if (users.find(u => u.email.toLowerCase() === email.trim().toLowerCase()))
     return { success: false, error: 'An account with this email already exists.' };
   if (password.length < 8)
     return { success: false, error: 'Password must be at least 8 characters.' };
+
+  // Supervisor and worker registrations require a valid invite code
+  if (role === 'supervisor' || role === 'worker') {
+    if (!inviteCode?.trim())
+      return { success: false, error: `A ${role} invite code is required to register.` };
+    const codeResult = validateInviteCode(inviteCode.trim().toUpperCase(), role);
+    if (!codeResult.valid)
+      return { success: false, error: codeResult.error };
+    // Consume the code after all validations pass
+    consumeInviteCode(codeResult.invite!.id, name.trim());
+  }
 
   const salt = generateSalt();
   const passwordHash = await hashPassword(password, salt);
@@ -154,4 +166,80 @@ export function getAllUsers(): AuthUser[] {
 
 export function deleteAuthUser(id: string): void {
   saveUsers(getStoredUsers().filter(u => u.id !== id));
+}
+
+// ── Invite codes ──────────────────────────────────────────────────────────────
+
+const CODES_KEY = 'chronix_invite_codes';
+const CODE_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+function makeCodeString(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const bytes = crypto.getRandomValues(new Uint8Array(8));
+  const raw = Array.from(bytes).map(b => chars[b % chars.length]).join('');
+  return raw.slice(0, 4) + '-' + raw.slice(4);
+}
+
+export function getInviteCodes(): InviteCode[] {
+  try { return JSON.parse(localStorage.getItem(CODES_KEY) || '[]'); }
+  catch { return []; }
+}
+
+function saveInviteCodes(codes: InviteCode[]): void {
+  localStorage.setItem(CODES_KEY, JSON.stringify(codes));
+}
+
+export function generateInviteCode(
+  targetRole: 'supervisor' | 'worker',
+  createdBy: string,
+  createdByName: string
+): InviteCode {
+  const code: InviteCode = {
+    id: 'ic-' + Date.now() + '-' + Math.random().toString(36).substring(2, 5),
+    code: makeCodeString(),
+    targetRole,
+    createdBy,
+    createdByName,
+    used: false,
+    createdAt: new Date().toISOString(),
+    expiresAt: new Date(Date.now() + CODE_TTL).toISOString(),
+  };
+  saveInviteCodes([...getInviteCodes(), code]);
+  return code;
+}
+
+export function validateInviteCode(
+  code: string,
+  targetRole: string
+): { valid: boolean; error?: string; invite?: InviteCode } {
+  const all = getInviteCodes();
+  const invite = all.find(c => c.code === code);
+  if (!invite) return { valid: false, error: 'Invalid invite code.' };
+  if (invite.used) return { valid: false, error: 'This invite code has already been used.' };
+  if (new Date(invite.expiresAt).getTime() < Date.now())
+    return { valid: false, error: 'This invite code has expired.' };
+  if (invite.targetRole !== targetRole)
+    return { valid: false, error: `This code is for a ${invite.targetRole} account, not ${targetRole}.` };
+  return { valid: true, invite };
+}
+
+function consumeInviteCode(id: string, usedByName: string): void {
+  saveInviteCodes(
+    getInviteCodes().map(c => c.id === id ? { ...c, used: true, usedByName } : c)
+  );
+}
+
+export function revokeInviteCode(id: string): void {
+  saveInviteCodes(getInviteCodes().filter(c => c.id !== id));
+}
+
+export function validateAndConsumeInviteCode(
+  code: string,
+  targetRole: 'supervisor' | 'worker',
+  usedByName: string
+): { valid: boolean; error?: string } {
+  const result = validateInviteCode(code, targetRole);
+  if (!result.valid) return { valid: false, error: result.error };
+  consumeInviteCode(result.invite!.id, usedByName);
+  return { valid: true };
 }

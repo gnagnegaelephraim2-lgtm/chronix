@@ -1,24 +1,30 @@
 import React, { useState } from 'react';
 import type { Worker, ClockLog, Announcement, PaymentHistory } from '../types';
+import type { InviteCode } from '../types/auth';
 import type { TFunction } from '../data/translations';
-import { 
-  Users, 
-  DollarSign, 
-  Bell, 
-  Settings, 
-  TrendingUp, 
-  FileText, 
-  Clock, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Check, 
+import { getInviteCodes, generateInviteCode, revokeInviteCode } from '../utils/authUtils';
+import {
+  Users,
+  DollarSign,
+  Bell,
+  Settings,
+  TrendingUp,
+  FileText,
+  Clock,
+  Plus,
+  Edit,
+  Trash2,
+  Check,
   AlertTriangle,
   Smartphone,
   Send,
   Upload,
   Mail,
-  MessageSquare
+  MessageSquare,
+  Key,
+  Copy,
+  RefreshCw,
+  Trash
 } from 'lucide-react';
 import { exportPayrollToPdf, exportPayrollToExcel } from '../utils/reportGenerator';
 
@@ -37,6 +43,8 @@ interface AdminPortalProps {
   onAddAnnouncement: (ann: Omit<Announcement, 'id' | 'date'>) => void;
   onDeleteAnnouncement: (id: string) => void;
   onProcessPayment: (workerId: string, hours: number, rate: number) => { success: boolean; error?: string };
+  currentUserId: string;
+  currentUserName: string;
   t: TFunction;
 }
 
@@ -55,11 +63,35 @@ export default function AdminPortal({
   onAddAnnouncement,
   onDeleteAnnouncement,
   onProcessPayment,
+  currentUserId,
+  currentUserName,
   t
 }: AdminPortalProps) {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'workers' | 'payroll' | 'announcements' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'workers' | 'payroll' | 'announcements' | 'settings' | 'access-codes'>('dashboard');
 
   // Edit / Add Worker Form states
+  // Invite codes state
+  const [inviteCodes, setInviteCodes] = useState<InviteCode[]>(() => getInviteCodes());
+  const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
+
+  const refreshCodes = () => setInviteCodes(getInviteCodes());
+
+  const handleGenerateSupervisorCode = () => {
+    generateInviteCode('supervisor', currentUserId, currentUserName);
+    refreshCodes();
+  };
+
+  const handleRevokeCode = (id: string) => {
+    revokeInviteCode(id);
+    refreshCodes();
+  };
+
+  const handleCopyCode = (code: InviteCode) => {
+    navigator.clipboard.writeText(code.code);
+    setCopiedCodeId(code.id);
+    setTimeout(() => setCopiedCodeId(null), 2000);
+  };
+
   const [isEditingWorker, setIsEditingWorker] = useState<boolean>(false);
   const [editingWorkerId, setEditingWorkerId] = useState<string | null>(null);
   const [workerForm, setWorkerForm] = useState({
@@ -302,6 +334,9 @@ export default function AdminPortal({
         </button>
         <button onClick={() => setActiveTab('settings')} className={`btn ${activeTab === 'settings' ? 'btn-primary' : 'btn-outline'}`} style={{ padding: '0.5rem 1.2rem', borderRadius: '8px' }}>
           <Settings size={16} /> {t('companySettings')}
+        </button>
+        <button onClick={() => { setActiveTab('access-codes'); refreshCodes(); }} className={`btn ${activeTab === 'access-codes' ? 'btn-primary' : 'btn-outline'}`} style={{ padding: '0.5rem 1.2rem', borderRadius: '8px' }}>
+          <Key size={16} /> Access Codes
         </button>
       </div>
 
@@ -1043,6 +1078,70 @@ export default function AdminPortal({
           >
             <Check size={16} /> Save Settings
           </button>
+        </div>
+      )}
+
+      {/* ACCESS CODES TAB */}
+      {activeTab === 'access-codes' && (
+        <div style={{ maxWidth: '800px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+            <div>
+              <h3 style={{ fontSize: '1.4rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Key size={22} style={{ color: 'var(--accent-primary)' }} /> Supervisor Access Codes
+              </h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '0.25rem' }}>
+                Generate one-time codes for supervisors to self-register. Each code expires in 7 days and can only be used once.
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: '0.6rem' }}>
+              <button onClick={() => refreshCodes()} className="btn btn-outline" style={{ padding: '0.5rem 0.9rem', borderRadius: '8px' }}>
+                <RefreshCw size={15} />
+              </button>
+              <button onClick={handleGenerateSupervisorCode} className="btn btn-primary" style={{ padding: '0.5rem 1.2rem', borderRadius: '8px' }}>
+                <Plus size={16} /> Generate Code
+              </button>
+            </div>
+          </div>
+
+          {inviteCodes.filter(c => c.targetRole === 'supervisor').length === 0 ? (
+            <div className="glass-panel" style={{ padding: '2.5rem', textAlign: 'center' }}>
+              <Key size={32} style={{ color: 'var(--text-muted)', marginBottom: '0.75rem' }} />
+              <p style={{ color: 'var(--text-secondary)' }}>No supervisor codes generated yet.</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '0.25rem' }}>Click "Generate Code" to create one and share it with your supervisors.</p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {inviteCodes.filter(c => c.targetRole === 'supervisor').sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map(code => {
+                const isExpired = new Date(code.expiresAt).getTime() < Date.now();
+                return (
+                  <div key={code.id} className="glass-panel" style={{ padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', opacity: code.used || isExpired ? 0.6 : 1 }}>
+                    <code style={{ fontSize: '1.3rem', fontWeight: 800, letterSpacing: '0.15rem', fontFamily: 'monospace', color: code.used ? 'var(--text-muted)' : 'var(--text-primary)', minWidth: '110px' }}>
+                      {code.code}
+                    </code>
+                    <div style={{ flex: 1, minWidth: '120px' }}>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                        Created {new Date(code.createdAt).toLocaleDateString()} · Expires {new Date(code.expiresAt).toLocaleDateString()}
+                      </div>
+                      {code.used && <div style={{ fontSize: '0.72rem', color: 'var(--accent-secondary)', marginTop: '0.15rem' }}>Used by: {code.usedByName}</div>}
+                    </div>
+                    <span className={`badge ${code.used ? 'badge-info' : isExpired ? 'badge-danger' : 'badge-success'}`} style={{ fontSize: '0.7rem' }}>
+                      {code.used ? 'Used' : isExpired ? 'Expired' : 'Active'}
+                    </span>
+                    {!code.used && !isExpired && (
+                      <button onClick={() => handleCopyCode(code)} className="btn btn-outline" style={{ padding: '0.35rem 0.7rem', borderRadius: '7px', color: copiedCodeId === code.id ? 'var(--accent-secondary)' : undefined }}>
+                        {copiedCodeId === code.id ? <Check size={15} /> : <Copy size={15} />}
+                      </button>
+                    )}
+                    {!code.used && (
+                      <button onClick={() => handleRevokeCode(code.id)} className="btn btn-outline" style={{ padding: '0.35rem 0.7rem', borderRadius: '7px', color: 'var(--accent-danger)', borderColor: 'rgba(239,68,68,0.3)' }}>
+                        <Trash size={15} />
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 

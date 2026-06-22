@@ -652,6 +652,8 @@ export default function App() {
             onAddAnnouncement={handleAddAnnouncement}
             onDeleteAnnouncement={handleDeleteAnnouncement}
             onProcessPayment={handleProcessPayment}
+            currentUserId={currentSession.userId}
+            currentUserName={currentSession.userName}
             t={t}
           />
         )}
@@ -684,6 +686,8 @@ export default function App() {
             logs={logs}
             onBulkClockAction={handleBulkClock}
             onUpdateWorker={handleUpdateWorker}
+            currentUserId={currentSession.userId}
+            currentUserName={currentSession.userName}
             t={t}
           />
         )}
