@@ -258,7 +258,7 @@ export default function KioskPortal({ workers, onClockAction, t }: KioskPortalPr
         </div>
       </header>
 
-      <div style={{ display: 'grid', gridTemplateColumns: selectedWorker ? '1fr' : '1fr 340px', gap: '2rem' }}>
+      <div className={selectedWorker ? "" : "responsive-grid-main-sidebar"} style={selectedWorker ? { display: 'grid', gridTemplateColumns: '1fr' } : undefined}>
         
         {/* Main interactive workflow */}
         {selectedWorker ? (

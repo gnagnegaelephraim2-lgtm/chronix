@@ -219,7 +219,7 @@ export default function WorkerPortal({ worker, logs, announcements, payments, on
 
       {/* Tab Contents */}
       {activeTab === 'clock' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '2rem' }}>
+        <div className="responsive-grid-main-sidebar">
           
           {/* Main Console */}
           <div className="glass-panel" style={{ padding: '2.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '380px' }}>
@@ -496,7 +496,7 @@ export default function WorkerPortal({ worker, logs, announcements, payments, on
       )}
 
       {activeTab === 'help' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '2rem' }}>
+        <div className="responsive-grid-main-sidebar">
           
           {/* Interactive Chat Console (Simulated WhatsApp UI) */}
           <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '480px' }}>

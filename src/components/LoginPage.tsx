@@ -334,7 +334,7 @@ export default function LoginPage({
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', background: 'var(--bg-primary)', position: 'relative', overflow: 'hidden' }}>
+    <div className="login-container">
       {/* Ambient glows */}
       <div style={{ position: 'absolute', top: '-250px', left: '-250px', width: '700px', height: '700px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.10) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
       <div style={{ position: 'absolute', bottom: '-200px', right: '-200px', width: '600px', height: '600px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(16,185,129,0.08) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
@@ -350,17 +350,7 @@ export default function LoginPage({
       </div>
 
       {/* ── LEFT PANEL: Brand ── */}
-      <div className="login-left-panel" style={{
-        flex: '0 0 42%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        padding: '3rem 3.5rem',
-        borderRight: '1px solid var(--border-color)',
-        background: 'var(--bg-secondary)',
-        position: 'relative',
-        zIndex: 1,
-      }}>
+      <div className="login-left-panel">
         {/* Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2.5rem' }}>
           <div style={{ width: '50px', height: '50px', borderRadius: '12px', overflow: 'hidden', border: '2px solid var(--accent-primary)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff' }}>
@@ -398,7 +388,7 @@ export default function LoginPage({
       </div>
 
       {/* ── RIGHT PANEL: Form ── */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', position: 'relative', zIndex: 1, overflowY: 'auto' }}>
+      <div className="login-right-panel">
         <div style={{ width: '100%', maxWidth: '440px', padding: '1rem 0' }}>
 
           {/* Tab switcher */}

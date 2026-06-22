@@ -20,6 +20,7 @@ import {
   UserCheck2,
   LogOut,
   ShieldCheck,
+  Menu,
 } from 'lucide-react';
 
 // Pre-seeded logo data URL (sleek stylized emblem base64)
@@ -139,6 +140,7 @@ export default function App() {
   // Portals: 'selector' | 'admin' | 'worker' | 'kiosk' | 'supervisor'
   const [portal, setPortal] = useState<'selector' | 'admin' | 'worker' | 'kiosk' | 'supervisor'>('selector');
   const [selectedWorkerForView, setSelectedWorkerForView] = useState<Worker | null>(null);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState<boolean>(false);
 
   // Auth session
   const [currentSession, setCurrentSession] = useState<AuthSession | null>(null);
@@ -494,7 +496,7 @@ export default function App() {
 
   const navBtn = (label: string, icon: React.ReactNode, target: typeof portal) => (
     <button
-      onClick={() => setPortal(target)}
+      onClick={() => { setPortal(target); setMobileSidebarOpen(false); }}
       className="btn btn-outline"
       style={{
         justifyContent: 'flex-start',
@@ -511,8 +513,32 @@ export default function App() {
   return (
     <div className="app-container">
 
+      {/* Mobile Drawer Backdrop */}
+      {mobileSidebarOpen && (
+        <div className="sidebar-backdrop" onClick={() => setMobileSidebarOpen(false)} />
+      )}
+
+      {/* Mobile Top Header */}
+      <div className="mobile-top-header">
+        <button 
+          onClick={() => setMobileSidebarOpen(true)}
+          style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '0.5rem' }}
+        >
+          <Menu size={22} />
+        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div style={{ width: '28px', height: '28px', borderRadius: '6px', overflow: 'hidden', border: '1px solid var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <img src={companyLogo} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+          </div>
+          <span style={{ fontSize: '0.9rem', fontWeight: 800, letterSpacing: '0.5px' }}>CHRONIX</span>
+        </div>
+        <span className={`badge ${isAdmin ? 'badge-info' : isSupervisor ? 'badge-warning' : 'badge-success'}`} style={{ fontSize: '0.55rem', padding: '0.15rem 0.45rem', textTransform: 'uppercase' }}>
+          {currentSession.role}
+        </span>
+      </div>
+
       {/* ── Sidebar ── */}
-      <aside className="sidebar">
+      <aside className={`sidebar ${mobileSidebarOpen ? 'mobile-open' : ''}`}>
         <div>
           {/* Logo */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
@@ -573,7 +599,7 @@ export default function App() {
                 {workers.filter(w => w.status === 'active').slice(0, 4).map(w => (
                   <button
                     key={w.id}
-                    onClick={() => { setSelectedWorkerForView(w); setPortal('worker'); }}
+                    onClick={() => { setSelectedWorkerForView(w); setPortal('worker'); setMobileSidebarOpen(false); }}
                     className="btn btn-outline"
                     style={{
                       justifyContent: 'flex-start',

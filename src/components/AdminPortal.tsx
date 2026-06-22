@@ -74,7 +74,6 @@ export default function AdminPortal({
   // Worker credentials modal
   const [credentialsWorker, setCredentialsWorker] = useState<Worker | null>(null);
   const [credPinVisible, setCredPinVisible] = useState(false);
-  const [credPwdVisible, setCredPwdVisible] = useState(false);
   const [credCopied, setCredCopied] = useState<'pin' | 'pwd' | null>(null);
 
   const copyCredential = (val: string, type: 'pin' | 'pwd') => {
@@ -438,7 +437,7 @@ export default function AdminPortal({
           </div>
 
           {/* Activity Logs & Permit Details feed */}
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem' }}>
+          <div className="responsive-grid-2-1">
             <div className="glass-panel" style={{ padding: '1.5rem' }}>
               <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>{t('recentActivity')}</h3>
               
@@ -801,7 +800,7 @@ export default function AdminPortal({
                                 <button onClick={() => startEditWorker(w)} className="btn btn-outline" style={{ padding: '0.4rem', borderRadius: '6px' }} title="Edit worker">
                                   <Edit size={14} />
                                 </button>
-                                <button onClick={() => { setCredentialsWorker(w); setCredPinVisible(false); setCredPwdVisible(false); }} className="btn btn-outline" style={{ padding: '0.4rem', borderRadius: '6px', color: 'var(--accent-primary)' }} title="View credentials">
+                                 <button onClick={() => { setCredentialsWorker(w); setCredPinVisible(false); }} className="btn btn-outline" style={{ padding: '0.4rem', borderRadius: '6px', color: 'var(--accent-primary)' }} title="View credentials">
                                   <Key size={14} />
                                 </button>
                                 <button onClick={() => triggerInvite(w)} className="btn btn-outline" style={{ padding: '0.4rem', borderRadius: '6px', color: 'var(--accent-secondary)' }} title="Send Invite">
@@ -979,7 +978,7 @@ export default function AdminPortal({
 
       {/* ANNOUNCEMENTS TAB */}
       {activeTab === 'announcements' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+        <div className="responsive-grid-1-1">
           {/* Create Announcement Form */}
           <form onSubmit={handleAnnouncementSubmit} className="glass-panel" style={{ padding: '2rem', height: 'fit-content' }}>
             <h3 style={{ fontSize: '1.3rem', marginBottom: '1.5rem' }}>{t('createAnnouncement')}</h3>
@@ -1252,7 +1251,7 @@ export default function AdminPortal({
       {/* WORKER INVITATION PHONE SIMULATOR MODAL */}
       {inviteModalOpen && inviteTargetWorker && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
-          <div className="glass-panel" style={{ padding: '2rem', display: 'flex', gap: '2rem', maxWidth: '780px', width: '100%', position: 'relative' }}>
+          <div className="glass-panel responsive-flex-modal" style={{ padding: '2rem', maxWidth: '780px', width: '100%', position: 'relative' }}>
             <button 
               onClick={() => { setInviteModalOpen(false); setInviteTargetWorker(null); }}
               style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer' }}

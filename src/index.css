@@ -148,24 +148,145 @@ h1, h2, h3, h4, h5, h6 {
   max-width: 1600px;
 }
 
-/* Responsive sidebar */
+/* Responsive adjustments and utilities */
+
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  background: var(--bg-primary);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-left-panel {
+  flex: 0 0 42%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 3rem 3.5rem;
+  border-right: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  position: relative;
+  z-index: 1;
+}
+
+.login-right-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  z-index: 1;
+  overflow-y: auto;
+}
+
+.responsive-grid-2-1 {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+}
+
+.responsive-grid-1-1 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.responsive-grid-main-sidebar {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 2rem;
+}
+
+.responsive-flex-modal {
+  display: flex;
+  gap: 2rem;
+}
+
+.mobile-top-header {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 99;
+}
+
+/* Responsive sidebar & grid layout overrides */
 @media (max-width: 1024px) {
   .app-container {
     flex-direction: column;
   }
-  .sidebar {
-    width: 100%;
-    height: auto;
-    position: relative;
-    padding: 1.5rem;
-    flex-direction: row;
-    align-items: center;
-    border-right: none;
-    border-bottom: 1px solid var(--border-color);
+
+  .mobile-top-header {
+    display: flex;
   }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 290px;
+    height: 100vh;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 10px 0 40px rgba(0, 0, 0, 0.55);
+    z-index: 1000;
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-color);
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 999;
+  }
+
   .main-content {
     margin-left: 0;
-    padding: 1.5rem;
+    padding: 1.5rem 1.25rem;
+  }
+
+  .login-left-panel {
+    display: none;
+  }
+
+  .responsive-grid-2-1,
+  .responsive-grid-1-1,
+  .responsive-grid-main-sidebar {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .responsive-flex-modal {
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding: 1rem 0.75rem;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pin-grid {
+    gap: 0.6rem;
   }
 }
 
