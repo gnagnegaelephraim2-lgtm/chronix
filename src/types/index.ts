@@ -20,6 +20,8 @@ export interface Worker {
   avatar?: string;
   status: 'active' | 'inactive';
   permitDetails: PermitDetails;
+  isSupervisor?: boolean;
+  supervisorCode?: string;
 }
 
 export interface ClockLog {

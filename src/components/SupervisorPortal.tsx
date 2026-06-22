@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { Worker, ClockLog } from '../types';
 import type { TFunction } from '../data/translations';
-import { Users, CheckSquare, Square, Check, LogIn, LogOut, Search, AlertTriangle } from 'lucide-react';
+import { Users, CheckSquare, Square, Check, LogIn, LogOut, Search, AlertTriangle, Key } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface SupervisorPortalProps {
@@ -11,15 +11,20 @@ interface SupervisorPortalProps {
     workerIds: string[], 
     actionType: 'clock_in' | 'clock_out'
   ) => { success: boolean; count: number; error?: string };
+  onUpdateWorker: (worker: Worker) => void;
   t: TFunction;
 }
 
-export default function SupervisorPortal({ workers, logs, onBulkClockAction, t }: SupervisorPortalProps) {
+export default function SupervisorPortal({ workers, logs, onBulkClockAction, onUpdateWorker, t }: SupervisorPortalProps) {
   const [selectedDept, setSelectedDept] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedWorkerIds, setSelectedWorkerIds] = useState<string[]>([]);
   const [notificationMsg, setNotificationMsg] = useState<string>('');
   const [isError, setIsError] = useState<boolean>(false);
+
+  // PIN editing states
+  const [editingWorkerForPin, setEditingWorkerForPin] = useState<Worker | null>(null);
+  const [newPinValue, setNewPinValue] = useState<string>('');
 
   // Departments list for filtering
   const departments = ['all', ...Array.from(new Set(workers.map(w => w.department))).filter(Boolean)];
@@ -222,10 +227,34 @@ export default function SupervisorPortal({ workers, logs, onBulkClockAction, t }
                 </div>
               </div>
 
-              {/* Status Badge */}
-              <span className={`badge ${clockStatus === 'in' ? 'badge-success' : 'badge-danger'}`} style={{ fontSize: '0.7rem' }}>
-                {clockStatus === 'in' ? 'Clocked In' : 'Clocked Out'}
-              </span>
+              {/* Status Badge & PIN management */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
+                <span className={`badge ${clockStatus === 'in' ? 'badge-success' : 'badge-danger'}`} style={{ fontSize: '0.7rem' }}>
+                  {clockStatus === 'in' ? 'Clocked In' : 'Clocked Out'}
+                </span>
+                <div 
+                  onClick={(e) => {
+                    e.stopPropagation(); // prevent card selection toggle
+                    setEditingWorkerForPin(w);
+                    setNewPinValue(w.pin || '');
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.3rem',
+                    background: 'rgba(255,255,255,0.06)',
+                    padding: '0.2rem 0.5rem',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    fontSize: '0.75rem',
+                    cursor: 'pointer'
+                  }}
+                  title="Assign/Change Employee PIN Code"
+                >
+                  <Key size={12} style={{ color: 'var(--accent-secondary)' }} />
+                  <span style={{ fontWeight: 600, fontFamily: 'monospace' }}>PIN: {w.pin || 'None'}</span>
+                </div>
+              </div>
             </div>
           );
         })}
@@ -236,6 +265,67 @@ export default function SupervisorPortal({ workers, logs, onBulkClockAction, t }
           </div>
         )}
       </div>
+
+      {/* Change PIN Modal */}
+      {editingWorkerForPin && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
+          <div className="glass-panel" style={{ padding: '2rem', maxWidth: '400px', width: '100%', position: 'relative' }}>
+            <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>
+              Assign Employee PIN Code
+            </h3>
+            <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: '1.25rem' }}>
+              Assign or change the secure Kiosk & Portal PIN for <strong>{editingWorkerForPin.name} {editingWorkerForPin.surname}</strong>.
+            </p>
+
+            <div className="form-group">
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.4rem' }}>
+                Employee PIN Code (4-6 digits)
+              </label>
+              <input 
+                type="text"
+                pattern="[0-9]*"
+                inputMode="numeric"
+                maxLength={6}
+                value={newPinValue} 
+                onChange={e => setNewPinValue(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                className="form-input" 
+                style={{ textAlign: 'center', fontSize: '1.25rem', letterSpacing: '0.5rem', fontWeight: 'bold' }}
+                placeholder="1234"
+                required
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1.75rem' }}>
+              <button 
+                type="button" 
+                onClick={() => setEditingWorkerForPin(null)} 
+                className="btn btn-outline"
+                style={{ flex: 1 }}
+              >
+                Cancel
+              </button>
+              <button 
+                type="button" 
+                onClick={() => {
+                  if (!/^\d{4,6}$/.test(newPinValue)) {
+                    alert("PIN must be between 4 and 6 digits.");
+                    return;
+                  }
+                  onUpdateWorker({
+                    ...editingWorkerForPin,
+                    pin: newPinValue
+                  });
+                  setEditingWorkerForPin(null);
+                }} 
+                className="btn btn-primary"
+                style={{ flex: 1 }}
+              >
+                Save PIN
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

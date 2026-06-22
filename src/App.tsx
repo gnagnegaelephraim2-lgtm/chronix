@@ -3,7 +3,7 @@ import type { Worker, ClockLog, Announcement, PaymentHistory } from './types';
 import type { AuthSession } from './types/auth';
 import type { Language } from './data/translations';
 import { getT } from './data/translations';
-import { createDefaultUsers, getSession, clearSession } from './utils/authUtils';
+import { clearSession } from './utils/authUtils';
 import AdminPortal from './components/AdminPortal';
 import WorkerPortal from './components/WorkerPortal';
 import KioskPortal from './components/KioskPortal';
@@ -180,28 +180,57 @@ export default function App() {
       localStorage.setItem('chronix_logs', JSON.stringify(mockLogs));
     }
 
-    if (storedAnnouncements) setAnnouncements(JSON.parse(storedAnnouncements));
-    else {
+    if (storedAnnouncements) {
+      setAnnouncements(JSON.parse(storedAnnouncements));
+    } else {
       setAnnouncements(MOCK_ANNOUNCEMENTS);
       localStorage.setItem('chronix_announcements', JSON.stringify(MOCK_ANNOUNCEMENTS));
     }
 
     if (storedPayments) setPayments(JSON.parse(storedPayments));
     if (storedCompanyName) setCompanyName(storedCompanyName);
-    if (storedCompanyLogo) setCompanyLogo(storedCompanyLogo);
     if (storedLang) setLang(storedLang as Language);
 
-    // Auth: ensure default accounts exist, then restore session
-    createDefaultUsers().then(() => {
-      const session = getSession();
-      if (session) {
-        setCurrentSession(session);
-        if (session.role === 'admin') setPortal('admin');
-        else if (session.role === 'supervisor') setPortal('supervisor');
-        // Worker: resolved in the effect below once workers are in state
+    // Load logo or fetch from public/logo.png and cache it as base64
+    const loadLogo = async () => {
+      if (storedCompanyLogo) {
+        setCompanyLogo(storedCompanyLogo);
+      } else {
+        try {
+          const response = await fetch('/logo.png');
+          const blob = await response.blob();
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const base64data = reader.result as string;
+            setCompanyLogo(base64data);
+            localStorage.setItem('chronix_company_logo', base64data);
+          };
+          reader.readAsDataURL(blob);
+        } catch (e) {
+          console.error("Failed to load /logo.png", e);
+          setCompanyLogo(DEFAULT_LOGO);
+        }
       }
-      setIsInitializing(false);
-    });
+    };
+    loadLogo();
+
+    // Restoring session
+    try {
+      const rawSession = localStorage.getItem('chronix_auth_session');
+      if (rawSession) {
+        const s: AuthSession = JSON.parse(rawSession);
+        if (new Date(s.expiresAt).getTime() > Date.now()) {
+          setCurrentSession(s);
+          if (s.role === 'admin') setPortal('admin');
+          else if (s.role === 'supervisor') setPortal('supervisor');
+        } else {
+          localStorage.removeItem('chronix_auth_session');
+        }
+      }
+    } catch (err) {
+      console.error("Failed to load session", err);
+    }
+    setIsInitializing(false);
   }, []);
 
   // Resolve worker session after workers are loaded
@@ -654,6 +683,7 @@ export default function App() {
             workers={workers}
             logs={logs}
             onBulkClockAction={handleBulkClock}
+            onUpdateWorker={handleUpdateWorker}
             t={t}
           />
         )}

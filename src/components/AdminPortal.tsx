@@ -73,6 +73,8 @@ export default function AdminPortal({
     pin: '',
     password: '',
     status: 'active' as 'active' | 'inactive',
+    isSupervisor: false,
+    supervisorCode: '',
     permitDetails: {
       workPermitExpiry: '',
       entryPermitDetails: '',
@@ -201,6 +203,8 @@ export default function AdminPortal({
       pin: w.pin,
       password: w.password || '',
       status: w.status,
+      isSupervisor: w.isSupervisor || false,
+      supervisorCode: w.supervisorCode || '',
       permitDetails: {
         workPermitExpiry: w.permitDetails?.workPermitExpiry || '',
         entryPermitDetails: w.permitDetails?.entryPermitDetails || '',
@@ -224,6 +228,8 @@ export default function AdminPortal({
       pin: Math.floor(1000 + Math.random() * 9000).toString(),
       password: Math.random().toString(36).substring(2, 10),
       status: 'active',
+      isSupervisor: false,
+      supervisorCode: '',
       permitDetails: {
         workPermitExpiry: '',
         entryPermitDetails: '',
@@ -596,6 +602,36 @@ export default function AdminPortal({
                       <option value="inactive">Inactive</option>
                     </select>
                   </div>
+
+                  <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1.25rem', marginBottom: '1rem' }}>
+                    <input 
+                      type="checkbox" 
+                      id="isSupervisorCheckbox"
+                      checked={workerForm.isSupervisor} 
+                      onChange={e => setWorkerForm({...workerForm, isSupervisor: e.target.checked})} 
+                      style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                    />
+                    <label htmlFor="isSupervisorCheckbox" style={{ marginBottom: 0, cursor: 'pointer', fontWeight: 600 }}>
+                      Appoint as Site Supervisor
+                    </label>
+                  </div>
+
+                  {workerForm.isSupervisor && (
+                    <div className="form-group">
+                      <label>Supervisor Access Code</label>
+                      <input 
+                        type="text" 
+                        value={workerForm.supervisorCode} 
+                        onChange={e => setWorkerForm({...workerForm, supervisorCode: e.target.value})} 
+                        className="form-input" 
+                        placeholder="e.g. SUP-9921"
+                        required={workerForm.isSupervisor}
+                      />
+                      <p style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+                        This code will be used by the supervisor to log in to the Supervisor Hub.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -645,7 +681,19 @@ export default function AdminPortal({
 
                       return (
                         <tr key={w.id}>
-                          <td style={{ fontWeight: 600 }}>{w.name} {w.surname}</td>
+                          <td style={{ fontWeight: 600 }}>
+                            <div>{w.name} {w.surname}</div>
+                            {w.isSupervisor && (
+                              <div style={{ marginTop: '0.2rem', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                                <span className="badge badge-warning" style={{ fontSize: '0.58rem', padding: '0.1rem 0.35rem', textTransform: 'uppercase' }}>
+                                  Supervisor
+                                </span>
+                                <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+                                  Code: {w.supervisorCode}
+                                </span>
+                              </div>
+                            )}
+                          </td>
                           <td>{w.passportOrNcid}</td>
                           <td>MUR {w.hourlySalary}/hr</td>
                           <td>{w.department}</td>
