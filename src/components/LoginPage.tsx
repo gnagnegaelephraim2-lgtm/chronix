@@ -65,9 +65,14 @@ export default function LoginPage({
 
   // Sync default/active company name
   useEffect(() => {
-    const savedName = localStorage.getItem('chronix_company_name') || companyName || 'Mauritius Sugar Cane Corp';
-    setCompName(savedName);
-  }, [companyName]);
+    // Only pre-fill company name on the sign-in forms, not on signup
+    if (directorMode === 'signin') {
+      const savedName = localStorage.getItem('chronix_company_name') || companyName || '';
+      setCompName(savedName);
+    } else {
+      setCompName('');
+    }
+  }, [directorMode, companyName]);
 
   const handleTabChange = (tab: 'director' | 'supervisor' | 'worker') => {
     setActiveTab(tab);
@@ -558,6 +563,13 @@ export default function LoginPage({
                   required
                 />
               </div>
+
+              {directorMode === 'signup' && localStorage.getItem('chronix_director_code') && (
+                <div style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: '8px', padding: '0.65rem 0.85rem', fontSize: '0.75rem', color: '#fbbf24', display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
+                  <AlertTriangle size={14} style={{ flexShrink: 0, marginTop: '0.1rem' }} />
+                  <span>A company account already exists on this device. Registering again will overwrite it. <button type="button" onClick={() => { setDirectorMode('signin'); setError(''); }} style={{ background: 'none', border: 'none', color: '#fbbf24', textDecoration: 'underline', cursor: 'pointer', padding: 0, fontSize: 'inherit' }}>Sign in instead</button></span>
+                </div>
+              )}
 
               {directorMode === 'signup' && (
                 <div>

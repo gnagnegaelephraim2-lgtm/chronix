@@ -24,7 +24,9 @@ import {
   Key,
   Copy,
   RefreshCw,
-  Trash
+  Trash,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { exportPayrollToPdf, exportPayrollToExcel } from '../utils/reportGenerator';
 
@@ -69,7 +71,30 @@ export default function AdminPortal({
 }: AdminPortalProps) {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'workers' | 'payroll' | 'announcements' | 'settings' | 'access-codes'>('dashboard');
 
-  // Edit / Add Worker Form states
+  // Worker credentials modal
+  const [credentialsWorker, setCredentialsWorker] = useState<Worker | null>(null);
+  const [credPinVisible, setCredPinVisible] = useState(false);
+  const [credPwdVisible, setCredPwdVisible] = useState(false);
+  const [credCopied, setCredCopied] = useState<'pin' | 'pwd' | null>(null);
+
+  const copyCredential = (val: string, type: 'pin' | 'pwd') => {
+    navigator.clipboard.writeText(val);
+    setCredCopied(type);
+    setTimeout(() => setCredCopied(null), 2000);
+  };
+
+  // Payroll date range filter
+  const [reportStart, setReportStart] = useState('');
+  const [reportEnd, setReportEnd] = useState('');
+
+  const filteredLogs = logs.filter(l => {
+    if (!reportStart && !reportEnd) return true;
+    const d = new Date(l.clockIn).getTime();
+    const s = reportStart ? new Date(reportStart).getTime() : -Infinity;
+    const e = reportEnd ? new Date(reportEnd + 'T23:59:59').getTime() : Infinity;
+    return d >= s && d <= e;
+  });
+
   // Invite codes state
   const [inviteCodes, setInviteCodes] = useState<InviteCode[]>(() => getInviteCodes());
   const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
@@ -140,6 +165,12 @@ export default function AdminPortal({
   // Calculation helpers
   const getWorkerTotalHours = (workerId: string) => {
     return logs
+      .filter(log => log.workerId === workerId && log.clockOut)
+      .reduce((sum, log) => sum + (log.totalHours || 0), 0);
+  };
+
+  const getFilteredHours = (workerId: string) => {
+    return filteredLogs
       .filter(log => log.workerId === workerId && log.clockOut)
       .reduce((sum, log) => sum + (log.totalHours || 0), 0);
   };
@@ -767,8 +798,11 @@ export default function AdminPortal({
                               </div>
                             ) : (
                               <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                <button onClick={() => startEditWorker(w)} className="btn btn-outline" style={{ padding: '0.4rem', borderRadius: '6px' }}>
+                                <button onClick={() => startEditWorker(w)} className="btn btn-outline" style={{ padding: '0.4rem', borderRadius: '6px' }} title="Edit worker">
                                   <Edit size={14} />
+                                </button>
+                                <button onClick={() => { setCredentialsWorker(w); setCredPinVisible(false); setCredPwdVisible(false); }} className="btn btn-outline" style={{ padding: '0.4rem', borderRadius: '6px', color: 'var(--accent-primary)' }} title="View credentials">
+                                  <Key size={14} />
                                 </button>
                                 <button onClick={() => triggerInvite(w)} className="btn btn-outline" style={{ padding: '0.4rem', borderRadius: '6px', color: 'var(--accent-secondary)' }} title="Send Invite">
                                   <Send size={14} />
@@ -802,25 +836,43 @@ export default function AdminPortal({
             </div>
           )}
 
-          {/* Export & Actions section */}
-          <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-            <div>
-              <h3 style={{ fontSize: '1.3rem' }}>{t('payroll')} Calculations</h3>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '0.2rem' }}>
-                {t('payrollFormula')}
-              </p>
+          {/* Date range filter + Export */}
+          <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem' }}>
+            <div style={{ flex: 1, minWidth: '260px' }}>
+              <h3 style={{ fontSize: '1.3rem', marginBottom: '0.25rem' }}>{t('payroll')} Calculations</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '1rem' }}>{t('payrollFormula')}</p>
+              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.3rem', textTransform: 'uppercase', letterSpacing: '0.4px' }}>From</label>
+                  <input type="date" value={reportStart} onChange={e => setReportStart(e.target.value)} className="form-input" style={{ padding: '0.45rem 0.75rem', fontSize: '0.85rem', width: 'auto' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.3rem', textTransform: 'uppercase', letterSpacing: '0.4px' }}>To</label>
+                  <input type="date" value={reportEnd} onChange={e => setReportEnd(e.target.value)} className="form-input" style={{ padding: '0.45rem 0.75rem', fontSize: '0.85rem', width: 'auto' }} />
+                </div>
+                {(reportStart || reportEnd) && (
+                  <button onClick={() => { setReportStart(''); setReportEnd(''); }} className="btn btn-outline" style={{ padding: '0.45rem 0.75rem', fontSize: '0.78rem', borderRadius: '8px', alignSelf: 'flex-end' }}>
+                    Clear Filter
+                  </button>
+                )}
+              </div>
+              {(reportStart || reportEnd) && (
+                <p style={{ fontSize: '0.72rem', color: 'var(--accent-secondary)', marginTop: '0.5rem' }}>
+                  Showing {filteredLogs.length} log{filteredLogs.length !== 1 ? 's' : ''} in selected range
+                </p>
+              )}
             </div>
-            
-            <div style={{ display: 'flex', gap: '1rem' }}>
-              <button 
-                onClick={() => exportPayrollToExcel(workers, logs, companyName)}
+
+            <div style={{ display: 'flex', gap: '1rem', alignSelf: 'flex-end' }}>
+              <button
+                onClick={() => exportPayrollToExcel(workers, filteredLogs, companyName)}
                 className="btn btn-outline"
               >
                 <FileText size={18} /> {t('exportExcel')}
               </button>
-              
-              <button 
-                onClick={() => exportPayrollToPdf(workers, logs, companyName, companyLogo, t)}
+
+              <button
+                onClick={() => exportPayrollToPdf(workers, filteredLogs, companyName, companyLogo, t)}
                 className="btn btn-primary"
               >
                 <FileText size={18} /> {t('exportPdf')}
@@ -845,15 +897,18 @@ export default function AdminPortal({
                 </thead>
                 <tbody>
                   {workers.map(w => {
-                    const unpaidHours = getUnpaidHours(w.id);
-                    const grossDue = unpaidHours * w.hourlySalary;
+                    const hoursInRange = (reportStart || reportEnd) ? getFilteredHours(w.id) : getUnpaidHours(w.id);
+                    const grossDue = hoursInRange * w.hourlySalary;
 
                     return (
                       <tr key={w.id}>
                         <td style={{ fontWeight: 600 }}>{w.name} {w.surname}</td>
                         <td>{w.passportOrNcid}</td>
                         <td>MUR {w.hourlySalary}/hr</td>
-                        <td>{unpaidHours.toFixed(2)} hrs</td>
+                        <td>
+                          {hoursInRange.toFixed(2)} hrs
+                          {(reportStart || reportEnd) && <span style={{ fontSize: '0.65rem', color: 'var(--accent-primary)', marginLeft: '0.3rem' }}>(filtered)</span>}
+                        </td>
                         <td style={{ fontWeight: 700, color: grossDue > 0 ? 'var(--accent-warning)' : 'var(--text-muted)' }}>
                           MUR {grossDue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </td>
@@ -1142,6 +1197,55 @@ export default function AdminPortal({
               })}
             </div>
           )}
+        </div>
+      )}
+
+      {/* WORKER CREDENTIALS MODAL */}
+      {credentialsWorker && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.72)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
+          <div className="glass-panel" style={{ padding: '2rem', maxWidth: '420px', width: '100%', position: 'relative' }}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '0.25rem' }}>Login Credentials</h3>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
+              Share these with <strong>{credentialsWorker.name} {credentialsWorker.surname}</strong> so they can sign in.
+            </p>
+
+            {/* PIN row */}
+            <div style={{ background: 'rgba(0,0,0,0.2)', borderRadius: '10px', padding: '1rem', marginBottom: '0.75rem' }}>
+              <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '0.5rem' }}>Employee PIN (for login &amp; kiosk)</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <code style={{ flex: 1, fontSize: '1.6rem', fontWeight: 900, letterSpacing: '0.4rem', fontFamily: 'monospace', color: 'var(--text-primary)' }}>
+                  {credPinVisible ? credentialsWorker.pin || '—' : '••••'}
+                </code>
+                <button type="button" onClick={() => setCredPinVisible(!credPinVisible)} className="btn btn-outline" style={{ padding: '0.4rem 0.6rem', borderRadius: '7px' }}>
+                  {credPinVisible ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
+                {credentialsWorker.pin && (
+                  <button type="button" onClick={() => copyCredential(credentialsWorker.pin, 'pin')} className="btn btn-outline" style={{ padding: '0.4rem 0.6rem', borderRadius: '7px', color: credCopied === 'pin' ? 'var(--accent-secondary)' : undefined }}>
+                    {credCopied === 'pin' ? <Check size={15} /> : <Copy size={15} />}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Supervisor code (if supervisor) */}
+            {credentialsWorker.isSupervisor && credentialsWorker.supervisorCode && (
+              <div style={{ background: 'rgba(99,102,241,0.08)', borderRadius: '10px', padding: '1rem', marginBottom: '0.75rem', border: '1px solid rgba(99,102,241,0.2)' }}>
+                <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '0.5rem' }}>Supervisor Access Code (for Supervisor portal)</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                  <code style={{ flex: 1, fontSize: '1.3rem', fontWeight: 800, letterSpacing: '0.15rem', fontFamily: 'monospace' }}>{credentialsWorker.supervisorCode}</code>
+                  <button type="button" onClick={() => copyCredential(credentialsWorker.supervisorCode!, 'pwd')} className="btn btn-outline" style={{ padding: '0.4rem 0.6rem', borderRadius: '7px', color: credCopied === 'pwd' ? 'var(--accent-secondary)' : undefined }}>
+                    {credCopied === 'pwd' ? <Check size={15} /> : <Copy size={15} />}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '1.25rem', lineHeight: 1.5 }}>
+              On the Login page, {credentialsWorker.isSupervisor ? 'the supervisor selects the Supervisor tab and enters their Access Code.' : 'the employee selects the Employee tab and enters their PIN on the numpad.'}
+            </p>
+
+            <button onClick={() => setCredentialsWorker(null)} className="btn btn-outline" style={{ width: '100%' }}>Close</button>
+          </div>
         </div>
       )}
 
