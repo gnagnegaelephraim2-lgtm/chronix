@@ -73,7 +73,11 @@ export function GoogleLoginModal({ onClose }: GoogleLoginModalProps) {
     setSigningInUser(emp);
     setTimeout(() => {
       const targetView: SessionView = ['admin', 'hr', 'supervisor'].includes(emp.role) ? 'admin' : 'employee';
-      loginAs(targetView, emp.id);
+      // Pass the whole object rather than emp.id — for a freshly-created
+      // employee (see handleCustomEmailSubmit) the store update from
+      // addEmployee hasn't flowed back into this context's state yet, so an
+      // id lookup would still miss it.
+      loginAs(targetView, emp);
       navigate(targetView === 'admin' ? '/admin' : '/employee');
     }, 1200);
   };

@@ -1,5 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import type { Session, SessionView } from '../types/session';
+import type { Employee } from '../types';
 import { useStore } from '../hooks/useStore';
 import { SessionContext, type SessionContextValue } from './sessionContextCore';
 
@@ -22,16 +23,19 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const value = useMemo<SessionContextValue>(
     () => ({
       session,
-      loginAs: (view: SessionView, employeeId?: string) => {
-        let employee;
-        if (employeeId) {
-          employee = state.employees.find((e) => e.id === employeeId);
+      loginAs: (view: SessionView, employeeOrId?: string | Employee) => {
+        let employee: Employee | undefined;
+        if (typeof employeeOrId === 'string') {
+          employee = state.employees.find((e) => e.id === employeeOrId);
+        } else if (employeeOrId) {
+          employee = employeeOrId;
         }
         if (!employee) {
           const wantedRole = view === 'admin' ? 'admin' : 'employee';
           employee = state.employees.find((e) => e.role === wantedRole) ?? state.employees[0];
         }
-        const finalView = employeeId
+        if (!employee) return; // nothing to log in as — store has no employees and no override was given
+        const finalView = employeeOrId
           ? (['admin', 'hr', 'supervisor'].includes(employee.role) ? 'admin' : 'employee')
           : view;
         const next: Session = { view: finalView, employeeId: employee.id, loggedInAt: new Date().toISOString() };

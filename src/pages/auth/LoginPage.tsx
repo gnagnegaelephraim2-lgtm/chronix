@@ -5,6 +5,7 @@ import { useSession } from '../../hooks/useSession';
 import { useStore, useStoreActions } from '../../hooks/useStore';
 import { useLanguage } from '../../hooks/useLanguage';
 import type { SessionView } from '../../types/session';
+import type { Employee } from '../../types';
 import logo from '../../assets/chronix_logo.png';
 import { GoogleLoginModal } from './GoogleLoginModal';
 import { useTheme } from '../../hooks/useTheme';
@@ -36,7 +37,7 @@ export function LoginPage() {
 
     const [firstName, ...rest] = fullName.trim().split(/\s+/);
     const lastName = rest.join(' ') || '—';
-    const newId = addEmployee({
+    const newEmployeeData: Omit<Employee, 'id'> = {
       firstName: firstName || 'New',
       lastName,
       avatarUrl: `https://i.pravatar.cc/150?u=${encodeURIComponent(trimmedEmail || fullName)}`,
@@ -49,8 +50,12 @@ export function LoginPage() {
       workLocationId: state.settings.workLocations[0]?.id ?? '',
       allowedCheckInMethods: ['gps_face'],
       leaveBalance: 14,
-    });
-    loginAs(view, newId);
+    };
+    const newId = addEmployee(newEmployeeData);
+    // Pass the full object, not just the id — the store update from
+    // addEmployee hasn't flowed back into this context yet, so looking the
+    // id up in state.employees right now would still see the old (missing) list.
+    loginAs(view, { ...newEmployeeData, id: newId });
     navigate(view === 'admin' ? '/admin' : '/employee');
   }
 
