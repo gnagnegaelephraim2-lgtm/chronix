@@ -10,8 +10,8 @@ export function LiveClockPreview() {
         <img src={logo} alt="Chronix" style={{ height: 18 }} />
         <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>Time Clock</span>
       </div>
-      <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Hello, John</div>
-      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>ID: EMP-1042</div>
+      <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Welcome back</div>
+      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>Ready to clock in</div>
       <div style={{ fontSize: '2rem', fontWeight: 700 }}>{now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true })}</div>
       <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
         {now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}

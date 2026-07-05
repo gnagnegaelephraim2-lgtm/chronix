@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, UserPlus, ArrowLeft, X } from 'lucide-react';
-import { useStore } from '../../hooks/useStore';
+import { useStore, useStoreActions } from '../../hooks/useStore';
 import { useSession } from '../../hooks/useSession';
 import { useLanguage } from '../../hooks/useLanguage';
 import type { Employee } from '../../types';
@@ -45,6 +45,7 @@ const googleTranslations = {
 export function GoogleLoginModal({ onClose }: GoogleLoginModalProps) {
   const navigate = useNavigate();
   const { state } = useStore();
+  const { addEmployee } = useStoreActions();
   const { loginAs } = useSession();
   const { lang } = useLanguage();
 
@@ -87,9 +88,47 @@ export function GoogleLoginModal({ onClose }: GoogleLoginModalProps) {
     if (match) {
       setEmailError('');
       handleSelectUser(match);
-    } else {
-      setEmailError(gt.userNotFound);
+      return;
     }
+
+    // No account yet — create one from the email's local-part rather than
+    // dead-ending with "not registered" (there's no seeded directory anymore).
+    const localPart = trimmedEmail.split('@')[0] || 'new.user';
+    const nameParts = localPart.split(/[._-]+/).filter(Boolean).map((p) => p[0].toUpperCase() + p.slice(1));
+    const firstName = nameParts[0] || 'New';
+    const lastName = nameParts.slice(1).join(' ') || '—';
+
+    const newId = addEmployee({
+      firstName,
+      lastName,
+      avatarUrl: `https://i.pravatar.cc/150?u=${encodeURIComponent(trimmedEmail)}`,
+      email: trimmedEmail,
+      phone: '',
+      role: 'employee',
+      department: '',
+      employmentType: 'full_time',
+      joinedAt: new Date().toISOString().slice(0, 10),
+      workLocationId: state.settings.workLocations[0]?.id ?? '',
+      allowedCheckInMethods: ['gps_face'],
+      leaveBalance: 14,
+    });
+
+    setEmailError('');
+    handleSelectUser({
+      id: newId,
+      firstName,
+      lastName,
+      avatarUrl: `https://i.pravatar.cc/150?u=${encodeURIComponent(trimmedEmail)}`,
+      email: trimmedEmail,
+      phone: '',
+      role: 'employee',
+      department: '',
+      employmentType: 'full_time',
+      joinedAt: new Date().toISOString().slice(0, 10),
+      workLocationId: state.settings.workLocations[0]?.id ?? '',
+      allowedCheckInMethods: ['gps_face'],
+      leaveBalance: 14,
+    });
   };
 
   const getRoleColor = (role: Employee['role']) => {

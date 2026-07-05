@@ -35,11 +35,11 @@ export type StoreAction =
   | { type: 'DECIDE_REQUEST'; id: string; decision: 'approved' | 'rejected'; decidedBy: string }
   | { type: 'SUBMIT_REIMBURSEMENT'; payload: Omit<Reimbursement, 'id' | 'status' | 'submittedAt' | 'decidedAt'> }
   | { type: 'DECIDE_REIMBURSEMENT'; id: string; decision: 'approved' | 'rejected' }
-  | { type: 'ADD_EMPLOYEE'; payload: Omit<Employee, 'id'> }
+  | { type: 'ADD_EMPLOYEE'; payload: Employee }
   | { type: 'UPDATE_EMPLOYEE'; payload: Employee }
   | { type: 'UPDATE_SETTINGS'; payload: Partial<BusinessSettings> };
 
-function uid(prefix: string): string {
+export function uid(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
 }
 
@@ -174,10 +174,9 @@ export function reducer(state: StoreState, action: StoreAction): StoreState {
       };
     }
     case 'ADD_EMPLOYEE': {
-      const employee: Employee = { ...action.payload, id: uid('emp') };
       return {
         ...state,
-        employees: [...state.employees, employee],
+        employees: [...state.employees, action.payload],
         settings: { ...state.settings, employeeCount: state.settings.employeeCount + 1 },
       };
     }

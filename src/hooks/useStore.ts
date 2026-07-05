@@ -1,5 +1,6 @@
 import { useContext, useMemo } from 'react';
 import { StoreContext, type StoreContextValue } from '../store/storeContextCore';
+import { uid } from '../store/storeReducer';
 import type { Employee, Reimbursement, Request, BusinessSettings, CheckInMethod } from '../types';
 
 export function useStore(): StoreContextValue {
@@ -23,7 +24,11 @@ export function useStoreActions() {
         dispatch({ type: 'SUBMIT_REIMBURSEMENT', payload }),
       decideReimbursement: (id: string, decision: 'approved' | 'rejected') =>
         dispatch({ type: 'DECIDE_REIMBURSEMENT', id, decision }),
-      addEmployee: (payload: Omit<Employee, 'id'>) => dispatch({ type: 'ADD_EMPLOYEE', payload }),
+      addEmployee: (payload: Omit<Employee, 'id'>): string => {
+        const id = uid('emp');
+        dispatch({ type: 'ADD_EMPLOYEE', payload: { ...payload, id } });
+        return id;
+      },
       updateEmployee: (payload: Employee) => dispatch({ type: 'UPDATE_EMPLOYEE', payload }),
       updateSettings: (payload: Partial<BusinessSettings>) => dispatch({ type: 'UPDATE_SETTINGS', payload }),
     }),

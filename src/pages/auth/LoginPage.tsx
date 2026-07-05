@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSession } from '../../hooks/useSession';
+import { useStore, useStoreActions } from '../../hooks/useStore';
 import { useLanguage } from '../../hooks/useLanguage';
 import type { SessionView } from '../../types/session';
 import logo from '../../assets/chronix_logo.png';
@@ -11,8 +12,11 @@ import { useTheme } from '../../hooks/useTheme';
 export function LoginPage() {
   const { t } = useLanguage();
   const { loginAs } = useSession();
+  const { state } = useStore();
+  const { addEmployee } = useStoreActions();
   const navigate = useNavigate();
   const [view, setView] = useState<SessionView>('admin');
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showGoogleModal, setShowGoogleModal] = useState(false);
@@ -20,7 +24,33 @@ export function LoginPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    loginAs(view);
+
+    const trimmedEmail = email.trim().toLowerCase();
+    const existing = state.employees.find((emp) => emp.email.toLowerCase() === trimmedEmail);
+
+    if (existing) {
+      loginAs(view, existing.id);
+      navigate(existing.role === 'employee' ? '/employee' : '/admin');
+      return;
+    }
+
+    const [firstName, ...rest] = fullName.trim().split(/\s+/);
+    const lastName = rest.join(' ') || '—';
+    const newId = addEmployee({
+      firstName: firstName || 'New',
+      lastName,
+      avatarUrl: `https://i.pravatar.cc/150?u=${encodeURIComponent(trimmedEmail || fullName)}`,
+      email: trimmedEmail,
+      phone: '',
+      role: view === 'admin' ? 'admin' : 'employee',
+      department: '',
+      employmentType: 'full_time',
+      joinedAt: new Date().toISOString().slice(0, 10),
+      workLocationId: state.settings.workLocations[0]?.id ?? '',
+      allowedCheckInMethods: ['gps_face'],
+      leaveBalance: 14,
+    });
+    loginAs(view, newId);
     navigate(view === 'admin' ? '/admin' : '/employee');
   }
 
@@ -88,6 +118,10 @@ export function LoginPage() {
           </div>
 
           <form onSubmit={handleSubmit}>
+            <div className="form-field">
+              <label className="form-label">{t('fullNameLabel')}</label>
+              <input className="form-input" type="text" placeholder={t('fullNamePlaceholder')} value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+            </div>
             <div className="form-field">
               <label className="form-label">{t('emailLabel')}</label>
               <input className="form-input" type="email" placeholder={t('emailPlaceholder')} value={email} onChange={(e) => setEmail(e.target.value)} required />

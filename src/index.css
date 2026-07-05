@@ -1013,11 +1013,129 @@ button, input, textarea, select {
   gap: 1.5rem;
 }
 .features-grid {
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 .pricing-grid {
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  max-width: 900px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-width: 1200px;
+  width: 100%;
+}
+@media (max-width: 1024px) {
+  .features-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .pricing-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 680px) {
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+  .pricing-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Premium Pricing Cards & List */
+.pricing-card--popular {
+  border: 2px solid var(--chronix-amber) !important;
+  box-shadow: 0 8px 30px rgba(243, 174, 44, 0.15) !important;
+  position: relative;
+  transform: scale(1.02);
+}
+.popular-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--chronix-amber);
+  color: var(--chronix-navy);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 6px rgba(243, 174, 44, 0.3);
+}
+.pricing-features-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.pricing-feature-item {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.pricing-feature-item::before {
+  content: "✓";
+  color: var(--success);
+  font-weight: bold;
+}
+.pricing-feature-item.disabled {
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+.pricing-feature-item.disabled::before {
+  content: "✗";
+  color: var(--danger);
+}
+
+/* Accordion Split FAQ Layout */
+.faq-two-column {
+  display: grid;
+  grid-template-columns: 4fr 6fr;
+  gap: 3rem;
+  width: 100%;
+  margin-top: 1.5rem;
+}
+.faq-info-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.25rem;
+}
+.faq-info-badge {
+  background: var(--warning-bg);
+  color: #b7791f;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+.faq-info-cta {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--card-radius);
+  padding: 1.25rem;
+  margin-top: 1rem;
+  box-shadow: var(--card-shadow);
+  width: 100%;
+}
+@media (max-width: 900px) {
+  .faq-two-column {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+/* Card Lift Animation */
+.card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease !important;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(25, 58, 91, 0.06);
+  border-color: rgba(243, 174, 44, 0.4);
 }
 .industries-header {
   display: flex;
