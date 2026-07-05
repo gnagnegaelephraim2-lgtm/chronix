@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Play } from 'lucide-react';
+import { ChevronDown, Play } from 'lucide-react';
 import { useLanguage } from '../../hooks/useLanguage';
 import { LiveClockPreview } from './LiveClockPreview';
 import { DemoVideoModal } from './DemoVideoModal';
@@ -32,6 +32,30 @@ export function Hero() {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [showDemo, setShowDemo] = useState(false);
+  const tiltRef = useRef<HTMLButtonElement>(null);
+
+  function handleTiltMove(e: React.MouseEvent<HTMLButtonElement>) {
+    const el = tiltRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    el.style.setProperty('--tilt-x', `${(-y * 10).toFixed(2)}deg`);
+    el.style.setProperty('--tilt-y', `${(x * 10).toFixed(2)}deg`);
+    el.style.setProperty('--tilt-scale', '1.02');
+  }
+
+  function handleTiltLeave() {
+    const el = tiltRef.current;
+    if (!el) return;
+    el.style.setProperty('--tilt-x', '0deg');
+    el.style.setProperty('--tilt-y', '0deg');
+    el.style.setProperty('--tilt-scale', '1');
+  }
+
+  function scrollToNext() {
+    document.querySelector('#industries')?.scrollIntoView({ behavior: 'smooth' });
+  }
 
   return (
     <header className="hero" id="home">
@@ -63,9 +87,12 @@ export function Hero() {
       </div>
       <div className="hero-visual">
         <button
+          ref={tiltRef}
           type="button"
           className="hero-visual-btn"
           onClick={() => setShowDemo(true)}
+          onMouseMove={handleTiltMove}
+          onMouseLeave={handleTiltLeave}
           aria-label="Watch product demo video"
         >
           <img src={heroImg} alt="" style={{ width: '100%', borderRadius: 16, display: 'block' }} />
@@ -77,6 +104,10 @@ export function Hero() {
           <LiveClockPreview />
         </div>
       </div>
+      <button type="button" className="hero-scroll-cue" onClick={scrollToNext} aria-label="Scroll to explore Chronix">
+        <span>Explore Chronix</span>
+        <ChevronDown size={20} className="hero-scroll-cue-icon" />
+      </button>
       {showDemo && <DemoVideoModal onClose={() => setShowDemo(false)} />}
     </header>
   );

@@ -1335,6 +1335,13 @@ button, input, textarea, select {
 .hero-marquee-row--right {
   animation: marquee-right 55s linear infinite;
 }
+/* Hover anywhere in the hero (not just the marquee, which is pointer-events:
+   none) to gently pause the background — a small "the page notices you"
+   touch. */
+.hero:hover .hero-marquee-row--left,
+.hero:hover .hero-marquee-row--right {
+  animation-play-state: paused;
+}
 @media (prefers-reduced-motion: reduce) {
   .hero-marquee-row--left,
   .hero-marquee-row--right {
@@ -1349,6 +1356,45 @@ button, input, textarea, select {
   }
 }
 
+/* ---------- Hero scroll cue ---------- */
+.hero-scroll-cue {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  padding: 0.5rem;
+}
+.hero-scroll-cue:hover {
+  color: var(--chronix-navy);
+}
+.hero-scroll-cue-icon {
+  animation: hero-scroll-bounce 1.8s ease-in-out infinite;
+}
+@keyframes hero-scroll-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-scroll-cue-icon {
+    animation: none;
+  }
+}
+@media (max-width: 768px) {
+  .hero-scroll-cue {
+    display: none;
+  }
+}
+
 /* ---------- Hero demo button ---------- */
 .hero-visual-btn {
   display: block;
@@ -1359,12 +1405,19 @@ button, input, textarea, select {
   cursor: pointer;
   position: relative;
   border-radius: 16px;
-  transition: var(--transition-smooth);
+  transition: transform 0.15s ease-out, box-shadow 0.2s ease;
+  transform: perspective(800px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) scale(var(--tilt-scale, 1));
+  transform-style: preserve-3d;
 }
 .hero-visual-btn:hover,
 .hero-visual-btn:focus-visible {
-  transform: scale(1.02);
   box-shadow: var(--card-shadow-hover);
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-visual-btn {
+    transform: none !important;
+    transition: none;
+  }
 }
 .hero-play-badge {
   position: absolute;
@@ -1609,5 +1662,96 @@ body.banano-mode .tracker-step--current .tracker-step-dot {
   .footer-bottom {
     padding-right: 120px !important;
   }
+}
+
+/* Industry Details Modal */
+.industry-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(43, 30, 6, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1.5rem;
+  animation: fadeIn 0.25s ease-out;
+}
+.industry-modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.industry-modal-header {
+  padding: 1.5rem 1.75rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-page);
+}
+.industry-modal-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--chronix-navy);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.industry-modal-stat-box {
+  background: var(--warning-bg);
+  border: 1px solid rgba(243, 174, 44, 0.3);
+  padding: 0.85rem 1.25rem;
+  border-radius: 8px;
+  margin-top: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.industry-modal-stat-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.industry-modal-stat-value {
+  font-size: 1.1rem;
+  color: #b7791f;
+  font-weight: 700;
+}
+.industry-modal-body {
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  overflow-y: auto;
+  max-height: 70vh;
+}
+.industry-modal-footer {
+  padding: 1.25rem 1.75rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  background: var(--bg-page);
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scaleIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 

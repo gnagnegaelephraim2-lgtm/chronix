@@ -3,7 +3,14 @@ import { useEffect, useRef } from 'react';
 // Adds a `.is-visible` class the first time the element scrolls into view —
 // index.css pairs `.reveal` (initial hidden state) with `.reveal.is-visible`
 // (the transitioned-in state) so this hook only ever needs to toggle one class.
-export function useScrollReveal<T extends HTMLElement>() {
+//
+// Safety net: a static screenshot/crawler/print of the page never scrolls,
+// so IntersectionObserver legitimately never fires for below-the-fold
+// sections — without a fallback they'd stay invisible forever (still taking
+// up layout space, which reads as "missing content"). The timeout reveals
+// everything a few seconds after mount regardless, which is long enough to
+// not interfere with the fade-in for anyone actually scrolling normally.
+export function useScrollReveal<T extends HTMLElement>(fallbackDelayMs = 2500) {
   const ref = useRef<T | null>(null);
 
   useEffect(() => {
@@ -15,10 +22,17 @@ export function useScrollReveal<T extends HTMLElement>() {
       return;
     }
 
+    let revealed = false;
+    const reveal = () => {
+      if (revealed) return;
+      revealed = true;
+      el.classList.add('is-visible');
+    };
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          el.classList.add('is-visible');
+          reveal();
           observer.unobserve(el);
         }
       },
@@ -26,8 +40,12 @@ export function useScrollReveal<T extends HTMLElement>() {
     );
 
     observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
+    const fallback = window.setTimeout(reveal, fallbackDelayMs);
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(fallback);
+    };
+  }, [fallbackDelayMs]);
 
   return ref;
 }
