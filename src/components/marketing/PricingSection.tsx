@@ -1,12 +1,14 @@
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../hooks/useLanguage';
+import { useScrollReveal } from '../../hooks/useScrollReveal';
 
 export function PricingSection() {
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const revealRef = useScrollReveal<HTMLElement>();
 
   return (
-    <section className="section" id="pricing">
+    <section className="section reveal" id="pricing" ref={revealRef}>
       <h2 className="section-title">{t('pricingTitle')}</h2>
       <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>{t('pricingSubtitle')}</p>
       <div className="pricing-grid">

@@ -1,4 +1,5 @@
 import { useLanguage } from '../../hooks/useLanguage';
+import { useScrollReveal } from '../../hooks/useScrollReveal';
 
 const FAQS = [
   { q: 'Do my employees need to download an app?', a: 'No. Chronix works entirely in the browser, on desktop or mobile, including iOS webviews.' },
@@ -9,8 +10,9 @@ const FAQS = [
 
 export function FAQSection() {
   const { t } = useLanguage();
+  const revealRef = useScrollReveal<HTMLElement>();
   return (
-    <section className="section" id="faq">
+    <section className="section reveal" id="faq" ref={revealRef}>
       <h2 className="section-title">{t('faqTitle')}</h2>
       <div className="faq-list" style={{ maxWidth: 720 }}>
         {FAQS.map((item) => (

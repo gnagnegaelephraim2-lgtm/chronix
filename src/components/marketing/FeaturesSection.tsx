@@ -1,5 +1,6 @@
 import { Clock, CalendarDays, Receipt, BarChart3, MapPin, QrCode } from 'lucide-react';
 import { useLanguage } from '../../hooks/useLanguage';
+import { useScrollReveal } from '../../hooks/useScrollReveal';
 
 const FEATURES = [
   { icon: Clock, title: 'Real-time Attendance', description: 'Track clock-ins and clock-outs as they happen, across every location.' },
@@ -12,8 +13,9 @@ const FEATURES = [
 
 export function FeaturesSection() {
   const { t } = useLanguage();
+  const revealRef = useScrollReveal<HTMLElement>();
   return (
-    <section className="section" id="features">
+    <section className="section reveal" id="features" ref={revealRef}>
       <h2 className="section-title">{t('featuresTitle')}</h2>
       <div className="features-grid">
         {FEATURES.map((f) => (

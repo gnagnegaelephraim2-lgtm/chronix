@@ -1,9 +1,13 @@
+import { useNavigate } from 'react-router-dom';
+import { Mail, MapPin, Phone } from 'lucide-react';
 import { useLanguage } from '../../hooks/useLanguage';
+import { FacebookIcon, InstagramIcon, LinkedinIcon } from '../common/SocialIcons';
 import logo from '../../assets/chronix_logo.png';
 
 const FOOTER_COLUMNS = [
   {
     heading: 'Product',
+    description: 'Everything Chronix does, in one place.',
     links: [
       { label: 'Features', href: '#features' },
       { label: 'Pricing', href: '#pricing' },
@@ -13,16 +17,21 @@ const FOOTER_COLUMNS = [
   },
   {
     heading: 'Industries',
+    description: 'Built for the sectors driving Mauritius forward.',
     links: [
       { label: 'Hospitality', href: '#industries' },
       { label: 'Construction', href: '#industries' },
       { label: 'Retail', href: '#industries' },
       { label: 'Manufacturing', href: '#industries' },
       { label: 'Logistics', href: '#industries' },
+      { label: 'Healthcare', href: '#industries' },
+      { label: 'Education', href: '#industries' },
+      { label: 'Financial Services', href: '#industries' },
     ],
   },
   {
     heading: 'Company',
+    description: 'A Mauritian product, built for Mauritian teams.',
     links: [
       { label: 'About', href: '#' },
       { label: 'Contact', href: '#' },
@@ -30,6 +39,7 @@ const FOOTER_COLUMNS = [
   },
   {
     heading: 'Legal',
+    description: 'The fine print, kept plain and short.',
     links: [
       { label: 'Privacy Policy', href: '#' },
       { label: 'Terms of Service', href: '#' },
@@ -37,26 +47,70 @@ const FOOTER_COLUMNS = [
   },
 ];
 
+const SOCIAL_LINKS = [
+  { icon: FacebookIcon, label: 'Facebook', href: '#' },
+  { icon: LinkedinIcon, label: 'LinkedIn', href: '#' },
+  { icon: InstagramIcon, label: 'Instagram', href: '#' },
+];
+
 export function Footer() {
   const { t } = useLanguage();
+  const navigate = useNavigate();
+
   return (
     <footer className="footer">
-      <div className="footer-grid">
+      <div className="footer-cta">
         <div>
+          <h3 style={{ fontSize: '1.25rem', color: '#fff', marginBottom: '0.35rem' }}>Ready to get started?</h3>
+          <p style={{ fontSize: '0.9rem' }}>Join Mauritian businesses already tracking attendance the smart way.</p>
+        </div>
+        <button className="btn btn-primary-amber" onClick={() => navigate('/login')}>
+          {t('getStartedNow')}
+        </button>
+      </div>
+
+      <div className="footer-grid">
+        <div className="footer-brand">
           <div style={{ background: '#fff', borderRadius: 8, padding: '0.4rem 0.7rem', display: 'inline-flex', marginBottom: '0.75rem' }}>
             <img src={logo} alt="Chronix" style={{ height: 20, display: 'block' }} />
           </div>
-          <p style={{ fontSize: '0.85rem', maxWidth: 320 }}>{t('footerTagline')}</p>
+          <p style={{ fontSize: '0.85rem', maxWidth: 320, marginBottom: '1.1rem' }}>{t('footerTagline')}</p>
+
+          <div className="footer-contact">
+            <div className="footer-contact-row">
+              <MapPin size={15} />
+              <span>Cybercity, Ebène, Mauritius</span>
+            </div>
+            <div className="footer-contact-row">
+              <Mail size={15} />
+              <a href="mailto:hello@chronix.mu">hello@chronix.mu</a>
+            </div>
+            <div className="footer-contact-row">
+              <Phone size={15} />
+              <a href="tel:+23052001234">+230 5200 1234</a>
+            </div>
+          </div>
+
+          <div className="footer-social">
+            {SOCIAL_LINKS.map((social) => (
+              <a key={social.label} href={social.href} aria-label={social.label} className="footer-social-icon">
+                <social.icon size={16} />
+              </a>
+            ))}
+          </div>
         </div>
+
         {FOOTER_COLUMNS.map((column) => (
           <div className="footer-column" key={column.heading}>
             <h4>{column.heading}</h4>
+            <p className="footer-column-desc">{column.description}</p>
             {column.links.map((link) => (
               <a href={link.href} key={link.label}>{link.label}</a>
             ))}
           </div>
         ))}
       </div>
+
       <div className="footer-bottom">
         <p>© {new Date().getFullYear()} Chronix. All rights reserved.</p>
         <p>Made for Mauritian businesses.</p>

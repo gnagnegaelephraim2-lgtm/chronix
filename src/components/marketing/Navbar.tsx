@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../hooks/useLanguage';
 import logo from '../../assets/chronix_logo.png';
@@ -5,9 +6,17 @@ import logo from '../../assets/chronix_logo.png';
 export function Navbar() {
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   return (
-    <nav className="navbar">
+    <nav className={`navbar ${scrolled ? 'navbar--scrolled' : ''}`}>
       <img src={logo} alt="Chronix" style={{ height: 30 }} />
       <div className="navbar-links">
         <a href="#home">{t('navHomeLink')}</a>
