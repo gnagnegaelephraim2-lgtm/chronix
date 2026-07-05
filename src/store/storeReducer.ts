@@ -1,0 +1,212 @@
+import type {
+  Employee,
+  AttendanceRecord,
+  Request,
+  Reimbursement,
+  ActivityEvent,
+  BusinessSettings,
+  CheckInMethod,
+} from '../types';
+import {
+  EMPLOYEES,
+  ATTENDANCE_RECORDS,
+  REQUESTS,
+  REIMBURSEMENTS,
+  ACTIVITY_EVENTS,
+  BUSINESS_SETTINGS,
+} from './mockData';
+import { localDateString } from '../utils/format';
+
+export const STORAGE_KEY = 'chronix_store_v1';
+
+export interface StoreState {
+  employees: Employee[];
+  attendance: AttendanceRecord[];
+  requests: Request[];
+  reimbursements: Reimbursement[];
+  activity: ActivityEvent[];
+  settings: BusinessSettings;
+}
+
+export type StoreAction =
+  | { type: 'CLOCK_IN'; employeeId: string; method: CheckInMethod; workLocationId: string }
+  | { type: 'CLOCK_OUT'; employeeId: string }
+  | { type: 'SUBMIT_REQUEST'; payload: Omit<Request, 'id' | 'status' | 'approvalSteps' | 'submittedAt' | 'decidedAt' | 'decidedBy'> }
+  | { type: 'DECIDE_REQUEST'; id: string; decision: 'approved' | 'rejected'; decidedBy: string }
+  | { type: 'SUBMIT_REIMBURSEMENT'; payload: Omit<Reimbursement, 'id' | 'status' | 'submittedAt' | 'decidedAt'> }
+  | { type: 'DECIDE_REIMBURSEMENT'; id: string; decision: 'approved' | 'rejected' }
+  | { type: 'ADD_EMPLOYEE'; payload: Omit<Employee, 'id'> }
+  | { type: 'UPDATE_EMPLOYEE'; payload: Employee }
+  | { type: 'UPDATE_SETTINGS'; payload: Partial<BusinessSettings> };
+
+function uid(prefix: string): string {
+  return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+}
+
+function nowIso(): string {
+  return new Date().toISOString();
+}
+
+function todayIso(): string {
+  return localDateString();
+}
+
+function isLate(clockInIso: string): boolean {
+  const d = new Date(clockInIso);
+  return d.getHours() > 9 || (d.getHours() === 9 && d.getMinutes() > 15);
+}
+
+export function reducer(state: StoreState, action: StoreAction): StoreState {
+  switch (action.type) {
+    case 'CLOCK_IN': {
+      const at = nowIso();
+      const late = isLate(at);
+      const record: AttendanceRecord = {
+        id: uid('att'),
+        employeeId: action.employeeId,
+        date: todayIso(),
+        clockIn: at,
+        clockOut: null,
+        breakMinutes: 0,
+        hours: null,
+        workLocationId: action.workLocationId,
+        method: action.method,
+        status: late ? 'late' : 'on_time',
+        live: true,
+      };
+      const event: ActivityEvent = {
+        id: uid('act'),
+        employeeId: action.employeeId,
+        kind: late ? 'check_in_late' : 'check_in',
+        at,
+      };
+      return {
+        ...state,
+        attendance: [record, ...state.attendance],
+        activity: [event, ...state.activity],
+      };
+    }
+    case 'CLOCK_OUT': {
+      const at = nowIso();
+      const openRecord = state.attendance.find((r) => r.employeeId === action.employeeId && r.live);
+      if (!openRecord) return state;
+      const hours = (new Date(at).getTime() - new Date(openRecord.clockIn).getTime()) / 3600000 - openRecord.breakMinutes / 60;
+      const event: ActivityEvent = { id: uid('act'), employeeId: action.employeeId, kind: 'check_out', at };
+      return {
+        ...state,
+        attendance: state.attendance.map((r) =>
+          r.id === openRecord.id ? { ...r, clockOut: at, hours: Math.max(0, Math.round(hours * 100) / 100), live: false } : r
+        ),
+        activity: [event, ...state.activity],
+      };
+    }
+    case 'SUBMIT_REQUEST': {
+      const at = nowIso();
+      const id = uid('req');
+      const request: Request = {
+        ...action.payload,
+        id,
+        status: 'pending',
+        approvalSteps: [
+          { step: 'submitted', state: 'done', date: at.slice(0, 10) },
+          { step: 'team_lead', state: 'in_progress', date: null },
+          { step: 'manager', state: 'pending', date: null },
+          { step: 'hr', state: 'pending', date: null },
+        ],
+        submittedAt: at,
+        decidedAt: null,
+        decidedBy: null,
+      };
+      const event: ActivityEvent = { id: uid('act'), employeeId: request.employeeId, kind: 'request_submitted', at };
+      return { ...state, requests: [request, ...state.requests], activity: [event, ...state.activity] };
+    }
+    case 'DECIDE_REQUEST': {
+      const at = nowIso();
+      const target = state.requests.find((r) => r.id === action.id);
+      if (!target) return state;
+      const event: ActivityEvent = {
+        id: uid('act'),
+        employeeId: target.employeeId,
+        kind: action.decision === 'approved' ? 'request_approved' : 'request_rejected',
+        at,
+      };
+      return {
+        ...state,
+        requests: state.requests.map((r) =>
+          r.id === action.id
+            ? {
+                ...r,
+                status: action.decision,
+                decidedAt: at,
+                decidedBy: action.decidedBy,
+                approvalSteps: r.approvalSteps.map((s) => ({ ...s, state: 'done', date: s.date ?? at.slice(0, 10) })),
+              }
+            : r
+        ),
+        activity: [event, ...state.activity],
+      };
+    }
+    case 'SUBMIT_REIMBURSEMENT': {
+      const at = nowIso();
+      const reimbursement: Reimbursement = { ...action.payload, id: uid('reim'), status: 'pending', submittedAt: at, decidedAt: null };
+      const events: ActivityEvent[] = [{ id: uid('act'), employeeId: reimbursement.employeeId, kind: 'request_submitted', at }];
+      if (reimbursement.receiptUrl) {
+        events.push({ id: uid('act'), employeeId: reimbursement.employeeId, kind: 'receipt_uploaded', at });
+      }
+      return { ...state, reimbursements: [reimbursement, ...state.reimbursements], activity: [...events, ...state.activity] };
+    }
+    case 'DECIDE_REIMBURSEMENT': {
+      const at = nowIso();
+      const target = state.reimbursements.find((r) => r.id === action.id);
+      if (!target) return state;
+      const event: ActivityEvent = {
+        id: uid('act'),
+        employeeId: target.employeeId,
+        kind: action.decision === 'approved' ? 'request_approved' : 'request_rejected',
+        at,
+      };
+      return {
+        ...state,
+        reimbursements: state.reimbursements.map((r) =>
+          r.id === action.id ? { ...r, status: action.decision, decidedAt: at } : r
+        ),
+        activity: [event, ...state.activity],
+      };
+    }
+    case 'ADD_EMPLOYEE': {
+      const employee: Employee = { ...action.payload, id: uid('emp') };
+      return {
+        ...state,
+        employees: [...state.employees, employee],
+        settings: { ...state.settings, employeeCount: state.settings.employeeCount + 1 },
+      };
+    }
+    case 'UPDATE_EMPLOYEE': {
+      return { ...state, employees: state.employees.map((e) => (e.id === action.payload.id ? action.payload : e)) };
+    }
+    case 'UPDATE_SETTINGS': {
+      return { ...state, settings: { ...state.settings, ...action.payload } };
+    }
+    default:
+      return state;
+  }
+}
+
+export function loadInitialState(): StoreState {
+  if (typeof window !== 'undefined') {
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (raw) return JSON.parse(raw) as StoreState;
+    } catch {
+      // fall through to seed data
+    }
+  }
+  return {
+    employees: EMPLOYEES,
+    attendance: ATTENDANCE_RECORDS,
+    requests: REQUESTS,
+    reimbursements: REIMBURSEMENTS,
+    activity: ACTIVITY_EVENTS,
+    settings: BUSINESS_SETTINGS,
+  };
+}
