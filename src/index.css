@@ -979,6 +979,8 @@ button, input, textarea, select {
   gap: 3rem;
   padding: 2rem 5% 5rem;
   flex-wrap: wrap;
+  position: relative;
+  overflow: hidden;
 }
 .hero-copy {
   flex: 1;
@@ -1160,6 +1162,183 @@ button, input, textarea, select {
   gap: 0.5rem;
   font-size: 0.78rem;
   opacity: 0.7;
+}
+
+/* ---------- Hero photo marquee ---------- */
+.hero-copy,
+.hero-visual {
+  position: relative;
+  z-index: 1;
+}
+.hero-marquee {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.75rem 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+/* Scrim to keep the headline legible over the photos */
+.hero-marquee::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--bg-page);
+  opacity: 0.8;
+}
+.hero-marquee-row {
+  display: flex;
+  width: max-content;
+}
+.hero-marquee-row img {
+  width: 220px;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-right: 1.25rem;
+  flex-shrink: 0;
+  opacity: 0.3;
+  filter: grayscale(30%) blur(0.5px);
+}
+@keyframes marquee-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes marquee-right {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+.hero-marquee-row--left {
+  animation: marquee-left 55s linear infinite;
+}
+.hero-marquee-row--right {
+  animation: marquee-right 55s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-marquee-row--left,
+  .hero-marquee-row--right {
+    animation-play-state: paused;
+  }
+}
+@media (max-width: 768px) {
+  .hero-marquee-row img {
+    width: 160px;
+    height: 100px;
+    margin-right: 1rem;
+  }
+}
+
+/* ---------- Hero demo button ---------- */
+.hero-visual-btn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  position: relative;
+  border-radius: 16px;
+  transition: var(--transition-smooth);
+}
+.hero-visual-btn:hover,
+.hero-visual-btn:focus-visible {
+  transform: scale(1.02);
+  box-shadow: var(--card-shadow-hover);
+}
+.hero-play-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--chronix-navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--card-shadow-hover);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+.hero-visual-btn:hover .hero-play-badge,
+.hero-visual-btn:focus-visible .hero-play-badge {
+  opacity: 1;
+}
+
+/* ---------- FAQ accordion ---------- */
+.faq-list {
+  gap: 0.75rem;
+}
+.faq-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  transition: var(--transition-smooth);
+}
+.faq-item--open {
+  box-shadow: var(--card-shadow-hover);
+}
+.faq-question {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  width: 100%;
+  padding: 1rem 1.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.faq-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--info-bg);
+  color: var(--info);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.faq-question-text {
+  flex: 1;
+}
+.faq-chevron {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  transition: transform 0.3s ease;
+}
+.faq-item--open .faq-chevron {
+  transform: rotate(180deg);
+}
+.faq-answer-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease;
+}
+.faq-item--open .faq-answer-wrap {
+  grid-template-rows: 1fr;
+}
+.faq-answer-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+.faq-answer {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.55;
+  padding: 0 1.25rem 1.1rem calc(2.15rem + 36px);
 }
 
 @media (max-width: 768px) {
