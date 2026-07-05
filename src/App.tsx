@@ -25,10 +25,12 @@ import { EmployeeSettings } from './pages/employee/Settings';
 import { EmployeeSettingsDetail } from './pages/employee/SettingsDetail';
 
 import { NanaBananoMascot } from './components/common/NanaBananoMascot';
+import { ScrollToTop } from './components/common/ScrollToTop';
 
 function App() {
   return (
     <>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<MarketingHome />} />
         <Route path="/login" element={<LoginPage />} />
