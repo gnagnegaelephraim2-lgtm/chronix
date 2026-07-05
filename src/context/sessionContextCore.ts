@@ -3,7 +3,7 @@ import type { Session, SessionView } from '../types/session';
 
 export interface SessionContextValue {
   session: Session | null;
-  loginAs: (view: SessionView) => void;
+  loginAs: (view: SessionView, employeeId?: string) => void;
   logout: () => void;
 }
 

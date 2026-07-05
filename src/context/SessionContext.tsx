@@ -22,10 +22,19 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const value = useMemo<SessionContextValue>(
     () => ({
       session,
-      loginAs: (view: SessionView) => {
-        const wantedRole = view === 'admin' ? 'admin' : 'employee';
-        const employee = state.employees.find((e) => e.role === wantedRole) ?? state.employees[0];
-        const next: Session = { view, employeeId: employee.id, loggedInAt: new Date().toISOString() };
+      loginAs: (view: SessionView, employeeId?: string) => {
+        let employee;
+        if (employeeId) {
+          employee = state.employees.find((e) => e.id === employeeId);
+        }
+        if (!employee) {
+          const wantedRole = view === 'admin' ? 'admin' : 'employee';
+          employee = state.employees.find((e) => e.role === wantedRole) ?? state.employees[0];
+        }
+        const finalView = employeeId
+          ? (['admin', 'hr', 'supervisor'].includes(employee.role) ? 'admin' : 'employee')
+          : view;
+        const next: Session = { view: finalView, employeeId: employee.id, loggedInAt: new Date().toISOString() };
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
         setSession(next);
       },

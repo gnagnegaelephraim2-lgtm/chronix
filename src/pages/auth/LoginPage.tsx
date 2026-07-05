@@ -5,6 +5,7 @@ import { useSession } from '../../hooks/useSession';
 import { useLanguage } from '../../hooks/useLanguage';
 import type { SessionView } from '../../types/session';
 import logo from '../../assets/chronix_logo.png';
+import { GoogleLoginModal } from './GoogleLoginModal';
 
 export function LoginPage() {
   const { t } = useLanguage();
@@ -13,6 +14,7 @@ export function LoginPage() {
   const [view, setView] = useState<SessionView>('admin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showGoogleModal, setShowGoogleModal] = useState(false);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -77,11 +79,18 @@ export function LoginPage() {
           </form>
 
           <div style={{ textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.82rem', marginBottom: '1rem' }}>{t('orLoginWith')}</div>
-          <button className="btn btn-outline" style={{ width: '100%' }}>
+          <button
+            type="button"
+            className="btn btn-outline"
+            style={{ width: '100%' }}
+            onClick={() => setShowGoogleModal(true)}
+          >
             {t('continueWithGoogle')}
           </button>
         </div>
       </div>
+
+      {showGoogleModal && <GoogleLoginModal onClose={() => setShowGoogleModal(false)} />}
 
       <div className="login-right-panel">
         <div style={{ color: '#fff', textAlign: 'center', maxWidth: 320 }}>
