@@ -6,16 +6,19 @@ import App from './App.tsx'
 import { StoreProvider } from './store/StoreContext'
 import { SessionProvider } from './context/SessionContext'
 import { LanguageProvider } from './context/LanguageContext'
+import { ThemeProvider } from './context/ThemeContext'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <LanguageProvider>
-        <StoreProvider>
-          <SessionProvider>
-            <App />
-          </SessionProvider>
-        </StoreProvider>
+        <ThemeProvider>
+          <StoreProvider>
+            <SessionProvider>
+              <App />
+            </SessionProvider>
+          </StoreProvider>
+        </ThemeProvider>
       </LanguageProvider>
     </BrowserRouter>
   </StrictMode>,

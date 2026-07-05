@@ -6,6 +6,7 @@ import { useLanguage } from '../../hooks/useLanguage';
 import type { SessionView } from '../../types/session';
 import logo from '../../assets/chronix_logo.png';
 import { GoogleLoginModal } from './GoogleLoginModal';
+import { useTheme } from '../../hooks/useTheme';
 
 export function LoginPage() {
   const { t } = useLanguage();
@@ -15,6 +16,7 @@ export function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showGoogleModal, setShowGoogleModal] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -23,7 +25,33 @@ export function LoginPage() {
   }
 
   return (
-    <div className="login-container">
+    <div className="login-container" style={{ position: 'relative' }}>
+      {/* Floating Banano Mode Toggle */}
+      <div style={{ position: 'absolute', top: '20px', right: '20px', zIndex: 10 }}>
+        <button
+          type="button"
+          onClick={toggleTheme}
+          style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border)',
+            borderRadius: '20px',
+            padding: '8px 16px',
+            fontSize: '0.85rem',
+            fontWeight: 600,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            cursor: 'pointer',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            color: 'var(--text-primary)',
+            transition: 'all 0.2s',
+          }}
+        >
+          <span>🍌</span>
+          {theme === 'banano' ? 'Standard Mode' : 'Banano Mode'}
+        </button>
+      </div>
+
       <div className="login-left-panel">
         <div style={{ maxWidth: 380, margin: '0 auto', width: '100%' }}>
           <img src={logo} alt="Chronix" style={{ height: 32, marginBottom: '2rem' }} />

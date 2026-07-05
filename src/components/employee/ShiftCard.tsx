@@ -3,6 +3,7 @@ import { useStoreActions } from '../../hooks/useStore';
 import { useGeolocationCheck } from '../../hooks/useGeolocationCheck';
 import { useLanguage } from '../../hooks/useLanguage';
 import type { Employee, Shift, WorkLocation } from '../../types';
+import { useTheme } from '../../hooks/useTheme';
 
 interface ShiftCardProps {
   employee: Employee;
@@ -15,15 +16,33 @@ export function ShiftCard({ employee, shift, location, isClockedIn }: ShiftCardP
   const { t } = useLanguage();
   const { clockIn, clockOut } = useStoreActions();
   const geo = useGeolocationCheck(location);
+  const { theme } = useTheme();
 
   function handleClockIn() {
     if (!geo.inRange || !location) return;
     clockIn(employee.id, employee.allowedCheckInMethods[0] ?? 'gps_face', location.id);
-    confetti({ particleCount: 60, spread: 65, origin: { y: 0.7 } });
+    if (theme === 'banano') {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.7 },
+        colors: ['#FFE135', '#FFF3A7', '#D4AF37', '#8B5A2B', '#FFFFFF'],
+      });
+    } else {
+      confetti({ particleCount: 60, spread: 65, origin: { y: 0.7 } });
+    }
   }
 
   function handleClockOut() {
     clockOut(employee.id);
+    if (theme === 'banano') {
+      confetti({
+        particleCount: 80,
+        spread: 60,
+        origin: { y: 0.7 },
+        colors: ['#FFE135', '#FFF3A7', '#D4AF37', '#8B5A2B', '#FFFFFF'],
+      });
+    }
   }
 
   return (

@@ -17,6 +17,7 @@ import { useSession } from '../../hooks/useSession';
 import { useStore } from '../../hooks/useStore';
 import { Avatar } from '../common/Avatar';
 import logo from '../../assets/chronix_logo.png';
+import { useTheme } from '../../hooks/useTheme';
 
 interface SidebarProps {
   variant: 'admin' | 'employee';
@@ -28,6 +29,7 @@ export function Sidebar({ variant, mobileOpen, onCloseMobile }: SidebarProps) {
   const { t } = useLanguage();
   const { session, logout } = useSession();
   const { state } = useStore();
+  const { theme, toggleTheme } = useTheme();
   const employee = state.employees.find((e) => e.id === session?.employeeId);
 
   const adminLinks = [
@@ -92,6 +94,10 @@ export function Sidebar({ variant, mobileOpen, onCloseMobile }: SidebarProps) {
               </div>
             </div>
           )}
+          <button className="nav-item" onClick={toggleTheme} style={{ color: theme === 'banano' ? 'var(--chronix-amber)' : 'inherit' }}>
+            <span style={{ fontSize: '16px', display: 'flex', alignItems: 'center', width: '18px', marginRight: '6px' }}>🍌</span>
+            {theme === 'banano' ? 'Banano Mode' : 'Switch to Banano'}
+          </button>
           <button className="nav-item" onClick={logout}>
             <LogOut size={18} />
             {t('logout')}

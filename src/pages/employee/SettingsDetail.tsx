@@ -5,11 +5,13 @@ import { EMPLOYEE_SETTINGS_SECTIONS } from '../../data/settingsSections';
 import { useSession } from '../../hooks/useSession';
 import { useStore } from '../../hooks/useStore';
 import { useLanguage } from '../../hooks/useLanguage';
+import { useTheme } from '../../hooks/useTheme';
 
 export function EmployeeSettingsDetail() {
   const { sectionId } = useParams();
   const navigate = useNavigate();
   const { lang, toggleLang } = useLanguage();
+  const { theme, toggleTheme } = useTheme();
   const { session } = useSession();
   const { state } = useStore();
   const employee = state.employees.find((e) => e.id === session?.employeeId);
@@ -66,6 +68,15 @@ export function EmployeeSettingsDetail() {
               </div>
               <button className="btn btn-outline" onClick={toggleLang}>
                 Switch to {lang === 'en' ? 'Français' : 'English'}
+              </button>
+            </div>
+            <div className="side-panel-row" style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
+              <div className="side-panel-row-main">
+                <div className="side-panel-name">Theme</div>
+                <div className="side-panel-sub">Current: {theme === 'banano' ? 'Nana Banano 🍌' : 'Standard'}</div>
+              </div>
+              <button className="btn btn-outline" onClick={toggleTheme}>
+                Switch to {theme === 'banano' ? 'Standard' : 'Nana Banano 🍌'}
               </button>
             </div>
           </div>

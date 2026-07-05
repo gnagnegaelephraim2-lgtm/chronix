@@ -1086,3 +1086,123 @@ button, input, textarea, select {
     gap: 1.5rem;
   }
 }
+
+/* ---------- Nana Banano Theme ---------- */
+
+body.banano-mode {
+  --chronix-navy:      #5C4008;  /* chocolate brown */
+  --chronix-amber:     #FFD200;  /* banana yellow */
+  --bg-page:           #FFFDF0;  /* banana cream */
+  --bg-card:           #FFFDF7;  /* warm cream card */
+  --border:            #FFEAA7;  /* light yellow border */
+  --text-primary:      #3d2b05;  /* dark brown text */
+  --text-secondary:    #8a713b;  /* medium brown text */
+  
+  /* Use banana emoji cursor to make it completely mindblowing! */
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' style='font-size:16px'><text y='18'>🍌</text></svg>"), auto !important;
+}
+
+/* Specific styling overrides for banano theme elements */
+body.banano-mode .login-right-panel {
+  background: linear-gradient(135deg, #FFD200 0%, #FFAE00 100%) !important;
+  color: #3D2B05 !important;
+}
+
+body.banano-mode .login-right-panel p {
+  color: #5C4008 !important;
+}
+
+body.banano-mode .sidebar {
+  background: #5C4008 !important;
+}
+
+body.banano-mode .sidebar .nav-item {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+body.banano-mode .sidebar .nav-item.active {
+  background: #FFD200 !important;
+  color: #3D2B05 !important;
+}
+
+body.banano-mode .sidebar-logo div {
+  background: #FFD200 !important;
+}
+
+body.banano-mode .btn-primary-navy {
+  background: #5C4008 !important;
+  color: #fff !important;
+}
+
+body.banano-mode .btn-primary-navy:hover {
+  background: #463005 !important;
+}
+
+body.banano-mode .btn-primary-amber {
+  background: #FFD200 !important;
+  color: #3D2B05 !important;
+}
+
+body.banano-mode .btn-primary-amber:hover {
+  background: #e6bd00 !important;
+}
+
+body.banano-mode .banner-card {
+  background: linear-gradient(120deg, #5C4008 0%, #3D2B05 100%) !important;
+}
+
+body.banano-mode .banner-card button.btn-outline {
+  border-color: #FFD200 !important;
+  color: #FFD200 !important;
+}
+
+body.banano-mode .btn-outline {
+  border-color: #FFD200 !important;
+  color: #5C4008 !important;
+}
+
+body.banano-mode .btn-outline:hover {
+  background: #FFFCE0 !important;
+}
+
+body.banano-mode .form-input:focus,
+body.banano-mode .form-textarea:focus,
+body.banano-mode .form-select:focus {
+  border-color: #FFD200 !important;
+  box-shadow: 0 0 0 3px rgba(255, 210, 0, 0.25) !important;
+}
+
+body.banano-mode .tracker-step--done .tracker-step-dot {
+  background: #5C4008 !important;
+}
+
+body.banano-mode .tracker-step--current .tracker-step-dot {
+  background: #FFD200 !important;
+  color: #5C4008 !important;
+}
+
+/* Animations */
+@keyframes nanabanano-float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(4deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+@keyframes nanabanano-wave {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(20deg); }
+}
+
+@keyframes nanabanano-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.nanabanano-arm {
+  animation: nanabanano-wave 1.5s ease-in-out infinite;
+}
+
+.nanabanano-interactive:hover .nanabanano-arm {
+  animation: nanabanano-wave 0.4s ease-in-out infinite;
+}
+
