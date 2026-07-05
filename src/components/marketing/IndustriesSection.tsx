@@ -335,10 +335,32 @@ export function IndustriesSection() {
   const trackRef = useRef<HTMLDivElement>(null);
   
   const [selectedIndustry, setSelectedIndustry] = useState<string | null>(null);
+  const [isHovered, setIsHovered] = useState(false);
 
   const scrollTrack = (direction: -1 | 1) => {
     trackRef.current?.scrollBy({ left: direction * 320, behavior: 'smooth' });
   };
+
+  // Carousel smooth auto-scrolling effect
+  useEffect(() => {
+    if (isHovered || selectedIndustry) return;
+
+    const interval = setInterval(() => {
+      if (trackRef.current) {
+        const track = trackRef.current;
+        const maxScroll = track.scrollWidth - track.clientWidth;
+        
+        // Loop back to start if at the end, otherwise advance by 320px
+        if (track.scrollLeft >= maxScroll - 15) {
+          track.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          track.scrollBy({ left: 320, behavior: 'smooth' });
+        }
+      }
+    }, 3800);
+
+    return () => clearInterval(interval);
+  }, [isHovered, selectedIndustry]);
 
   // Listen to industry search query changes
   useEffect(() => {
@@ -397,7 +419,12 @@ export function IndustriesSection() {
           </button>
         </div>
       </div>
-      <div className="industries-carousel-track" ref={trackRef}>
+      <div 
+        className="industries-carousel-track" 
+        ref={trackRef}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
         {INDUSTRIES.map((industry, index) => (
           <div 
             className="industry-card-compact" 
