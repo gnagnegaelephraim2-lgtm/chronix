@@ -5,6 +5,10 @@ import { EmployeeLayout } from './routes/EmployeeLayout';
 
 import { MarketingHome } from './pages/marketing/MarketingHome';
 import { LoginPage } from './pages/auth/LoginPage';
+import { AboutPage } from './pages/marketing/AboutPage';
+import { ContactPage } from './pages/marketing/ContactPage';
+import { PrivacyPage } from './pages/marketing/PrivacyPage';
+import { TermsPage } from './pages/marketing/TermsPage';
 
 import { Dashboard } from './pages/admin/Dashboard';
 import { Attendance } from './pages/admin/Attendance';
@@ -28,6 +32,10 @@ function App() {
       <Routes>
         <Route path="/" element={<MarketingHome />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
 
         <Route
           path="/admin"

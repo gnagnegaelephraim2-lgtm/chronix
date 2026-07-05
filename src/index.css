@@ -1604,3 +1604,10 @@ body.banano-mode .tracker-step--current .tracker-step-dot {
   animation: nanabanano-wave 0.4s ease-in-out infinite;
 }
 
+/* Mascot overlap fix & subpage styling overrides */
+@media (min-width: 768px) {
+  .footer-bottom {
+    padding-right: 120px !important;
+  }
+}
+

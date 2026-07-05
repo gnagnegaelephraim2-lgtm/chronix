@@ -17,62 +17,62 @@ import security1 from '../../assets/industries/security-1.jpg';
 const INDUSTRIES = [
   {
     name: 'Hospitality',
-    description: 'Front desk, kitchen, and housekeeping teams run on shifts. See who is in, at every property.',
+    description: "Hotels and restaurants run on shifts. See who showed up for breakfast service before the first guest sits down.",
     photo: hospitality2,
   },
   {
     name: 'Construction',
-    description: 'Know who is on site before the first pour. GPS check-ins built for crews in the field.',
+    description: "Your sites are spread across the island. GPS clock-in means you know who's on which site, without driving there.",
     photo: construction1,
   },
   {
     name: 'Retail',
-    description: 'Cover every till and shop-floor shift, whether you run one store or ten.',
+    description: "Multiple shops, rotating staff, weekend rushes. One dashboard shows every store at once.",
     photo: retail1,
   },
   {
     name: 'Manufacturing',
-    description: 'From textile lines to production floors, keep every shift staffed and every hour counted.',
+    description: "Shift changeovers, overtime, night teams. Chronix tracks every hour so payroll matches reality.",
     photo: manufacturing1,
   },
   {
     name: 'Logistics',
-    description: 'Drivers, pickers, and warehouse crews — tracked wherever the work happens.',
+    description: "Drivers and warehouse teams start early and finish late. Clock-ins from the road, records you can trust.",
     photo: logistics1,
   },
   {
     name: 'Agriculture',
-    description: 'From cane fields to tea estates, know your field teams are in before the morning cut.',
+    description: "From field crews to harvesting teams. GPS clock-ins verify attendance across large farms and estates.",
     photo: agriculture1,
   },
   {
     name: 'Healthcare',
-    description: 'Clinics and pharmacies never really close. Keep every shift covered, day and night.',
+    description: "Clinics and care teams can't afford gaps in coverage. Know instantly when a shift isn't filled.",
     photo: healthcare1,
   },
   {
     name: 'Education',
-    description: 'Teachers, tutors, and support staff — one register across every campus and classroom.',
+    description: "Teaching and support staff across campuses. Simple attendance, clean records for administration.",
     photo: education1,
   },
   {
     name: 'BPO & ICT',
-    description: 'Night shifts and split shifts are the norm. See every seat filled, on every campaign.',
+    description: "Night shifts, split shifts, and 24/7 campaigns. See every seat filled and every hour tracked accurately.",
     photo: bpo1,
   },
   {
     name: 'Financial Services',
-    description: 'Branches, back office, and client teams — accurate hours without chasing timesheets.',
+    description: "Compliance needs clean records. Every clock-in is timestamped, verified, and export-ready.",
     photo: financial1,
   },
   {
     name: 'Food & Beverage',
-    description: 'From prep to last order, know who is behind the counter at every outlet.',
+    description: "From prep cooks to front-of-house staff. Know who is on shift at every outlet in real time.",
     photo: foodbeverage1,
   },
   {
     name: 'Security Services',
-    description: 'Guards rotate around the clock and across sites. Confirm every post is covered, with GPS proof.',
+    description: "Guards rotating across different posts. GPS verification confirms that every site is covered.",
     photo: security1,
   },
 ];

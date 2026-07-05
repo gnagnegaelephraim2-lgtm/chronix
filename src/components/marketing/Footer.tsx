@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Mail, MapPin, Phone } from 'lucide-react';
 import { useLanguage } from '../../hooks/useLanguage';
 import { FacebookIcon, InstagramIcon, LinkedinIcon } from '../common/SocialIcons';
@@ -33,24 +33,24 @@ const FOOTER_COLUMNS = [
     heading: 'Company',
     description: 'A Mauritian product, built for Mauritian teams.',
     links: [
-      { label: 'About', href: '#' },
-      { label: 'Contact', href: '#' },
+      { label: 'About', href: '/about' },
+      { label: 'Contact', href: '/contact' },
     ],
   },
   {
     heading: 'Legal',
     description: 'The fine print, kept plain and short.',
     links: [
-      { label: 'Privacy Policy', href: '#' },
-      { label: 'Terms of Service', href: '#' },
+      { label: 'Privacy Policy', href: '/privacy' },
+      { label: 'Terms of Service', href: '/terms' },
     ],
   },
 ];
 
 const SOCIAL_LINKS = [
-  { icon: FacebookIcon, label: 'Facebook', href: '#' },
-  { icon: LinkedinIcon, label: 'LinkedIn', href: '#' },
-  { icon: InstagramIcon, label: 'Instagram', href: '#' },
+  { icon: FacebookIcon, label: 'Facebook', href: '/contact' },
+  { icon: LinkedinIcon, label: 'LinkedIn', href: '/contact' },
+  { icon: InstagramIcon, label: 'Instagram', href: '/contact' },
 ];
 
 export function Footer() {
@@ -104,9 +104,20 @@ export function Footer() {
           <div className="footer-column" key={column.heading}>
             <h4>{column.heading}</h4>
             <p className="footer-column-desc">{column.description}</p>
-            {column.links.map((link) => (
-              <a href={link.href} key={link.label}>{link.label}</a>
-            ))}
+            {column.links.map((link) => {
+              if (link.href.startsWith('/')) {
+                return (
+                  <Link to={link.href} key={link.label}>
+                    {link.label}
+                  </Link>
+                );
+              }
+              return (
+                <a href={link.href} key={link.label}>
+                  {link.label}
+                </a>
+              );
+            })}
           </div>
         ))}
       </div>
