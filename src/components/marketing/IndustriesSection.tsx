@@ -373,10 +373,13 @@ export function IndustriesSection() {
       );
       if (matched) {
         const idx = INDUSTRIES.indexOf(matched);
-        setSelectedIndustry(matched.name);
-        
-        // Scroll section and carousel smoothly
+
+        // Deferred rather than called directly in the effect body — avoids
+        // a same-tick cascading re-render, and lines up with the scroll
+        // below anyway (150ms is imperceptible).
         setTimeout(() => {
+          setSelectedIndustry(matched.name);
+
           const sectionElement = document.getElementById('industries');
           if (sectionElement) {
             sectionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });

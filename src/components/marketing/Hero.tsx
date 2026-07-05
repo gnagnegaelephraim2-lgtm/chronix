@@ -86,7 +86,7 @@ export function Hero() {
       </div>
       <div className="hero-visual">
         <div
-          ref={tiltRef as any}
+          ref={tiltRef}
           className="hero-visual-btn hero-visual-dashboard"
           onClick={() => setShowDemo(true)}
           onMouseMove={handleTiltMove}
