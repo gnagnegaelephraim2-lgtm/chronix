@@ -11,6 +11,7 @@ export function Navbar() {
       <img src={logo} alt="Chronix" style={{ height: 30 }} />
       <div className="navbar-links">
         <a href="#home">{t('navHomeLink')}</a>
+        <a href="#industries">Industries</a>
         <a href="#features">{t('navFeatures')}</a>
         <a href="#pricing">{t('navPricing')}</a>
         <a href="#faq">{t('navFaq')}</a>

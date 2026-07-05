@@ -980,10 +980,88 @@ button, input, textarea, select {
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   max-width: 900px;
 }
+.industries-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+.industry-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  transition: var(--transition-smooth);
+}
+.industry-card:hover {
+  box-shadow: var(--card-shadow-hover);
+}
+.industry-photo-hero {
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+  display: block;
+}
+.industry-thumbs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-top: 4px;
+}
+.industry-thumbs img {
+  width: 100%;
+  height: 105px;
+  object-fit: cover;
+  display: block;
+}
+.industry-card-body {
+  padding: 1.1rem 1.25rem 1.35rem;
+}
 .footer {
   background: var(--chronix-navy);
   color: rgba(255, 255, 255, 0.8);
   padding: 3rem 5%;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+}
+.footer-column h4 {
+  color: #fff;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.9rem;
+}
+.footer-column a {
+  display: block;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.88rem;
+  text-decoration: none;
+  margin-bottom: 0.6rem;
+  transition: var(--transition-smooth);
+}
+.footer-column a:hover {
+  color: #fff;
+}
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding-top: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  opacity: 0.7;
+}
+
+@media (max-width: 1024px) {
+  .industries-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 768px) {
@@ -993,5 +1071,18 @@ button, input, textarea, select {
   }
   .navbar-links {
     display: none;
+  }
+  .industries-grid {
+    grid-template-columns: 1fr;
+  }
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 }

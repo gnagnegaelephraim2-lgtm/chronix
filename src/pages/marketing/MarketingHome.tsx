@@ -1,6 +1,7 @@
 // Screen A — Marketing site (chronix.com)
 import { Navbar } from '../../components/marketing/Navbar';
 import { Hero } from '../../components/marketing/Hero';
+import { IndustriesSection } from '../../components/marketing/IndustriesSection';
 import { FeaturesSection } from '../../components/marketing/FeaturesSection';
 import { PricingSection } from '../../components/marketing/PricingSection';
 import { FAQSection } from '../../components/marketing/FAQSection';
@@ -11,6 +12,7 @@ export function MarketingHome() {
     <div>
       <Navbar />
       <Hero />
+      <IndustriesSection />
       <FeaturesSection />
       <PricingSection />
       <FAQSection />
