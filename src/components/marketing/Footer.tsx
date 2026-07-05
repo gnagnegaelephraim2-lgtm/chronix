@@ -48,9 +48,9 @@ const FOOTER_COLUMNS = [
 ];
 
 const SOCIAL_LINKS = [
-  { icon: FacebookIcon, label: 'Facebook', href: '/contact' },
-  { icon: LinkedinIcon, label: 'LinkedIn', href: '/contact' },
-  { icon: InstagramIcon, label: 'Instagram', href: '/contact' },
+  { icon: FacebookIcon, label: 'Facebook', href: 'https://www.facebook.com/profile.php?id=61590746107633' },
+  { icon: LinkedinIcon, label: 'LinkedIn', href: 'https://www.linkedin.com/company/chronixx/' },
+  { icon: InstagramIcon, label: 'Instagram', href: 'https://www.instagram.com/chronix.mu/' },
 ];
 
 export function Footer() {
@@ -93,7 +93,14 @@ export function Footer() {
 
           <div className="footer-social">
             {SOCIAL_LINKS.map((social) => (
-              <a key={social.label} href={social.href} aria-label={social.label} className="footer-social-icon">
+              <a
+                key={social.label}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={social.label}
+                className="footer-social-icon"
+              >
                 <social.icon size={16} />
               </a>
             ))}
