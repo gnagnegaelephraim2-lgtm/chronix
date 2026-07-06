@@ -16,7 +16,7 @@ export function LiveClockPreview() {
   }
 
   return (
-    <div className="live-clock-preview" style={{ background: '#fff', borderRadius: '16px', border: '1px solid var(--border)', boxShadow: '0 15px 35px rgba(0,0,0,0.06)', padding: '1.75rem', width: '330px', boxSizing: 'border-box', textAlign: 'left' }}>
+    <div className="live-clock-preview" style={{ background: 'rgba(255, 255, 255, 0.82)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderRadius: '16px', border: '1px solid var(--border)', boxShadow: '0 15px 35px rgba(0,0,0,0.06)', padding: '1.75rem', width: '330px', boxSizing: 'border-box', textAlign: 'left' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
           <img src={logo} alt="Chronix" style={{ height: 26, width: 26, objectFit: 'contain' }} />
