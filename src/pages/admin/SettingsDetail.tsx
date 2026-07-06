@@ -6,7 +6,7 @@ import { useStore, useStoreActions } from '../../hooks/useStore';
 import type { CheckInMethod } from '../../types';
 
 const CHECK_IN_OPTIONS: Array<{ value: CheckInMethod; label: string }> = [
-  { value: 'gps_face', label: 'GPS + Face Recognition' },
+  { value: 'gps_face', label: 'GPS Check-In' },
   { value: 'qr', label: 'QR Code' },
   { value: 'kiosk', label: 'Shared Kiosk Terminal' },
 ];

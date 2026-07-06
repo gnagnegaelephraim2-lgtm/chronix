@@ -37,8 +37,8 @@ export function AboutPage() {
 
           <p>
             {isFr
-              ? "C'est une plateforme simple où vos employés pointent directement depuis leur téléphone. La géolocalisation et la vérification faciale garantissent que c'est bien eux, et qu'ils sont bien sur site. Vous voyez qui travaille en direct, de n'importe où. Les congés, notes de frais et chiffres de paie vivent tous au même endroit. Pas de papier. Pas de nuits blanches. Pas d'erreur."
-              : "It's one simple platform where your team clocks in with their phone — GPS and face verification make sure it's really them, really there. You see who's working, right now, from anywhere. Leave requests, expense claims, and payroll numbers all live in the same place. No paper. No late nights. No guessing."}
+              ? "C'est une plateforme simple où vos employés pointent directement depuis leur téléphone, avec la position GPS enregistrée à chaque pointage. Vous voyez qui travaille en direct, de n'importe où. Les congés, notes de frais et chiffres de paie vivent tous au même endroit. Pas de papier. Pas de nuits blanches. Pas d'erreur."
+              : "It's one simple platform where your team clocks in with their phone, with the GPS location captured at every check-in. You see who's working, right now, from anywhere. Leave requests, expense claims, and payroll numbers all live in the same place. No paper. No late nights. No guessing."}
           </p>
 
           <h2 style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--chronix-navy)', marginTop: '2rem', marginBottom: '0.5rem' }}>

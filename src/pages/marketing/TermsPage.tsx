@@ -87,8 +87,8 @@ export function TermsPage() {
             </h2>
             <p>
               {isFr
-                ? "Utilisez Chronix honnêtement. N'essayez pas de pirater le service, de le copier, de le revendre ou de l'utiliser pour enfreindre les droits de quiconque. Les employeurs doivent utiliser les fonctionnalités de présence, de localisation et de vérification faciale conformément aux lois en vigueur et en informer préalablement leurs employés — c'est une obligation légale, pas seulement une règle de courtoisie."
-                : "Use Chronix honestly. Don't try to break it, copy it, resell it, or use it to violate anyone's rights. Employers must use attendance, location, and verification features lawfully and inform their employees about them — that's a legal requirement, not just good manners."}
+                ? "Utilisez Chronix honnêtement. N'essayez pas de pirater le service, de le copier, de le revendre ou de l'utiliser pour enfreindre les droits de quiconque. Les employeurs doivent utiliser les fonctionnalités de présence et de localisation conformément aux lois en vigueur et en informer préalablement leurs employés — c'est une obligation légale, pas seulement une règle de courtoisie."
+                : "Use Chronix honestly. Don't try to break it, copy it, resell it, or use it to violate anyone's rights. Employers must use attendance and location features lawfully and inform their employees about them — that's a legal requirement, not just good manners."}
             </p>
           </section>
 

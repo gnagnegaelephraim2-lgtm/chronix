@@ -3,7 +3,7 @@ import { useLanguage } from '../../hooks/useLanguage';
 import { useSession } from '../../hooks/useSession';
 import { useStore } from '../../hooks/useStore';
 import { Avatar } from '../common/Avatar';
-import logo from '../../assets/chronix_logo.png';
+import logoWhite from '../../assets/chronix_logo_white.png';
 
 interface TopBarProps {
   variant: 'admin' | 'employee';
@@ -21,9 +21,7 @@ export function TopBar({ variant, onOpenMobile }: TopBarProps) {
       <button className="icon-btn" onClick={onOpenMobile} aria-label="Open menu" style={{ background: 'transparent', border: 'none', color: '#fff' }}>
         <Menu size={22} />
       </button>
-      <div style={{ background: '#fff', borderRadius: 6, padding: '0.2rem 0.5rem', display: 'inline-flex' }}>
-        <img src={logo} alt="Chronix" style={{ height: 16, display: 'block' }} />
-      </div>
+      <img src={logoWhite} alt="Chronix" style={{ height: 20, display: 'block' }} />
       <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
         <button className="icon-btn" onClick={toggleLang} style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: '0.75rem', width: 'auto' }}>
           {lang.toUpperCase()}

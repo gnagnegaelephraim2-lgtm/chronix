@@ -88,19 +88,19 @@ const INDUSTRY_DETAILS = {
       heading: '24/7 Shift Coverage & Multi-Property Audits',
       details: [
         'Tourism and hospitality drive the island\'s economy, but managing housekeeping, culinary, and front desk rotations across resort properties is complex.',
-        'Chronix gives resort managers a live overview of active shifts across all properties in real time. Staff clock in on their smartphones using face verification, eliminating timecard inflation and ensuring key departments are fully staffed for breakfast and night shifts.'
+        'Chronix gives resort managers a live overview of active shifts across all properties in real time. Staff clock in from their smartphones in seconds, eliminating timecard inflation and ensuring key departments are fully staffed for breakfast and night shifts.'
       ],
       points: ['Multi-property attendance lists', 'Direct overtime calculation', 'No specialized hardware required']
     },
     Construction: {
       gdp: '5% of Mauritius GDP',
       workforce: '50,000+ field workers',
-      heading: 'Geofenced Site Logins & Precision Tracking',
+      heading: 'GPS Site Logins & Precision Tracking',
       details: [
         'With chantiers spread from Grand Baie to Bel Ombre, managing contractors and ensuring site presence is a massive challenge for builders.',
-        'Chronix utilizes high-precision geofencing to restrict clock-in points within a strict radius of active construction sites. Supervisors verify crews are present without leaving the main office, stopping buddy-punching and timesheet errors immediately.'
+        'Chronix tags every clock-in with a GPS location, so supervisors can see exactly which site a crew checked in from without leaving the main office, cutting down timesheet disputes immediately.'
       ],
-      points: ['Strict radius geofencing', 'Offline-resilient logs', 'Detailed contractor reports']
+      points: ['GPS-tagged clock-ins', 'Offline-resilient logs', 'Detailed contractor reports']
     },
     Retail: {
       gdp: '12% of Mauritius GDP',
@@ -190,7 +190,7 @@ const INDUSTRY_DETAILS = {
         'From kitchen prep teams starting at 5 AM to front-of-house staff leaving at midnight, F&B operations require tight scheduling.',
         'Chronix lets restaurant managers track attendance at each kitchen or restaurant outlet. Verify staffing level to ensure guests receive excellent service.'
       ],
-      points: ['Kitchen shift handovers', 'Outlet-specific schedules', 'Phone geofencing checks']
+      points: ['Kitchen shift handovers', 'Outlet-specific schedules', 'Phone GPS check-ins']
     },
     'Security Services': {
       gdp: '3% of Mauritius GDP',
@@ -210,7 +210,7 @@ const INDUSTRY_DETAILS = {
       heading: 'Couverture Horaire 24/7 et Suivi Hôtelier',
       details: [
         'Le tourisme et l\'hôtellerie animent l\'île, mais la gestion des plannings de réception, cuisine et ménage sur plusieurs sites est complexe.',
-        'Chronix offre aux directeurs d\'hôtel une vue en temps réel de tous les effectifs actifs. Le pointage mobile par reconnaissance faciale évite les erreurs de cartes d\'heures et assure la couverture des services.'
+        'Chronix offre aux directeurs d\'hôtel une vue en temps réel de tous les effectifs actifs. Le pointage mobile en quelques secondes évite les erreurs de cartes d\'heures et assure la couverture des services.'
       ],
       points: ['Listes de présence multi-hôtels', 'Calcul direct des heures supplémentaires', 'Aucun équipement spécial requis']
     },
@@ -220,9 +220,9 @@ const INDUSTRY_DETAILS = {
       heading: 'Pointage Géolocalisé et Suivi de Chantiers',
       details: [
         'Avec des chantiers répartis de Grand Baie à Bel Ombre, s\'assurer de la présence des équipes sur site est un défi quotidien.',
-        'Chronix restreint le pointage dans le rayon exact du chantier par géorepérage GPS. Les superviseurs valident la présence sans se déplacer, évitant les fraudes de pointage.'
+        'Chronix associe chaque pointage à une position GPS, permettant aux superviseurs de voir précisément de quel chantier une équipe a pointé, sans avoir à se déplacer.'
       ],
-      points: ['Géolocalisation stricte par rayon', 'Fonctionnement hors-ligne', 'Rapports de chantiers précis']
+      points: ['Pointages géolocalisés', 'Fonctionnement hors-ligne', 'Rapports de chantiers précis']
     },
     Retail: {
       gdp: '12% du PIB mauricien',

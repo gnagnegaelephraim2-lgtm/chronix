@@ -29,8 +29,8 @@ export function PrivacyPage() {
           <div style={{ fontSize: '0.88rem', color: '#7a2224', lineHeight: 1.5 }}>
             <strong>{isFr ? 'Brouillon uniquement' : 'Draft only'}</strong> —{' '}
             {isFr 
-              ? "faites relire ce document par un avocat mauricien avant publication. Chronix traite des données biométriques (vérification faciale) et de localisation, qui sont sensibles en vertu de la loi sur la protection des données (Data Protection Act 2017). Ce brouillon pose les bases, mais ne constitue pas un conseil juridique."
-              : "have this reviewed by a Mauritian lawyer before publishing. Chronix processes biometric (facial verification) and location data, which are sensitive under the Data Protection Act 2017. This draft covers the right ground, but it isn't legal advice."}
+              ? "faites relire ce document par un avocat mauricien avant publication. Chronix traite des données de localisation, qui sont sensibles en vertu de la loi sur la protection des données (Data Protection Act 2017). Ce brouillon pose les bases, mais ne constitue pas un conseil juridique."
+              : "have this reviewed by a Mauritian lawyer before publishing. Chronix processes location data, which is sensitive under the Data Protection Act 2017. This draft covers the right ground, but it isn't legal advice."}
           </div>
         </div>
 
@@ -74,11 +74,7 @@ export function PrivacyPage() {
               </li>
               <li>
                 <strong>{isFr ? 'Données de localisation :' : 'Location data:'}</strong>{' '}
-                {isFr ? 'la position de votre appareil au moment précis où vous pointez — uniquement pour confirmer que vous êtes dans la zone de travail autorisée. Nous ne suivons pas votre position en dehors du pointage.' : 'your device\'s location at the moment you clock in or out — only to confirm you\'re within your allowed work area. We do not track your location outside of clock-in and clock-out.'}
-              </li>
-              <li>
-                <strong>{isFr ? 'Données de vérification faciale :' : 'Facial verification data:'}</strong>{' '}
-                {isFr ? 'si votre employeur l\'active, nous comparons une photo prise lors du pointage avec votre photo de référence pour confirmer votre identité. Il s\'agit de données biométriques et nous les protégeons avec le plus haut niveau de sécurité.' : 'if your employer enables it, we compare a photo taken at clock-in against your reference photo to confirm it\'s you. This is biometric data and we treat it with the highest level of protection.'}
+                {isFr ? 'la position de votre appareil au moment précis où vous pointez, associée à votre fiche de présence. Nous ne suivons pas votre position en dehors du pointage.' : 'your device\'s location at the moment you clock in or out, attached to your attendance record. We do not track your location outside of clock-in and clock-out.'}
               </li>
               <li>
                 <strong>{isFr ? 'Demandes et réclamations :' : 'Requests and claims:'}</strong>{' '}
@@ -125,8 +121,8 @@ export function PrivacyPage() {
             </h2>
             <p>
               {isFr
-                ? "Les dossiers de présence et de paie sont conservés aussi longtemps que votre employeur en a besoin pour répondre à ses obligations légales (la loi mauricienne sur le travail et la fiscalité impose de conserver les dossiers pendant plusieurs années). Les images de vérification faciale utilisées pour la comparaison sont conservées uniquement pendant la durée nécessaire à la vérification ou selon les préférences de l'employeur. Lorsque les données ne sont plus nécessaires, elles sont supprimées."
-                : "Attendance and payroll records are kept as long as your employer needs them to meet legal obligations (Mauritian employment and tax law requires records to be kept for several years). Facial verification images used for matching are kept only as long as needed for verification or retained per employer settings. When data is no longer needed, it's deleted."}
+                ? "Les dossiers de présence et de paie sont conservés aussi longtemps que votre employeur en a besoin pour répondre à ses obligations légales (la loi mauricienne sur le travail et la fiscalité impose de conserver les dossiers pendant plusieurs années). Lorsque les données ne sont plus nécessaires, elles sont supprimées."
+                : "Attendance and payroll records are kept as long as your employer needs them to meet legal obligations (Mauritian employment and tax law requires records to be kept for several years). When data is no longer needed, it's deleted."}
             </p>
           </section>
 

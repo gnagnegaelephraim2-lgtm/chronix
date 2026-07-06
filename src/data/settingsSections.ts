@@ -2,8 +2,8 @@ import type { SettingsSectionDef } from '../types';
 
 export const ADMIN_SETTINGS_SECTIONS: SettingsSectionDef[] = [
   { id: 'shift-settings', title: 'Shift Settings', description: 'Shifts, schedules, shift policies.', icon: 'Clock' },
-  { id: 'work-location-settings', title: 'Work Location Settings', description: 'Office locations, remote work, geo-fencing rules.', icon: 'MapPin' },
-  { id: 'check-in-methods', title: 'Check-In Methods', description: 'Attendance check-in and verification methods (GPS + face, QR, etc.).', icon: 'ScanFace' },
+  { id: 'work-location-settings', title: 'Work Location Settings', description: 'Office locations and remote work settings.', icon: 'MapPin' },
+  { id: 'check-in-methods', title: 'Check-In Methods', description: 'Attendance check-in methods (GPS, QR, kiosk, etc.).', icon: 'ScanFace' },
   { id: 'employee-settings', title: 'Employee Settings', description: 'Employee info, onboarding, HR preferences.', icon: 'Users' },
   { id: 'leave-absence-settings', title: 'Leave and Absence Settings', description: 'Leave types, policies, approval workflows.', icon: 'CalendarDays' },
   { id: 'report-settings', title: 'Report Settings', description: 'Reports, KPIs, visualization preferences.', icon: 'BarChart3' },

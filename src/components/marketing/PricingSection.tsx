@@ -12,7 +12,7 @@ const PRICING_DATA = {
       desc: 'Perfect for micro-businesses looking to transition from paper logs to a secure, modern digital registry.',
       limit: 'Flat rate for up to 15 employees',
       features: [
-        { text: 'GPS geofenced clock-ins', enabled: true },
+        { text: 'GPS-tagged clock-ins', enabled: true },
         { text: 'Standard attendance lists', enabled: true },
         { text: 'Daily shift scheduler', enabled: true },
         { text: 'Standard email reports', enabled: true },
@@ -47,7 +47,7 @@ const PRICING_DATA = {
         { text: 'Everything in Growth', enabled: true },
         { text: 'Custom payroll CSV formatting', enabled: true },
         { text: 'Priority support & account manager', enabled: true },
-        { text: 'Custom geofencing boundaries', enabled: true },
+        { text: 'Custom GPS location tagging', enabled: true },
         { text: 'Guided onboarding & HR training', enabled: true },
         { text: '99.9% system uptime SLA', enabled: true },
       ]
@@ -99,7 +99,7 @@ const PRICING_DATA = {
         { text: 'Tout ce qui est dans Croissance', enabled: true },
         { text: 'Formats CSV de paie personnalisés', enabled: true },
         { text: 'Support prioritaire & gestionnaire', enabled: true },
-        { text: 'Limites de géorepérage sur mesure', enabled: true },
+        { text: 'Suivi GPS personnalisé par site', enabled: true },
         { text: 'Formation RH & onboarding guidé', enabled: true },
         { text: 'Contrat d\'engagement de service SLA', enabled: true },
       ]

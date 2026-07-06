@@ -12,9 +12,9 @@ const FEATURES_DATA = {
     },
     {
       icon: MapPin,
-      title: 'GPS & Geofenced Check-In',
-      description: 'Ensure crews are on site before they clock in. Restrict points of check-in within a specific radius of your retail branches, hotels, or construction zones with geofencing technology.',
-      points: ['Precision geofencing', 'Mobile browser location', 'Buddy-punching prevention']
+      title: 'GPS Check-In',
+      description: 'See exactly where your team clocked in from. Every check-in is tagged with a GPS location captured from the employee\'s phone, so you have a clear record for every retail branch, hotel, or construction zone.',
+      points: ['GPS-tagged clock-ins', 'Mobile browser location', 'Per-site attendance history']
     },
     {
       icon: QrCode,
@@ -50,9 +50,9 @@ const FEATURES_DATA = {
     },
     {
       icon: MapPin,
-      title: 'Pointage GPS et Géorepérage',
-      description: 'Assurez-vous que vos équipes sont bien sur le site avant de pointer. Limitez les zones de pointage dans un rayon spécifique autour de vos magasins, hôtels ou chantiers.',
-      points: ['Géorepérage haute précision', 'Localisation sur navigateur mobile', 'Anti-fraude de pointage']
+      title: 'Pointage GPS',
+      description: 'Sachez exactement d\'où votre équipe a pointé. Chaque pointage est associé à une position GPS captée depuis le téléphone de l\'employé, pour un historique clair par magasin, hôtel ou chantier.',
+      points: ['Pointages géolocalisés', 'Localisation sur navigateur mobile', 'Historique de présence par site']
     },
     {
       icon: QrCode,
