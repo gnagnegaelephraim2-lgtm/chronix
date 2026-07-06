@@ -1,12 +1,11 @@
 // Screen C4 — Admin Reimbursements
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Clock, CheckCircle2, XCircle, Wallet } from 'lucide-react';
 import { StatCard } from '../../components/common/StatCard';
 import { DataTable, type DataTableColumn } from '../../components/common/DataTable';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { ApproveRejectActions } from '../../components/common/ApproveRejectActions';
 import { Avatar } from '../../components/common/Avatar';
-import { NewReimbursementModal } from '../../components/admin/NewReimbursementModal';
 import { RecentActivityPanel } from '../../components/admin/RecentActivityPanel';
 import { useStore, useStoreActions } from '../../hooks/useStore';
 import { useLanguage } from '../../hooks/useLanguage';
@@ -22,7 +21,6 @@ export function Reimbursements() {
   const { t } = useLanguage();
   const { state } = useStore();
   const { decideReimbursement } = useStoreActions();
-  const [showModal, setShowModal] = useState(false);
 
   const pendingCount = state.reimbursements.filter((r) => r.status === 'pending' || r.status === 'in_review').length;
   const approvedCount = state.reimbursements.filter((r) => r.status === 'approved').length;
@@ -87,9 +85,6 @@ export function Reimbursements() {
           <h1 style={{ fontSize: '1.5rem' }}>{t('reimbursementsTitle')}</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{t('reimbursementsSubtitle')}</p>
         </div>
-        <button className="btn btn-primary-navy" onClick={() => setShowModal(true)}>
-          {t('newReimbursement')}
-        </button>
       </div>
 
       <div className="stat-card-row">
@@ -105,8 +100,6 @@ export function Reimbursements() {
         </div>
         <RecentActivityPanel />
       </div>
-
-      {showModal && <NewReimbursementModal onClose={() => setShowModal(false)} />}
     </div>
   );
 }

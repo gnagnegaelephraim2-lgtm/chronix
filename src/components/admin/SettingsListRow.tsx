@@ -12,6 +12,7 @@ import {
   User,
   FileText,
   Settings as SettingsIcon,
+  CreditCard,
   ChevronRight,
 } from 'lucide-react';
 import type { SettingsSectionDef } from '../../types';
@@ -29,6 +30,7 @@ const ICONS: Record<string, typeof Clock> = {
   User,
   FileText,
   Settings: SettingsIcon,
+  CreditCard,
 };
 
 export function SettingsListRow({ section, basePath }: { section: SettingsSectionDef; basePath: string }) {

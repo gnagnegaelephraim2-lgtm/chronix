@@ -10,6 +10,7 @@ import { useStore, useStoreActions } from '../../hooks/useStore';
 import { useLanguage } from '../../hooks/useLanguage';
 import type { Employee } from '../../types';
 import { uid } from '../../store/storeReducer';
+import { guessCardBrand } from '../../utils/trial';
 import { AuthShell } from './AuthShell';
 
 export function SignupPage() {
@@ -26,6 +27,9 @@ export function SignupPage() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardExpiry, setCardExpiry] = useState('');
+  const [cardCvv, setCardCvv] = useState('');
   const [error, setError] = useState('');
 
   function handleSubmit(e: React.FormEvent) {
@@ -36,6 +40,12 @@ export function SignupPage() {
     const existing = state.employees.find((emp) => emp.email.toLowerCase() === trimmedEmail);
     if (existing) {
       setError(t('emailAlreadyRegisteredError'));
+      return;
+    }
+
+    const cardDigits = cardNumber.replace(/\D/g, '');
+    if (cardDigits.length < 12 || !/^\d{2}\/\d{2}$/.test(cardExpiry) || !/^\d{3,4}$/.test(cardCvv)) {
+      setError(t('invalidCardError'));
       return;
     }
 
@@ -71,6 +81,14 @@ export function SignupPage() {
       companyName: companyName.trim(),
       employeeCount: Math.max(1, Number(employeeCount) || 1),
       workLocations: [newLocation],
+      trialStartedAt: new Date().toISOString(),
+      trialCancelled: false,
+      // Only the brand, last 4 digits, and expiry are ever kept — the full
+      // card number and CVV exist only in this handler's local variables and
+      // are discarded once this function returns. There's no backend here
+      // to process a real charge, so storing more than a display fragment
+      // would be pure liability with no corresponding capability.
+      billingCard: { brand: guessCardBrand(cardDigits), last4: cardDigits.slice(-4), expiry: cardExpiry },
     });
 
     // Pass the full object, not just the id — the store update from
@@ -122,6 +140,26 @@ export function SignupPage() {
           <label className="form-label">{t('passwordLabel')}</label>
           <input className="form-input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
         </div>
+
+        <div style={{ borderTop: '1px solid var(--border)', margin: '1.25rem 0' }} />
+        <h3 style={{ fontSize: '0.95rem', marginBottom: '0.25rem' }}>{t('billingSectionTitle')}</h3>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginBottom: '1rem' }}>{t('billingSectionSubtitle')}</p>
+
+        <div className="form-field">
+          <label className="form-label">{t('cardNumberLabel')}</label>
+          <input className="form-input" type="text" inputMode="numeric" placeholder="4242 4242 4242 4242" value={cardNumber} onChange={(e) => { setCardNumber(e.target.value); setError(''); }} required />
+        </div>
+        <div className="contact-form-row">
+          <div className="form-field" style={{ marginBottom: 0 }}>
+            <label className="form-label">{t('cardExpiryLabel')}</label>
+            <input className="form-input" type="text" placeholder="MM/YY" value={cardExpiry} onChange={(e) => { setCardExpiry(e.target.value); setError(''); }} required />
+          </div>
+          <div className="form-field" style={{ marginBottom: 0 }}>
+            <label className="form-label">{t('cardCvvLabel')}</label>
+            <input className="form-input" type="text" inputMode="numeric" placeholder="123" value={cardCvv} onChange={(e) => { setCardCvv(e.target.value); setError(''); }} required />
+          </div>
+        </div>
+        <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: '0.75rem 0 1rem' }}>{t('trialDisclaimer')}</p>
 
         {error && (
           <p style={{ color: 'var(--danger)', fontSize: '0.85rem', marginBottom: '1rem' }}>

@@ -10,6 +10,7 @@ import { TeamAttendanceTable } from '../../components/admin/TeamAttendanceTable'
 import { PendingApprovalsPanel } from '../../components/admin/PendingApprovalsPanel';
 import { UpcomingLeavePanel } from '../../components/admin/UpcomingLeavePanel';
 import { RecentActivityPanel } from '../../components/admin/RecentActivityPanel';
+import { TrialBanner } from '../../components/admin/TrialBanner';
 import { useStore } from '../../hooks/useStore';
 import { useSession } from '../../hooks/useSession';
 import { useLanguage } from '../../hooks/useLanguage';
@@ -39,6 +40,8 @@ export function Dashboard() {
         </div>
         <button className="btn btn-outline">{t('filters')}</button>
       </div>
+
+      <TrialBanner settings={state.settings} />
 
       <BannerCard
         text={t('insightBannerText')}

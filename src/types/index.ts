@@ -104,6 +104,12 @@ export interface Shift {
   graceMinutes: number;
 }
 
+export interface BillingCard {
+  brand: string;
+  last4: string;
+  expiry: string; // MM/YY
+}
+
 export interface BusinessSettings {
   companyName: string;
   logoUrl: string;
@@ -115,6 +121,9 @@ export interface BusinessSettings {
   approvalFlow: ApprovalStepName[];
   notificationChannels: NotificationChannel[];
   departments: string[];
+  trialStartedAt: string | null; // ISO datetime
+  trialCancelled: boolean;
+  billingCard: BillingCard | null;
 }
 
 export interface ActivityEvent {

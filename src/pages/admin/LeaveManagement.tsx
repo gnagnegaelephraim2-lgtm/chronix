@@ -7,7 +7,6 @@ import { StatusBadge } from '../../components/common/StatusBadge';
 import { ApproveRejectActions } from '../../components/common/ApproveRejectActions';
 import { Avatar } from '../../components/common/Avatar';
 import { SearchInput } from '../../components/common/SearchInput';
-import { NewLeaveRequestModal } from '../../components/admin/NewLeaveRequestModal';
 import { PendingApprovalsPanel } from '../../components/admin/PendingApprovalsPanel';
 import { UpcomingLeavePanel } from '../../components/admin/UpcomingLeavePanel';
 import { useStore, useStoreActions } from '../../hooks/useStore';
@@ -26,7 +25,6 @@ export function LeaveManagement() {
   const { state } = useStore();
   const { decideRequest } = useStoreActions();
   const { session } = useSession();
-  const [showModal, setShowModal] = useState(false);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
@@ -83,9 +81,6 @@ export function LeaveManagement() {
           <h1 style={{ fontSize: '1.5rem' }}>{t('leaveManagementTitle')}</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{t('leaveManagementSubtitle')}</p>
         </div>
-        <button className="btn btn-primary-navy" onClick={() => setShowModal(true)}>
-          {t('newLeaveRequest')}
-        </button>
       </div>
 
       <div className="stat-card-row">
@@ -114,8 +109,6 @@ export function LeaveManagement() {
           <UpcomingLeavePanel />
         </div>
       </div>
-
-      {showModal && <NewLeaveRequestModal onClose={() => setShowModal(false)} />}
     </div>
   );
 }

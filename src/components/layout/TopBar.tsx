@@ -1,8 +1,9 @@
-import { Bell, ChevronDown, Menu, Search } from 'lucide-react';
+import { ChevronDown, Menu, Search } from 'lucide-react';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useSession } from '../../hooks/useSession';
 import { useStore } from '../../hooks/useStore';
 import { Avatar } from '../common/Avatar';
+import { NotificationBell } from './NotificationBell';
 import logoWhite from '../../assets/chronix_logo_white.png';
 
 interface TopBarProps {
@@ -27,7 +28,7 @@ export function TopBar({ variant, onOpenMobile }: TopBarProps) {
           {lang.toUpperCase()}
         </button>
         {variant === 'admin' ? (
-          <Bell size={20} color="#fff" />
+          <NotificationBell color="#fff" />
         ) : (
           employee && <Avatar src={employee.avatarUrl} name={`${employee.firstName} ${employee.lastName}`} size={28} />
         )}
@@ -66,9 +67,7 @@ export function DesktopTopBar({ variant }: { variant: 'admin' | 'employee' }) {
         <button className="btn btn-outline" onClick={toggleLang} style={{ padding: '0.4rem 0.8rem', minHeight: 32 }}>
           {lang === 'en' ? 'FR' : 'EN'}
         </button>
-        <div style={{ position: 'relative' }}>
-          <Bell size={20} color="var(--text-secondary)" />
-        </div>
+        {variant === 'admin' && <NotificationBell />}
         {employee && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <Avatar src={employee.avatarUrl} name={`${employee.firstName} ${employee.lastName}`} size={34} />

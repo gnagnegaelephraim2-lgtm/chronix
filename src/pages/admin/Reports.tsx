@@ -6,6 +6,7 @@ import { useStore } from '../../hooks/useStore';
 import { useLanguage } from '../../hooks/useLanguage';
 import { getReportsAggregates } from '../../store/selectors';
 import { downloadCsv } from '../../utils/csvExport';
+import { downloadPdf } from '../../utils/pdfExport';
 import { localDateString } from '../../utils/format';
 import type { ReportCardDef } from '../../types';
 
@@ -44,20 +45,27 @@ export function Reports() {
     downloadCsv(`chronix-report-${from}-to-${to}.csv`, rows);
   }
 
-  function handleGenerate(id: string) {
+  function reportRows(id: string): Array<Record<string, string | number>> {
     const aggregates = getReportsAggregates(state, { from, to });
-    if (id === 'overtime') {
-      downloadCsv('overtime-report.csv', [{ 'Overtime Hours': aggregates.overtimeHours }]);
-    } else if (id === 'absence') {
-      downloadCsv('absence-report.csv', [{ 'Absence Count': aggregates.absenceCount }]);
-    } else if (id === 'qr') {
-      downloadCsv('qr-attendance-report.csv', [{ 'QR Check-ins': aggregates.qrCheckIns }]);
-    } else {
-      downloadCsv(
-        'department-performance-report.csv',
-        aggregates.departmentBreakdown.map((d) => ({ Department: d.department, 'On-time %': d.onTimePct, 'Avg Hours': d.avgHours }))
-      );
-    }
+    if (id === 'overtime') return [{ 'Overtime Hours': aggregates.overtimeHours }];
+    if (id === 'absence') return [{ 'Absence Count': aggregates.absenceCount }];
+    if (id === 'qr') return [{ 'QR Check-ins': aggregates.qrCheckIns }];
+    return aggregates.departmentBreakdown.map((d) => ({ Department: d.department, 'On-time %': d.onTimePct, 'Avg Hours': d.avgHours }));
+  }
+
+  const REPORT_TITLES: Record<string, string> = {
+    overtime: 'Overtime Report',
+    absence: 'Absence Report',
+    qr: 'QR Code Attendance Report',
+    department: 'Department Performance Report',
+  };
+
+  function handleGenerate(id: string) {
+    downloadCsv(`${id}-report.csv`, reportRows(id));
+  }
+
+  function handleExportPdf(id: string) {
+    downloadPdf(`${id}-report.pdf`, `${REPORT_TITLES[id]} (${from} to ${to})`, reportRows(id));
   }
 
   return (
@@ -87,7 +95,7 @@ export function Reports() {
 
       <div className="features-grid" style={{ marginBottom: '1.5rem' }}>
         {REPORT_DEFS.map((def) => (
-          <ReportCard key={def.id} def={def} onGenerate={() => handleGenerate(def.id)} />
+          <ReportCard key={def.id} def={def} onGenerate={() => handleGenerate(def.id)} onExportPdf={() => handleExportPdf(def.id)} />
         ))}
       </div>
 

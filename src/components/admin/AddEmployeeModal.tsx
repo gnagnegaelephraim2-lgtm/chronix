@@ -4,7 +4,13 @@ import { Modal } from '../common/Modal';
 import { FormField, FormSelect } from '../common/FormField';
 import { useStore, useStoreActions } from '../../hooks/useStore';
 import { localDateString } from '../../utils/format';
-import type { EmploymentType } from '../../types';
+import type { CheckInMethod, EmploymentType } from '../../types';
+
+const METHOD_LABELS: Record<CheckInMethod, string> = {
+  gps_face: 'GPS Check-In',
+  qr: 'QR Code',
+  kiosk: 'Shared Kiosk Terminal',
+};
 
 function generateTempPin(): string {
   return String(Math.floor(100000 + Math.random() * 900000));
@@ -19,6 +25,7 @@ export function AddEmployeeModal({ onClose }: { onClose: () => void }) {
   const [phone, setPhone] = useState('');
   const [department, setDepartment] = useState('');
   const [employmentType, setEmploymentType] = useState<EmploymentType>('full_time');
+  const [allowedMethods, setAllowedMethods] = useState<CheckInMethod[]>(['gps_face']);
   const [createdPin, setCreatedPin] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -40,7 +47,7 @@ export function AddEmployeeModal({ onClose }: { onClose: () => void }) {
       employmentType,
       joinedAt: localDateString(),
       workLocationId: state.settings.workLocations[0]?.id ?? '',
-      allowedCheckInMethods: ['gps_face'],
+      allowedCheckInMethods: allowedMethods.length ? allowedMethods : ['gps_face'],
       leaveBalance: 14,
       credential: pin,
       mustChangePassword: true,
@@ -117,6 +124,23 @@ export function AddEmployeeModal({ onClose }: { onClose: () => void }) {
         <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '-0.5rem', marginBottom: '1rem' }}>
           Type a new department name or pick one you've already used — Chronix remembers it for next time.
         </p>
+
+        <div className="form-field">
+          <label className="form-label">Allowed Check-In Methods</label>
+          {state.settings.checkInMethods.map((method) => (
+            <label key={method} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={allowedMethods.includes(method)}
+                onChange={(e) =>
+                  setAllowedMethods(e.target.checked ? [...allowedMethods, method] : allowedMethods.filter((m) => m !== method))
+                }
+              />
+              <span style={{ fontSize: '0.88rem' }}>{METHOD_LABELS[method]}</span>
+            </label>
+          ))}
+        </div>
+
         <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
           <button type="button" className="btn btn-outline" onClick={onClose}>
             Cancel

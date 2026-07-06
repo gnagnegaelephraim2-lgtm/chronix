@@ -5,6 +5,7 @@ import { ChevronLeft, Trash2 } from 'lucide-react';
 import { ADMIN_SETTINGS_SECTIONS } from '../../data/settingsSections';
 import { useStore, useStoreActions } from '../../hooks/useStore';
 import { uid } from '../../store/storeReducer';
+import { getTrialStatus } from '../../utils/trial';
 import type { CheckInMethod, Shift } from '../../types';
 
 const CHECK_IN_OPTIONS: Array<{ value: CheckInMethod; label: string }> = [
@@ -148,10 +149,75 @@ export function AdminSettingsDetail() {
                 <span className="side-panel-name">{opt.label}</span>
               </label>
             ))}
+
+            {state.settings.checkInMethods.includes('kiosk') && (
+              <div style={{ marginTop: '1.25rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border)' }}>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
+                  Open this on a shared tablet or computer at your entrance — employees tap their own name to clock in or out.
+                </p>
+                <a href="/kiosk" target="_blank" rel="noreferrer" className="btn btn-primary-navy" style={{ display: 'inline-flex' }}>
+                  Launch Kiosk Terminal →
+                </a>
+              </div>
+            )}
           </div>
         )}
 
-        {!['shift-settings', 'work-location-settings', 'check-in-methods'].includes(section.id) && (
+        {section.id === 'billing' && (
+          <div>
+            {(() => {
+              const trial = getTrialStatus(state.settings);
+              return (
+                <>
+                  <h3 style={{ marginBottom: '0.75rem', fontSize: '0.95rem' }}>Trial Status</h3>
+                  <div className="side-panel-row">
+                    <div className="side-panel-row-main">
+                      <div className="side-panel-name">
+                        {state.settings.trialCancelled
+                          ? 'Trial cancelled'
+                          : trial.active
+                            ? trial.expired
+                              ? 'Trial ended'
+                              : `${trial.daysRemaining} day${trial.daysRemaining === 1 ? '' : 's'} remaining`
+                            : 'No active trial'}
+                      </div>
+                      <div className="side-panel-sub">7-day free trial, then billed automatically unless cancelled.</div>
+                    </div>
+                    {trial.active && !state.settings.trialCancelled && (
+                      <button
+                        type="button"
+                        className="btn btn-outline"
+                        onClick={() => {
+                          if (confirm('Cancel your trial? You will not be charged.')) {
+                            updateSettings({ trialCancelled: true });
+                          }
+                        }}
+                      >
+                        Cancel Trial
+                      </button>
+                    )}
+                  </div>
+
+                  <h3 style={{ margin: '1.5rem 0 0.75rem', fontSize: '0.95rem' }}>Payment Method</h3>
+                  {state.settings.billingCard ? (
+                    <div className="side-panel-row">
+                      <div className="side-panel-row-main">
+                        <div className="side-panel-name">
+                          {state.settings.billingCard.brand} •••• {state.settings.billingCard.last4}
+                        </div>
+                        <div className="side-panel-sub">Expires {state.settings.billingCard.expiry}</div>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="empty-state">No card on file.</p>
+                  )}
+                </>
+              );
+            })()}
+          </div>
+        )}
+
+        {!['shift-settings', 'work-location-settings', 'check-in-methods', 'billing'].includes(section.id) && (
           <div className="empty-state">This section is coming soon.</div>
         )}
       </div>

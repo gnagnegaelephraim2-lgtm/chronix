@@ -35,4 +35,7 @@ export const BUSINESS_SETTINGS: BusinessSettings = {
   approvalFlow: ['submitted', 'team_lead', 'manager', 'hr'],
   notificationChannels: ['email', 'in_app'],
   departments: [],
+  trialStartedAt: null,
+  trialCancelled: false,
+  billingCard: null,
 };
