@@ -156,7 +156,7 @@ export function SignupPage() {
           </div>
           <div className="form-field" style={{ marginBottom: 0 }}>
             <label className="form-label">{t('cardCvvLabel')}</label>
-            <input className="form-input" type="text" inputMode="numeric" placeholder="123" value={cardCvv} onChange={(e) => { setCardCvv(e.target.value); setError(''); }} required />
+            <input className="form-input" type="password" inputMode="numeric" placeholder="•••" value={cardCvv} onChange={(e) => { setCardCvv(e.target.value); setError(''); }} required maxLength={4} />
           </div>
         </div>
         <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: '0.75rem 0 1rem' }}>{t('trialDisclaimer')}</p>

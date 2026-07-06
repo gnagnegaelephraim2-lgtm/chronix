@@ -4,15 +4,33 @@ import { useTheme } from '../../hooks/useTheme';
 import logo from '../../assets/chronix_logo.png';
 import logoWhite from '../../assets/chronix_logo_white.png';
 
+// Import industry background images
+import hospitality1 from '../../assets/industries/hospitality-1.jpg';
+import construction1 from '../../assets/industries/construction-1.jpg';
+import retail1 from '../../assets/industries/retail-1.jpg';
+import manufacturing1 from '../../assets/industries/manufacturing-1.jpg';
+import logistics1 from '../../assets/industries/logistics-1.jpg';
+import agriculture1 from '../../assets/industries/agriculture-1.jpg';
+import healthcare1 from '../../assets/industries/healthcare-1.jpg';
+import education1 from '../../assets/industries/education-1.jpg';
+import bpo1 from '../../assets/industries/bpo-1.jpg';
+import financial1 from '../../assets/industries/financial-1.jpg';
+import foodbeverage1 from '../../assets/industries/foodbeverage-1.jpg';
+import security1 from '../../assets/industries/security-1.jpg';
+import hospitality2 from '../../assets/industries/hospitality-2.jpg';
+import construction2 from '../../assets/industries/construction-2.jpg';
+import retail2 from '../../assets/industries/retail-2.jpg';
+import manufacturing2 from '../../assets/industries/manufacturing-2.jpg';
+import logistics2 from '../../assets/industries/logistics-2.jpg';
+import healthcare2 from '../../assets/industries/healthcare-2.jpg';
+
+const MARQUEE_ROW_A = [hospitality1, construction1, retail1, manufacturing1, logistics1, agriculture1, healthcare1, education1, bpo1];
+const MARQUEE_ROW_B = [financial1, foodbeverage1, security1, hospitality2, construction2, retail2, manufacturing2, logistics2, healthcare2];
+
 interface AuthShellProps {
   children: ReactNode;
 }
 
-// Shared split-layout shell for Login and Signup. The Banano Mode toggle
-// used to be position:absolute over the whole page — on mobile, where the
-// right branding panel is hidden, that put it directly on top of the logo
-// with no clearance. Putting it in the same flex row as the logo means it
-// takes up real layout space instead of floating over whatever's beneath it.
 export function AuthShell({ children }: AuthShellProps) {
   const { theme, toggleTheme } = useTheme();
 
@@ -33,8 +51,32 @@ export function AuthShell({ children }: AuthShellProps) {
         </div>
       </div>
 
-      <div className="login-right-panel">
-        <div style={{ color: '#fff', textAlign: 'center', maxWidth: 340, position: 'relative', zIndex: 1 }}>
+      <div className="login-right-panel" style={{ position: 'relative', overflow: 'hidden' }}>
+        {/* Background Scrolling Marquee */}
+        <div className="hero-marquee" aria-hidden="true" style={{ opacity: 0.16, zIndex: 0 }}>
+          <div className="hero-marquee-row hero-marquee-row--left">
+            {[...MARQUEE_ROW_A, ...MARQUEE_ROW_A].map((src, i) => (
+              <img src={src} alt="" key={i} loading="lazy" style={{ opacity: 0.65 }} />
+            ))}
+          </div>
+          <div className="hero-marquee-row hero-marquee-row--right">
+            {[...MARQUEE_ROW_B, ...MARQUEE_ROW_B].map((src, i) => (
+              <img src={src} alt="" key={i} loading="lazy" style={{ opacity: 0.65 }} />
+            ))}
+          </div>
+        </div>
+
+        {/* Semi-translucent overlay color overlay */}
+        <div 
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(160deg, rgba(25, 58, 91, 0.9) 0%, rgba(15, 36, 56, 0.95) 100%)',
+            zIndex: 1
+          }}
+        />
+
+        <div style={{ color: '#fff', textAlign: 'center', maxWidth: 340, position: 'relative', zIndex: 2 }}>
           <img src={logoWhite} alt="Chronix" style={{ height: 125, width: 125, objectFit: 'contain', margin: '-45px auto -0.25rem', display: 'block' }} />
 
           <div className="auth-mockup-card">
