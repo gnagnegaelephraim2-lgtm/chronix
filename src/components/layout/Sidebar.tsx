@@ -16,7 +16,7 @@ import { useLanguage } from '../../hooks/useLanguage';
 import { useSession } from '../../hooks/useSession';
 import { useStore } from '../../hooks/useStore';
 import { Avatar } from '../common/Avatar';
-import logo from '../../assets/chronix_logo.png';
+import logoWhite from '../../assets/chronix_logo_white.png';
 import { useTheme } from '../../hooks/useTheme';
 
 interface SidebarProps {
@@ -55,10 +55,8 @@ export function Sidebar({ variant, mobileOpen, onCloseMobile }: SidebarProps) {
       {mobileOpen && <div className="sidebar-backdrop" onClick={onCloseMobile} />}
       <aside className={`sidebar ${mobileOpen ? 'mobile-open' : ''}`}>
         <div>
-          <div className="sidebar-logo">
-            <div style={{ background: '#fff', borderRadius: 8, padding: '0.35rem 0.6rem', display: 'inline-flex' }}>
-              <img src={logo} alt="Chronix" style={{ height: 22, display: 'block' }} />
-            </div>
+          <div className="sidebar-logo" style={{ padding: '0.5rem 1rem' }}>
+            <img src={logoWhite} alt="Chronix" style={{ height: 24, display: 'block' }} />
           </div>
           <ul className="nav-list">
             {links.map((link) => (

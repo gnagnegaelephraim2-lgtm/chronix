@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Mail, MapPin, Phone } from 'lucide-react';
 import { useLanguage } from '../../hooks/useLanguage';
 import { FacebookIcon, InstagramIcon, LinkedinIcon } from '../common/SocialIcons';
-import logo from '../../assets/chronix_logo.png';
+import logoWhite from '../../assets/chronix_logo_white.png';
 
 const FOOTER_COLUMNS = [
   {
@@ -71,8 +71,8 @@ export function Footer() {
 
       <div className="footer-grid">
         <div className="footer-brand">
-          <div style={{ background: '#fff', borderRadius: 8, padding: '0.4rem 0.7rem', display: 'inline-flex', marginBottom: '1.1rem' }}>
-            <img src={logo} alt="Chronix" style={{ height: 24, display: 'block' }} />
+          <div style={{ display: 'inline-flex', marginBottom: '1.1rem' }}>
+            <img src={logoWhite} alt="Chronix" style={{ height: 24, display: 'block' }} />
           </div>
           <p style={{ fontSize: '0.85rem', maxWidth: 320, marginBottom: '1.1rem' }}>{t('footerTagline')}</p>
 
