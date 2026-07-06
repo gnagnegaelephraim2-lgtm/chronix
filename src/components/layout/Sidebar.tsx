@@ -55,8 +55,8 @@ export function Sidebar({ variant, mobileOpen, onCloseMobile }: SidebarProps) {
       {mobileOpen && <div className="sidebar-backdrop" onClick={onCloseMobile} />}
       <aside className={`sidebar ${mobileOpen ? 'mobile-open' : ''}`}>
         <div>
-          <div className="sidebar-logo" style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center' }}>
-            <img src={logoWhite} alt="Chronix" style={{ height: 100, width: 100, objectFit: 'contain', margin: '-38px 0', display: 'block' }} />
+          <div className="sidebar-logo" style={{ padding: '1.25rem 1rem 1.75rem', display: 'flex', alignItems: 'center' }}>
+            <img src={logoWhite} alt="Chronix" style={{ height: 145, width: 145, objectFit: 'contain', margin: '-53px 0 -57px -18px', display: 'block' }} />
           </div>
           <ul className="nav-list">
             {links.map((link) => (
