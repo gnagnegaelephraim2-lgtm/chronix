@@ -1,4 +1,3 @@
-import { ShieldAlert } from 'lucide-react';
 import { Navbar } from '../../components/marketing/Navbar';
 import { Footer } from '../../components/marketing/Footer';
 import { useLanguage } from '../../hooks/useLanguage';
@@ -14,26 +13,6 @@ export function TermsPage() {
       <Navbar />
 
       <main style={{ flexGrow: 1, padding: '4rem 5%', maxWidth: '800px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
-        {/* Lawyer Warning Badge */}
-        <div style={{
-          display: 'flex',
-          gap: '1rem',
-          background: 'var(--danger-bg)',
-          border: '1px solid rgba(229, 72, 77, 0.35)',
-          borderRadius: '8px',
-          padding: '1.25rem',
-          marginBottom: '2.5rem',
-          alignItems: 'flex-start'
-        }}>
-          <ShieldAlert size={22} style={{ color: 'var(--danger)', flexShrink: 0 }} />
-          <div style={{ fontSize: '0.88rem', color: '#7a2224', lineHeight: 1.5 }}>
-            <strong>{isFr ? 'Brouillon uniquement' : 'Draft only'}</strong> —{' '}
-            {isFr 
-              ? "faites relire ce document par un avocat mauricien avant publication. Ces conditions de service doivent être conformes aux lois du travail mauriciennes. Ce brouillon sert de base, mais ne constitue pas un conseil juridique."
-              : "have this reviewed by a Mauritian lawyer before publishing. These terms of service must comply with Mauritian employment and business laws. This draft covers the right ground, but it isn't legal advice."}
-          </div>
-        </div>
-
         <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--chronix-navy)', marginBottom: '0.5rem', letterSpacing: '-0.5px' }}>
           {isFr ? 'Conditions d\'Utilisation' : 'Terms of Service'}
         </h1>

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTheme } from '../../hooks/useTheme';
 import logo from '../../assets/chronix_logo.png';
 import logoWhite from '../../assets/chronix_logo_white.png';
+import { ArrowLeft } from 'lucide-react';
 
 // Import industry background images
 import hospitality1 from '../../assets/industries/hospitality-1.jpg';
@@ -38,6 +39,25 @@ export function AuthShell({ children }: AuthShellProps) {
     <div className="login-container">
       <div className="login-left-panel">
         <div style={{ maxWidth: 380, margin: '0 auto', width: '100%' }}>
+          <div style={{ marginBottom: '1.25rem' }}>
+            <Link 
+              to="/" 
+              style={{ 
+                display: 'inline-flex', 
+                alignItems: 'center', 
+                gap: '0.4rem', 
+                color: 'var(--text-secondary)', 
+                textDecoration: 'none', 
+                fontSize: '0.88rem', 
+                fontWeight: 600, 
+                transition: 'color 0.2s' 
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--chronix-navy)')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+            >
+              <ArrowLeft size={16} /> Back to website
+            </Link>
+          </div>
           <div className="auth-top-row">
             <Link to="/" aria-label="Back to Chronix home">
               <img src={logo} alt="Chronix" style={{ height: 110, width: 110, objectFit: 'contain', margin: '-39px 0', display: 'block' }} />

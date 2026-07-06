@@ -1,4 +1,3 @@
-import { ShieldAlert } from 'lucide-react';
 import { Navbar } from '../../components/marketing/Navbar';
 import { Footer } from '../../components/marketing/Footer';
 import { useLanguage } from '../../hooks/useLanguage';
@@ -14,26 +13,6 @@ export function PrivacyPage() {
       <Navbar />
 
       <main style={{ flexGrow: 1, padding: '4rem 5%', maxWidth: '800px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
-        {/* Lawyer Warning Badge */}
-        <div style={{
-          display: 'flex',
-          gap: '1rem',
-          background: 'var(--danger-bg)',
-          border: '1px solid rgba(229, 72, 77, 0.35)',
-          borderRadius: '8px',
-          padding: '1.25rem',
-          marginBottom: '2.5rem',
-          alignItems: 'flex-start'
-        }}>
-          <ShieldAlert size={22} style={{ color: 'var(--danger)', flexShrink: 0 }} />
-          <div style={{ fontSize: '0.88rem', color: '#7a2224', lineHeight: 1.5 }}>
-            <strong>{isFr ? 'Brouillon uniquement' : 'Draft only'}</strong> —{' '}
-            {isFr 
-              ? "faites relire ce document par un avocat mauricien avant publication. Chronix traite des données de localisation, qui sont sensibles en vertu de la loi sur la protection des données (Data Protection Act 2017). Ce brouillon pose les bases, mais ne constitue pas un conseil juridique."
-              : "have this reviewed by a Mauritian lawyer before publishing. Chronix processes location data, which is sensitive under the Data Protection Act 2017. This draft covers the right ground, but it isn't legal advice."}
-          </div>
-        </div>
-
         <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--chronix-navy)', marginBottom: '0.5rem', letterSpacing: '-0.5px' }}>
           {isFr ? 'Politique de Confidentialité' : 'Privacy Policy'}
         </h1>

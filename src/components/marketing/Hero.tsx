@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import { useLanguage } from '../../hooks/useLanguage';
 import { DemoVideoModal } from './DemoVideoModal';
+import { LiveClockPreview } from './LiveClockPreview';
 
 import hospitality1 from '../../assets/industries/hospitality-1.jpg';
 import construction1 from '../../assets/industries/construction-1.jpg';
@@ -88,17 +89,15 @@ export function Hero() {
         zIndex: 2,
         padding: '3.5rem 3rem',
         maxWidth: '820px',
-        background: 'rgba(253, 251, 247, 0.78)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        border: '1px solid rgba(255, 255, 255, 0.65)',
+        background: 'transparent',
+        backdropFilter: 'blur(3px)',
+        WebkitBackdropFilter: 'blur(3px)',
         borderRadius: '24px',
-        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.06)'
       }}>
-        <h1 style={{ fontSize: '3.4rem', lineHeight: 1.1, marginBottom: '1.5rem', textAlign: 'center', letterSpacing: '-1.5px', fontWeight: 800 }}>
+        <h1 style={{ fontSize: '3.4rem', lineHeight: 1.1, marginBottom: '1.5rem', textAlign: 'center', letterSpacing: '-1.5px', fontWeight: 800, textShadow: '0 2px 20px rgba(255,255,255,0.95), 0 1px 4px rgba(255,255,255,0.95)' }}>
           {t('heroHeadlinePrefix')} <span className="amber-text">{t('heroHeadlineAmber')}</span>
         </h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '1.15rem', marginBottom: '2.25rem', maxWidth: 620, textAlign: 'center', lineHeight: 1.55 }}>{t('heroSubtext')}</p>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '1.15rem', marginBottom: '2.25rem', maxWidth: 620, textAlign: 'center', lineHeight: 1.55, textShadow: '0 2px 16px rgba(255,255,255,0.95), 0 1px 4px rgba(255,255,255,0.95)' }}>{t('heroSubtext')}</p>
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
           <button className="btn btn-primary-amber btn-lg" onClick={() => navigate('/signup')} style={{ padding: '0.85rem 2.25rem', fontSize: '1.05rem', fontWeight: 600 }}>
             {t('getStartedNow')}
@@ -107,6 +106,10 @@ export function Hero() {
             {t('watchDemo')}
           </button>
         </div>
+      </div>
+
+      <div className="hero-clock-widget" style={{ position: 'absolute', bottom: '5.5rem', right: '2rem', zIndex: 2 }}>
+        <LiveClockPreview />
       </div>
 
       <button type="button" className="hero-scroll-cue" onClick={scrollToNext} aria-label="Scroll to explore Chronix" style={{ zIndex: 2 }}>
