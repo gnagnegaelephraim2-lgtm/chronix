@@ -57,8 +57,8 @@ export function ContactPage() {
                 </div>
                 <div>
                   <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase' }}>Email</div>
-                  <a href="mailto:hello@chronix.mu" style={{ fontSize: '1rem', color: 'var(--chronix-navy)', fontWeight: 600, textDecoration: 'none' }}>
-                    hello@chronix.mu
+                  <a href="mailto:chronix.mu@gmail.com" style={{ fontSize: '1rem', color: 'var(--chronix-navy)', fontWeight: 600, textDecoration: 'none' }}>
+                    chronix.mu@gmail.com
                   </a>
                 </div>
               </div>
@@ -82,7 +82,7 @@ export function ContactPage() {
                 <div>
                   <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase' }}>Office</div>
                   <span style={{ fontSize: '1rem', color: 'var(--chronix-navy)', fontWeight: 600 }}>
-                    Cybercity, Ebène, Mauritius
+                    Beau Plan, Pamplemousses, Mauritius
                   </span>
                 </div>
               </div>
@@ -117,7 +117,7 @@ export function ContactPage() {
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5, margin: 0 }}>
                   {isFr
                     ? "Merci pour votre message. Un conseiller de notre équipe vous contactera dans les plus brefs délais."
-                    : "Thank you for reaching out. A real person from our Ebène office will get back to you shortly."}
+                    : "Thank you for reaching out. A real person from our Beau Plan office will get back to you shortly."}
                 </p>
                 <button className="btn btn-outline" style={{ marginTop: '1.5rem' }} onClick={() => setFormSubmitted(false)}>
                   {isFr ? 'Envoyer un autre message' : 'Send another message'}

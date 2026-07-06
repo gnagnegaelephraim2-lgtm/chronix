@@ -133,7 +133,7 @@ export function Hero() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {[
                 { name: 'Gaelle Ephraim', sector: 'Hospitality 🏨', action: 'Clocked In', loc: 'Le Suffren Hotel, Port Louis', time: 'Just now', initial: 'GE', color: 'var(--info)' },
-                { name: 'Jean Pierre', sector: 'Construction 🏗️', action: 'Clocked In', loc: 'Cybercity, Ebène', time: '2 mins ago', initial: 'JP', color: 'var(--chronix-amber)' },
+                { name: 'Jean Pierre', sector: 'Construction 🏗️', action: 'Clocked In', loc: 'Beau Plan, Pamplemousses', time: '2 mins ago', initial: 'JP', color: 'var(--chronix-amber)' },
                 { name: 'Sarah Latour', sector: 'Retail 🛍️', action: 'Clocked Out', loc: 'Bagatelle Mall, Moka', time: '5 mins ago', initial: 'SL', color: 'var(--danger)' },
                 { name: 'Anil Ramgoolam', sector: 'Manufacturing 🏭', action: 'Clocked In', loc: 'Plaine Lauzun Freezone', time: '12 mins ago', initial: 'AR', color: 'var(--success)' }
               ].map((log, index) => (

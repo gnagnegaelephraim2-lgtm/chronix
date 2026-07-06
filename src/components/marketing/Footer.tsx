@@ -79,11 +79,11 @@ export function Footer() {
           <div className="footer-contact">
             <div className="footer-contact-row">
               <MapPin size={15} />
-              <span>Cybercity, Ebène, Mauritius</span>
+              <span>Beau Plan, Pamplemousses, Mauritius</span>
             </div>
             <div className="footer-contact-row">
               <Mail size={15} />
-              <a href="mailto:hello@chronix.mu">hello@chronix.mu</a>
+              <a href="mailto:chronix.mu@gmail.com">chronix.mu@gmail.com</a>
             </div>
             <div className="footer-contact-row">
               <Phone size={15} />

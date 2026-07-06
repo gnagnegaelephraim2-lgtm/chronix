@@ -150,8 +150,8 @@ export function TermsPage() {
           <section style={{ borderTop: '1px solid var(--border)', paddingTop: '1.5rem', marginTop: '1rem' }}>
             <p>
               {isFr 
-                ? 'Pour toute question concernant ces conditions : hello@chronix.mu.'
-                : 'Questions about any of this: hello@chronix.mu.'}
+                ? 'Pour toute question concernant ces conditions : chronix.mu@gmail.com.'
+                : 'Questions about any of this: chronix.mu@gmail.com.'}
             </p>
           </section>
         </div>

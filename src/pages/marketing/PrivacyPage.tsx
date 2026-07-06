@@ -54,8 +54,8 @@ export function PrivacyPage() {
             </h2>
             <p>
               {isFr
-                ? "Chronix (« nous », « notre ») est une plateforme de gestion des présences opérée depuis Cybercity, Ebène, Maurice. Si votre employeur utilise Chronix, il est le responsable du traitement de vos données de travail ; nous traitons ces données en son nom. Pour toute question : hello@chronix.mu."
-                : 'Chronix ("we", "us") is a workforce attendance platform operated from Cybercity, Ebène, Mauritius. If your employer uses Chronix, they are the data controller for your work records; we process that data on their behalf. Questions: hello@chronix.mu.'}
+                ? "Chronix (« nous », « notre ») est une plateforme de gestion des présences opérée depuis Beau Plan, Pamplemousses, Maurice. Si votre employeur utilise Chronix, il est le responsable du traitement de vos données de travail ; nous traitons ces données en son nom. Pour toute question : chronix.mu@gmail.com."
+                : 'Chronix ("we", "us") is a workforce attendance platform operated from Beau Plan, Pamplemousses, Mauritius. If your employer uses Chronix, they are the data controller for your work records; we process that data on their behalf. Questions: chronix.mu@gmail.com.'}
             </p>
           </section>
 
@@ -110,8 +110,8 @@ export function PrivacyPage() {
             </h2>
             <p>
               {isFr
-                ? 'Vous pouvez demander à voir les données personnelles que nous détenons à votre sujet, les corriger ou — lorsque la loi le permet — les supprimer. Écrivez à hello@chronix.mu et nous vous répondrons. Vous pouvez également déposer une plainte auprès du bureau de protection des données de Maurice (Data Protection Office) si vous n\'êtes pas satisfait.'
-                : 'You can ask to see the personal data we hold about you, correct it, or — where the law allows — have it deleted. Write to hello@chronix.mu and we\'ll respond. You can also complain to the Data Protection Office of Mauritius if you\'re not satisfied.'}
+                ? 'Vous pouvez demander à voir les données personnelles que nous détenons à votre sujet, les corriger ou — lorsque la loi le permet — les supprimer. Écrivez à chronix.mu@gmail.com et nous vous répondrons. Vous pouvez également déposer une plainte auprès du bureau de protection des données de Maurice (Data Protection Office) si vous n\'êtes pas satisfait.'
+                : 'You can ask to see the personal data we hold about you, correct it, or — where the law allows — have it deleted. Write to chronix.mu@gmail.com and we\'ll respond. You can also complain to the Data Protection Office of Mauritius if you\'re not satisfied.'}
             </p>
           </section>
 

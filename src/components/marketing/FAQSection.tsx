@@ -27,7 +27,7 @@ const FAQ_LEFT_DATA = {
     desc: 'Cannot find the answer you are looking for? Our local Mauritian support team is here to assist you with onboarding, shift schedules, GPS setup, and payroll exports.',
     ctaTitle: 'Need Direct Help?',
     ctaText: 'Speak to a human or write to us for rapid assistance:',
-    email: 'support@chronix.mu',
+    email: 'chronix.mu@gmail.com',
     phone: '+230 5700 1234',
   },
   fr: {
@@ -36,7 +36,7 @@ const FAQ_LEFT_DATA = {
     desc: 'Vous ne trouvez pas la réponse à vos questions ? Notre équipe locale à Maurice est à votre service pour vous guider lors de l\'intégration de vos salariés ou du paramétrage des horaires.',
     ctaTitle: 'Besoin d\'Aide Directe ?',
     ctaText: 'Échangez avec un conseiller local pour une assistance rapide :',
-    email: 'support@chronix.mu',
+    email: 'chronix.mu@gmail.com',
     phone: '+230 5700 1234',
   }
 } as const;
