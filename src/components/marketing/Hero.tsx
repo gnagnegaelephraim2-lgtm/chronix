@@ -62,24 +62,39 @@ export function Hero() {
               backgroundImage: `url(${src})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
-              opacity: i === bgIndex ? 0.38 : 0,
+              opacity: i === bgIndex ? 0.85 : 0,
               transition: 'opacity 1.2s ease-in-out',
             }}
           />
         ))}
-        {/* Soft theme-matching overlay scrim */}
+        {/* Extremely soft theme wash overlay */}
         <div 
           style={{
             position: 'absolute',
             inset: 0,
             background: 'var(--bg-page)',
-            opacity: 0.82,
+            opacity: 0.12,
             zIndex: 1
           }}
         />
       </div>
 
-      <div className="hero-copy" style={{ textAlign: 'center', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 2, padding: '3rem 1.25rem', maxWidth: '820px' }}>
+      <div className="hero-copy" style={{
+        textAlign: 'center',
+        margin: '0 auto',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        zIndex: 2,
+        padding: '3.5rem 3rem',
+        maxWidth: '820px',
+        background: 'rgba(253, 251, 247, 0.78)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        border: '1px solid rgba(255, 255, 255, 0.65)',
+        borderRadius: '24px',
+        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.06)'
+      }}>
         <h1 style={{ fontSize: '3.4rem', lineHeight: 1.1, marginBottom: '1.5rem', textAlign: 'center', letterSpacing: '-1.5px', fontWeight: 800 }}>
           {t('heroHeadlinePrefix')} <span className="amber-text">{t('heroHeadlineAmber')}</span>
         </h1>

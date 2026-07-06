@@ -51,27 +51,27 @@ export function AuthShell({ children }: AuthShellProps) {
         </div>
       </div>
 
-      <div className="login-right-panel" style={{ position: 'relative', overflow: 'hidden' }}>
+      <div className="login-right-panel" style={{ position: 'relative', overflow: 'hidden', background: '#0a0d10' }}>
         {/* Background Scrolling Marquee */}
-        <div className="hero-marquee" aria-hidden="true" style={{ opacity: 0.16, zIndex: 0 }}>
+        <div className="hero-marquee" aria-hidden="true" style={{ opacity: 0.8, zIndex: 0 }}>
           <div className="hero-marquee-row hero-marquee-row--left">
             {[...MARQUEE_ROW_A, ...MARQUEE_ROW_A].map((src, i) => (
-              <img src={src} alt="" key={i} loading="lazy" style={{ opacity: 0.65 }} />
+              <img src={src} alt="" key={i} loading="lazy" style={{ opacity: 0.9, filter: 'grayscale(0%)' }} />
             ))}
           </div>
           <div className="hero-marquee-row hero-marquee-row--right">
             {[...MARQUEE_ROW_B, ...MARQUEE_ROW_B].map((src, i) => (
-              <img src={src} alt="" key={i} loading="lazy" style={{ opacity: 0.65 }} />
+              <img src={src} alt="" key={i} loading="lazy" style={{ opacity: 0.9, filter: 'grayscale(0%)' }} />
             ))}
           </div>
         </div>
 
-        {/* Semi-translucent overlay color overlay */}
+        {/* Soft, dark translucent scrim to preserve white text contrast */}
         <div 
           style={{
             position: 'absolute',
             inset: 0,
-            background: 'linear-gradient(160deg, rgba(25, 58, 91, 0.9) 0%, rgba(15, 36, 56, 0.95) 100%)',
+            background: 'rgba(10, 13, 16, 0.45)',
             zIndex: 1
           }}
         />
