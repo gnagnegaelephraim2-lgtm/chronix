@@ -29,7 +29,7 @@ export function Navbar() {
         <a href="#" className="navbar-login-link" onClick={(e) => { e.preventDefault(); navigate('/login'); }} style={{ fontWeight: 600, fontSize: '0.9rem' }}>
           {t('loginButton')}
         </a>
-        <button className="btn btn-primary-amber" onClick={() => navigate('/login')}>
+        <button className="btn btn-primary-amber" onClick={() => navigate('/signup')}>
           {t('signUp')}
         </button>
       </div>

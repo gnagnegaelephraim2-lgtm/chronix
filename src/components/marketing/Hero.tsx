@@ -76,7 +76,7 @@ export function Hero() {
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', marginBottom: '1.75rem', maxWidth: 520 }}>{t('heroSubtext')}</p>
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <button className="btn btn-primary-amber" onClick={() => navigate('/login')}>
+          <button className="btn btn-primary-amber" onClick={() => navigate('/signup')}>
             {t('getStartedNow')}
           </button>
           <button className="btn btn-primary-navy" onClick={() => setShowDemo(true)}>

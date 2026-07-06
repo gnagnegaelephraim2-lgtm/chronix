@@ -64,7 +64,7 @@ export function Footer() {
           <h3 style={{ fontSize: '1.25rem', color: '#fff', marginBottom: '0.35rem' }}>Ready to get started?</h3>
           <p style={{ fontSize: '0.9rem' }}>Join Mauritian businesses already tracking attendance the smart way.</p>
         </div>
-        <button className="btn btn-primary-amber" onClick={() => navigate('/login')}>
+        <button className="btn btn-primary-amber" onClick={() => navigate('/signup')}>
           {t('getStartedNow')}
         </button>
       </div>

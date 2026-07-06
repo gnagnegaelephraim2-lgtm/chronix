@@ -1,174 +1,108 @@
-// Screen B — Login (shared)
+// Screen B — Login (existing accounts only; new accounts go through Signup)
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSession } from '../../hooks/useSession';
-import { useStore, useStoreActions } from '../../hooks/useStore';
+import { useStore } from '../../hooks/useStore';
 import { useLanguage } from '../../hooks/useLanguage';
 import type { SessionView } from '../../types/session';
-import type { Employee } from '../../types';
-import logo from '../../assets/chronix_logo.png';
 import { GoogleLoginModal } from './GoogleLoginModal';
-import { useTheme } from '../../hooks/useTheme';
+import { AuthShell } from './AuthShell';
 
 export function LoginPage() {
   const { t } = useLanguage();
   const { loginAs } = useSession();
   const { state } = useStore();
-  const { addEmployee } = useStoreActions();
   const navigate = useNavigate();
   const [view, setView] = useState<SessionView>('admin');
-  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [showGoogleModal, setShowGoogleModal] = useState(false);
-  const { theme, toggleTheme } = useTheme();
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError('');
 
     const trimmedEmail = email.trim().toLowerCase();
     const existing = state.employees.find((emp) => emp.email.toLowerCase() === trimmedEmail);
 
-    if (existing) {
-      loginAs(view, existing.id);
-      navigate(existing.role === 'employee' ? '/employee' : '/admin');
+    if (!existing) {
+      setError(t('noAccountFoundError'));
       return;
     }
 
-    const [firstName, ...rest] = fullName.trim().split(/\s+/);
-    const lastName = rest.join(' ') || '—';
-    const newEmployeeData: Omit<Employee, 'id'> = {
-      firstName: firstName || 'New',
-      lastName,
-      avatarUrl: `https://i.pravatar.cc/150?u=${encodeURIComponent(trimmedEmail || fullName)}`,
-      email: trimmedEmail,
-      phone: '',
-      role: view === 'admin' ? 'admin' : 'employee',
-      department: '',
-      employmentType: 'full_time',
-      joinedAt: new Date().toISOString().slice(0, 10),
-      workLocationId: state.settings.workLocations[0]?.id ?? '',
-      allowedCheckInMethods: ['gps_face'],
-      leaveBalance: 14,
-    };
-    const newId = addEmployee(newEmployeeData);
-    // Pass the full object, not just the id — the store update from
-    // addEmployee hasn't flowed back into this context yet, so looking the
-    // id up in state.employees right now would still see the old (missing) list.
-    loginAs(view, { ...newEmployeeData, id: newId });
-    navigate(view === 'admin' ? '/admin' : '/employee');
+    loginAs(view, existing.id);
+    navigate(existing.role === 'employee' ? '/employee' : '/admin');
   }
 
   return (
-    <div className="login-container" style={{ position: 'relative' }}>
-      {/* Floating Banano Mode Toggle */}
-      <div style={{ position: 'absolute', top: '20px', right: '20px', zIndex: 10 }}>
+    <AuthShell>
+      <h1 style={{ fontSize: '1.5rem', marginBottom: '0.4rem' }}>{t('loginTitle')}</h1>
+      <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>{t('loginSubtitle')}</p>
+
+      <div style={{ display: 'flex', border: '1px solid var(--border)', borderRadius: 'var(--button-radius)', marginBottom: '1.5rem', overflow: 'hidden' }}>
         <button
           type="button"
-          onClick={toggleTheme}
+          onClick={() => setView('admin')}
+          className="btn"
           style={{
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border)',
-            borderRadius: '20px',
-            padding: '8px 16px',
-            fontSize: '0.85rem',
-            fontWeight: 600,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            cursor: 'pointer',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-            color: 'var(--text-primary)',
-            transition: 'all 0.2s',
+            flex: 1,
+            borderRadius: 0,
+            background: view === 'admin' ? 'var(--chronix-amber)' : 'transparent',
+            color: view === 'admin' ? 'var(--chronix-navy)' : 'var(--text-primary)',
           }}
         >
-          <span>🍌</span>
-          {theme === 'banano' ? 'Standard Mode' : 'Banano Mode'}
+          {t('loginBusinessTab')}
+        </button>
+        <button
+          type="button"
+          onClick={() => setView('employee')}
+          className="btn"
+          style={{
+            flex: 1,
+            borderRadius: 0,
+            background: view === 'employee' ? 'var(--chronix-amber)' : 'transparent',
+            color: view === 'employee' ? 'var(--chronix-navy)' : 'var(--text-primary)',
+          }}
+        >
+          {t('loginEmployeeTab')}
         </button>
       </div>
 
-      <div className="login-left-panel">
-        <div style={{ maxWidth: 380, margin: '0 auto', width: '100%' }}>
-          <img src={logo} alt="Chronix" style={{ height: 32, marginBottom: '2rem' }} />
-          <h1 style={{ fontSize: '1.5rem', marginBottom: '0.4rem' }}>{t('loginTitle')}</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>{t('loginSubtitle')}</p>
-
-          <div style={{ display: 'flex', border: '1px solid var(--border)', borderRadius: 'var(--button-radius)', marginBottom: '1.5rem', overflow: 'hidden' }}>
-            <button
-              type="button"
-              onClick={() => setView('admin')}
-              className="btn"
-              style={{
-                flex: 1,
-                borderRadius: 0,
-                background: view === 'admin' ? 'var(--chronix-amber)' : 'transparent',
-                color: view === 'admin' ? 'var(--chronix-navy)' : 'var(--text-primary)',
-              }}
-            >
-              {t('loginBusinessTab')}
-            </button>
-            <button
-              type="button"
-              onClick={() => setView('employee')}
-              className="btn"
-              style={{
-                flex: 1,
-                borderRadius: 0,
-                background: view === 'employee' ? 'var(--chronix-amber)' : 'transparent',
-                color: view === 'employee' ? 'var(--chronix-navy)' : 'var(--text-primary)',
-              }}
-            >
-              {t('loginEmployeeTab')}
-            </button>
-          </div>
-
-          <form onSubmit={handleSubmit}>
-            <div className="form-field">
-              <label className="form-label">{t('fullNameLabel')}</label>
-              <input className="form-input" type="text" placeholder={t('fullNamePlaceholder')} value={fullName} onChange={(e) => setFullName(e.target.value)} required />
-            </div>
-            <div className="form-field">
-              <label className="form-label">{t('emailLabel')}</label>
-              <input className="form-input" type="email" placeholder={t('emailPlaceholder')} value={email} onChange={(e) => setEmail(e.target.value)} required />
-            </div>
-            <div className="form-field">
-              <label className="form-label">{t('passwordLabel')}</label>
-              <input className="form-input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-            </div>
-            <div style={{ textAlign: 'right', marginBottom: '1.25rem' }}>
-              <a href="#" style={{ fontSize: '0.82rem', color: 'var(--chronix-navy)', fontWeight: 600 }}>
-                {t('forgotPassword')}
-              </a>
-            </div>
-            <button type="submit" className="btn btn-primary-amber" style={{ width: '100%', marginBottom: '1.25rem' }}>
-              {t('loginButton')}
-            </button>
-          </form>
-
-          <div style={{ textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.82rem', marginBottom: '1rem' }}>{t('orLoginWith')}</div>
-          <button
-            type="button"
-            className="btn btn-outline"
-            style={{ width: '100%' }}
-            onClick={() => setShowGoogleModal(true)}
-          >
-            {t('continueWithGoogle')}
-          </button>
+      <form onSubmit={handleSubmit}>
+        <div className="form-field">
+          <label className="form-label">{t('emailLabel')}</label>
+          <input className="form-input" type="email" placeholder={t('emailPlaceholder')} value={email} onChange={(e) => { setEmail(e.target.value); setError(''); }} required />
         </div>
-      </div>
+        <div className="form-field">
+          <label className="form-label">{t('passwordLabel')}</label>
+          <input className="form-input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        </div>
+        {error && (
+          <p style={{ color: 'var(--danger)', fontSize: '0.85rem', marginBottom: '1rem' }}>
+            {error} <Link to="/signup" style={{ fontWeight: 600 }}>{t('signUpLinkText')}</Link>
+          </p>
+        )}
+        <div style={{ textAlign: 'right', marginBottom: '1.25rem' }}>
+          <a href="#" style={{ fontSize: '0.82rem', color: 'var(--chronix-navy)', fontWeight: 600 }}>
+            {t('forgotPassword')}
+          </a>
+        </div>
+        <button type="submit" className="btn btn-primary-amber" style={{ width: '100%', marginBottom: '1.25rem' }}>
+          {t('loginButton')}
+        </button>
+      </form>
+
+      <div style={{ textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.82rem', marginBottom: '1rem' }}>{t('orLoginWith')}</div>
+      <button type="button" className="btn btn-outline" style={{ width: '100%', marginBottom: '1.5rem' }} onClick={() => setShowGoogleModal(true)}>
+        {t('continueWithGoogle')}
+      </button>
+
+      <p style={{ textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+        {t('dontHaveAccount')} <Link to="/signup" style={{ fontWeight: 600, color: 'var(--chronix-navy)' }}>{t('signUpLinkText')}</Link>
+      </p>
 
       {showGoogleModal && <GoogleLoginModal onClose={() => setShowGoogleModal(false)} />}
-
-      <div className="login-right-panel">
-        <div style={{ color: '#fff', textAlign: 'center', maxWidth: 320 }}>
-          <div style={{ background: '#fff', borderRadius: 12, padding: '0.6rem 1rem', display: 'inline-flex', marginBottom: '1.5rem' }}>
-            <img src={logo} alt="Chronix" style={{ height: 32, display: 'block' }} />
-          </div>
-          <p style={{ fontSize: '1.05rem', lineHeight: 1.6 }}>
-            One shared system, two views. Everything your team does on the clock appears instantly on your dashboard.
-          </p>
-        </div>
-      </div>
-    </div>
+    </AuthShell>
   );
 }

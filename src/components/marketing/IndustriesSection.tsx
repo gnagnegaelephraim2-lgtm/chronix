@@ -545,7 +545,7 @@ export function IndustriesSection() {
                 type="button"
                 onClick={() => {
                   setSelectedIndustry(null);
-                  navigate('/login');
+                  navigate('/signup');
                 }}
               >
                 {lang === 'fr' ? 'Démarrer l\'essai gratuit' : 'Start Free Trial'}

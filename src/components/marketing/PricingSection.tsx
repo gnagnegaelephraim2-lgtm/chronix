@@ -146,7 +146,7 @@ export function PricingSection() {
             ))}
           </ul>
 
-          <button className="btn btn-outline" style={{ width: '100%', marginTop: '1.5rem' }} onClick={() => navigate('/login')}>
+          <button className="btn btn-outline" style={{ width: '100%', marginTop: '1.5rem' }} onClick={() => navigate('/signup')}>
             {data.startTrial}
           </button>
         </div>
@@ -174,7 +174,7 @@ export function PricingSection() {
             ))}
           </ul>
 
-          <button className="btn btn-primary-amber" style={{ width: '100%', marginTop: '1.5rem' }} onClick={() => navigate('/login')}>
+          <button className="btn btn-primary-amber" style={{ width: '100%', marginTop: '1.5rem' }} onClick={() => navigate('/signup')}>
             {data.startTrial}
           </button>
         </div>
@@ -201,7 +201,7 @@ export function PricingSection() {
             ))}
           </ul>
 
-          <button className="btn btn-outline" style={{ width: '100%', marginTop: '1.5rem' }} onClick={() => navigate('/login')}>
+          <button className="btn btn-outline" style={{ width: '100%', marginTop: '1.5rem' }} onClick={() => navigate('/contact')}>
             {data.contactSales}
           </button>
         </div>

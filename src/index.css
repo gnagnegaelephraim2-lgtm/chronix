@@ -287,6 +287,39 @@ button, input, textarea, select {
   position: relative;
   overflow: hidden;
 }
+.auth-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+.banano-toggle {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  color: var(--text-primary);
+  transition: var(--transition-smooth);
+  white-space: nowrap;
+}
+.banano-toggle:hover {
+  border-color: var(--chronix-navy);
+}
+@media (max-width: 380px) {
+  .banano-toggle {
+    padding: 6px 12px;
+    font-size: 0.78rem;
+  }
+}
 
 /* ---------- Grid utilities ---------- */
 .responsive-grid-2-1 {
