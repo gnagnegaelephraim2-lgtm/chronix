@@ -71,8 +71,8 @@ export function Footer() {
 
       <div className="footer-grid">
         <div className="footer-brand">
-          <div style={{ display: 'inline-flex', marginBottom: '1.1rem' }}>
-            <img src={logo} alt="Chronix" style={{ height: 24, display: 'block', filter: 'brightness(0) invert(1)' }} />
+          <div style={{ background: '#fff', borderRadius: 8, padding: '0.4rem 0.7rem', display: 'inline-flex', marginBottom: '1.1rem' }}>
+            <img src={logo} alt="Chronix" style={{ height: 24, display: 'block' }} />
           </div>
           <p style={{ fontSize: '0.85rem', maxWidth: 320, marginBottom: '1.1rem' }}>{t('footerTagline')}</p>
 
