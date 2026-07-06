@@ -92,17 +92,13 @@ export function Hero() {
         maxWidth: '820px',
         width: '100%',
         boxSizing: 'border-box',
-        background: 'rgba(253, 251, 247, 0.85)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        border: '1px solid rgba(255, 255, 255, 0.65)',
+        background: 'transparent',
         borderRadius: '24px',
-        boxShadow: '0 20px 50px rgba(0, 0, 0, 0.08)'
       }}>
-        <h1 style={{ fontSize: 'clamp(1.9rem, 6.5vw, 3.4rem)', lineHeight: 1.15, marginBottom: '1.25rem', textAlign: 'center', letterSpacing: '-1px', fontWeight: 800, color: 'var(--chronix-navy)' }}>
+        <h1 style={{ fontSize: 'clamp(1.9rem, 6.5vw, 3.4rem)', lineHeight: 1.15, marginBottom: '1.25rem', textAlign: 'center', letterSpacing: '-1px', fontWeight: 800, color: '#000' }}>
           {t('heroHeadlinePrefix')} <span className="amber-text">{t('heroHeadlineAmber')}</span>
         </h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: 'clamp(0.95rem, 2.6vw, 1.15rem)', marginBottom: '1.75rem', maxWidth: 620, textAlign: 'center', lineHeight: 1.55, fontWeight: 500 }}>{t('heroSubtext')}</p>
+        <p style={{ color: '#000', fontSize: 'clamp(0.95rem, 2.6vw, 1.15rem)', marginBottom: '1.75rem', maxWidth: 620, textAlign: 'center', lineHeight: 1.55, fontWeight: 500 }}>{t('heroSubtext')}</p>
         <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap', justifyContent: 'center' }}>
           <button className="btn btn-primary-amber btn-lg" onClick={() => navigate('/signup')} style={{ padding: 'clamp(0.7rem, 2vw, 0.85rem) clamp(1.5rem, 5vw, 2.25rem)', fontSize: 'clamp(0.92rem, 2vw, 1.05rem)', fontWeight: 600 }}>
             {t('getStartedNow')}
