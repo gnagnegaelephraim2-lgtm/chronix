@@ -1,12 +1,13 @@
 // Screen C4 — Admin Reimbursements
-import { useMemo } from 'react';
-import { Clock, CheckCircle2, XCircle, Wallet } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Clock, CheckCircle2, XCircle, Wallet, Eye } from 'lucide-react';
 import { StatCard } from '../../components/common/StatCard';
 import { DataTable, type DataTableColumn } from '../../components/common/DataTable';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { ApproveRejectActions } from '../../components/common/ApproveRejectActions';
 import { Avatar } from '../../components/common/Avatar';
 import { RecentActivityPanel } from '../../components/admin/RecentActivityPanel';
+import { RequestDetailModal } from '../../components/admin/RequestDetailModal';
 import { useStore, useStoreActions } from '../../hooks/useStore';
 import { useLanguage } from '../../hooks/useLanguage';
 import { formatMUR } from '../../utils/format';
@@ -21,6 +22,7 @@ export function Reimbursements() {
   const { t } = useLanguage();
   const { state } = useStore();
   const { decideReimbursement } = useStoreActions();
+  const [viewingRow, setViewingRow] = useState<Row | null>(null);
 
   const pendingCount = state.reimbursements.filter((r) => r.status === 'pending' || r.status === 'in_review').length;
   const approvedCount = state.reimbursements.filter((r) => r.status === 'approved').length;
@@ -69,11 +71,16 @@ export function Reimbursements() {
       key: 'actions',
       header: 'Actions',
       render: (row) => (
-        <ApproveRejectActions
-          disabled={row.reimbursement.status === 'approved' || row.reimbursement.status === 'rejected'}
-          onApprove={() => decideReimbursement(row.reimbursement.id, 'approved')}
-          onReject={() => decideReimbursement(row.reimbursement.id, 'rejected')}
-        />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <button type="button" className="icon-btn" aria-label="View details" onClick={() => setViewingRow(row)}>
+            <Eye size={16} />
+          </button>
+          <ApproveRejectActions
+            disabled={row.reimbursement.status === 'approved' || row.reimbursement.status === 'rejected'}
+            onApprove={() => decideReimbursement(row.reimbursement.id, 'approved')}
+            onReject={() => decideReimbursement(row.reimbursement.id, 'rejected')}
+          />
+        </div>
       ),
     },
   ];
@@ -100,6 +107,24 @@ export function Reimbursements() {
         </div>
         <RecentActivityPanel />
       </div>
+
+      {viewingRow && (
+        <RequestDetailModal
+          title="Reimbursement"
+          employee={viewingRow.employee}
+          status={viewingRow.reimbursement.status}
+          fields={[
+            { label: 'Expense Type', value: viewingRow.reimbursement.expenseType },
+            { label: 'Date', value: viewingRow.reimbursement.date },
+            { label: 'Amount', value: formatMUR(viewingRow.reimbursement.amountMUR) },
+          ]}
+          reason={viewingRow.reimbursement.description}
+          attachmentUrl={viewingRow.reimbursement.receiptUrl}
+          onApprove={() => decideReimbursement(viewingRow.reimbursement.id, 'approved')}
+          onReject={() => decideReimbursement(viewingRow.reimbursement.id, 'rejected')}
+          onClose={() => setViewingRow(null)}
+        />
+      )}
     </div>
   );
 }

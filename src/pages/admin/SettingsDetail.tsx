@@ -6,7 +6,9 @@ import { ADMIN_SETTINGS_SECTIONS } from '../../data/settingsSections';
 import { useStore, useStoreActions } from '../../hooks/useStore';
 import { uid } from '../../store/storeReducer';
 import { getTrialStatus } from '../../utils/trial';
-import type { CheckInMethod, Shift } from '../../types';
+import { Avatar } from '../../components/common/Avatar';
+import { EditEmployeeModal } from '../../components/admin/EditEmployeeModal';
+import type { CheckInMethod, Employee, Shift } from '../../types';
 
 const CHECK_IN_OPTIONS: Array<{ value: CheckInMethod; label: string }> = [
   { value: 'gps_face', label: 'GPS Check-In' },
@@ -23,6 +25,7 @@ export function AdminSettingsDetail() {
   const { updateSettings } = useStoreActions();
   const section = ADMIN_SETTINGS_SECTIONS.find((s) => s.id === sectionId);
   const [shiftDraft, setShiftDraft] = useState(emptyShiftDraft);
+  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
 
   if (!section) return <div className="empty-state">Section not found.</div>;
 
@@ -217,10 +220,36 @@ export function AdminSettingsDetail() {
           </div>
         )}
 
-        {!['shift-settings', 'work-location-settings', 'check-in-methods', 'billing'].includes(section.id) && (
+        {section.id === 'employee-settings' && (
+          <div>
+            <h3 style={{ marginBottom: '1rem', fontSize: '0.95rem' }}>Team ({state.employees.length})</h3>
+            {state.employees.length === 0 && <p className="empty-state">No employees yet.</p>}
+            {state.employees.map((emp) => {
+              const shift = state.settings.shifts.find((s) => s.id === emp.shiftId);
+              return (
+                <div key={emp.id} className="side-panel-row">
+                  <Avatar src={emp.avatarUrl} name={`${emp.firstName} ${emp.lastName}`} size={36} />
+                  <div className="side-panel-row-main">
+                    <div className="side-panel-name">{emp.firstName} {emp.lastName}</div>
+                    <div className="side-panel-sub">
+                      {emp.department || '—'} · {shift ? shift.name : 'No shift'} · MUR {emp.hourlyRateMUR}/hr
+                    </div>
+                  </div>
+                  <button type="button" className="btn btn-outline" onClick={() => setEditingEmployee(emp)}>
+                    Edit
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {!['shift-settings', 'work-location-settings', 'check-in-methods', 'billing', 'employee-settings'].includes(section.id) && (
           <div className="empty-state">This section is coming soon.</div>
         )}
       </div>
+
+      {editingEmployee && <EditEmployeeModal employee={editingEmployee} onClose={() => setEditingEmployee(null)} />}
     </div>
   );
 }

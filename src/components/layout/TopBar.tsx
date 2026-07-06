@@ -1,9 +1,10 @@
-import { ChevronDown, Menu, Search } from 'lucide-react';
+import { ChevronDown, Menu } from 'lucide-react';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useSession } from '../../hooks/useSession';
 import { useStore } from '../../hooks/useStore';
 import { Avatar } from '../common/Avatar';
 import { NotificationBell } from './NotificationBell';
+import { GlobalSearch } from './GlobalSearch';
 import logoWhite from '../../assets/chronix_logo_white.png';
 
 interface TopBarProps {
@@ -48,10 +49,7 @@ export function DesktopTopBar({ variant }: { variant: 'admin' | 'employee' }) {
   return (
     <div className={`topbar topbar--${variant}`}>
       {variant === 'admin' ? (
-        <div style={{ position: 'relative', flex: 1, maxWidth: 420 }}>
-          <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
-          <input className="form-input" style={{ paddingLeft: '2.25rem' }} placeholder="Search people, reports, or settings…" />
-        </div>
+        <GlobalSearch />
       ) : (
         <div>
           <div style={{ fontWeight: 700 }}>

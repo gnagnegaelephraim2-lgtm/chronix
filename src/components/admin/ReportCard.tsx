@@ -1,7 +1,7 @@
-import { Clock, UserX, QrCode, Building2, FileDown } from 'lucide-react';
+import { Clock, UserX, QrCode, Building2, FileDown, Wallet } from 'lucide-react';
 import type { ReportCardDef } from '../../types';
 
-const ICONS = { overtime: Clock, absence: UserX, qr: QrCode, department: Building2 };
+const ICONS = { overtime: Clock, absence: UserX, qr: QrCode, department: Building2, payroll: Wallet };
 
 export function ReportCard({ def, onGenerate, onExportPdf }: { def: ReportCardDef; onGenerate: () => void; onExportPdf: () => void }) {
   const Icon = ICONS[def.icon];

@@ -30,8 +30,10 @@ export interface Employee {
   employmentType: EmploymentType;
   joinedAt: string; // ISO date
   workLocationId: string;
+  shiftId: string | null; // which of the business's shifts this employee is assigned to
   allowedCheckInMethods: CheckInMethod[];
   leaveBalance: number; // days remaining
+  hourlyRateMUR: number; // hourly pay in Mauritian Rupees, used in payroll-adjacent reports
   credential: string; // password (business owner) or admin-issued temp PIN (employee)
   mustChangePassword?: boolean; // true for employee accounts until they set their own password
 }
@@ -138,7 +140,7 @@ export interface ReportCardDef {
   id: string;
   title: string;
   description: string;
-  icon: 'overtime' | 'absence' | 'qr' | 'department';
+  icon: 'overtime' | 'absence' | 'qr' | 'department' | 'payroll';
 }
 
 export interface SettingsSectionDef {

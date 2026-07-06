@@ -63,7 +63,7 @@ export function SignupPage() {
     const newEmployeeData: Omit<Employee, 'id'> = {
       firstName: firstName || 'New',
       lastName,
-      avatarUrl: `https://i.pravatar.cc/150?u=${encodeURIComponent(trimmedEmail || fullName)}`,
+      avatarUrl: '',
       email: trimmedEmail,
       phone: phone.trim(),
       role: 'admin',
@@ -71,8 +71,10 @@ export function SignupPage() {
       employmentType: 'full_time',
       joinedAt: new Date().toISOString().slice(0, 10),
       workLocationId: newLocation.id,
+      shiftId: null,
       allowedCheckInMethods: ['gps_face'],
       leaveBalance: 14,
+      hourlyRateMUR: 0,
       credential: password,
     };
     const newId = addEmployee(newEmployeeData);

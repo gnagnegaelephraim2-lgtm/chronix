@@ -15,6 +15,7 @@ const REPORT_DEFS: ReportCardDef[] = [
   { id: 'absence', title: 'Absence Report', description: 'Absences, leaves, and attendance trends.', icon: 'absence' },
   { id: 'qr', title: 'QR Code Attendance Report', description: 'Attendance captured via QR check-ins.', icon: 'qr' },
   { id: 'department', title: 'Department Performance Report', description: 'Department-wise metrics side by side.', icon: 'department' },
+  { id: 'payroll', title: 'Payroll Summary Report', description: 'Hours worked x hourly rate per employee, for the date range.', icon: 'payroll' },
 ];
 
 export function Reports() {
@@ -32,6 +33,7 @@ export function Reports() {
       .filter((r) => r.date >= from && r.date <= to)
       .map((r) => {
         const emp = state.employees.find((e) => e.id === r.employeeId);
+        const hours = r.hours ?? 0;
         return {
           Employee: emp ? `${emp.firstName} ${emp.lastName}` : '',
           Department: emp?.department ?? '',
@@ -39,13 +41,31 @@ export function Reports() {
           ClockIn: r.clockIn,
           ClockOut: r.clockOut ?? '',
           Hours: r.hours ?? '',
+          'Hourly Rate (MUR)': emp?.hourlyRateMUR ?? 0,
+          'Est. Pay (MUR)': Math.round(hours * (emp?.hourlyRateMUR ?? 0) * 100) / 100,
           Status: r.status,
         };
       });
     downloadCsv(`chronix-report-${from}-to-${to}.csv`, rows);
   }
 
+  function payrollRows(): Array<Record<string, string | number>> {
+    return state.employees.map((emp) => {
+      const hours = state.attendance
+        .filter((r) => r.employeeId === emp.id && r.date >= from && r.date <= to)
+        .reduce((sum, r) => sum + (r.hours ?? 0), 0);
+      return {
+        Employee: `${emp.firstName} ${emp.lastName}`,
+        Department: emp.department,
+        'Hours Worked': Math.round(hours * 100) / 100,
+        'Hourly Rate (MUR)': emp.hourlyRateMUR,
+        'Est. Pay (MUR)': Math.round(hours * emp.hourlyRateMUR * 100) / 100,
+      };
+    });
+  }
+
   function reportRows(id: string): Array<Record<string, string | number>> {
+    if (id === 'payroll') return payrollRows();
     const aggregates = getReportsAggregates(state, { from, to });
     if (id === 'overtime') return [{ 'Overtime Hours': aggregates.overtimeHours }];
     if (id === 'absence') return [{ 'Absence Count': aggregates.absenceCount }];
@@ -58,6 +78,7 @@ export function Reports() {
     absence: 'Absence Report',
     qr: 'QR Code Attendance Report',
     department: 'Department Performance Report',
+    payroll: 'Payroll Summary Report',
   };
 
   function handleGenerate(id: string) {

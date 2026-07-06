@@ -1,6 +1,6 @@
 // Screen C3 — Admin Leave Management
 import { useMemo, useState } from 'react';
-import { Clock, CheckCircle2, XCircle, CalendarClock } from 'lucide-react';
+import { Clock, CheckCircle2, XCircle, CalendarClock, Eye } from 'lucide-react';
 import { StatCard } from '../../components/common/StatCard';
 import { DataTable, type DataTableColumn } from '../../components/common/DataTable';
 import { StatusBadge } from '../../components/common/StatusBadge';
@@ -9,6 +9,7 @@ import { Avatar } from '../../components/common/Avatar';
 import { SearchInput } from '../../components/common/SearchInput';
 import { PendingApprovalsPanel } from '../../components/admin/PendingApprovalsPanel';
 import { UpcomingLeavePanel } from '../../components/admin/UpcomingLeavePanel';
+import { RequestDetailModal } from '../../components/admin/RequestDetailModal';
 import { useStore, useStoreActions } from '../../hooks/useStore';
 import { useSession } from '../../hooks/useSession';
 import { useLanguage } from '../../hooks/useLanguage';
@@ -27,6 +28,7 @@ export function LeaveManagement() {
   const { session } = useSession();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [viewingRow, setViewingRow] = useState<Row | null>(null);
 
   const leaveRequests = state.requests.filter((r) => r.type === 'leave');
   const pendingCount = leaveRequests.filter((r) => r.status === 'pending').length;
@@ -65,11 +67,16 @@ export function LeaveManagement() {
       key: 'actions',
       header: 'Actions',
       render: (row) => (
-        <ApproveRejectActions
-          disabled={row.request.status === 'approved' || row.request.status === 'rejected'}
-          onApprove={() => decideRequest(row.request.id, 'approved', session?.employeeId ?? '')}
-          onReject={() => decideRequest(row.request.id, 'rejected', session?.employeeId ?? '')}
-        />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <button type="button" className="icon-btn" aria-label="View details" onClick={() => setViewingRow(row)}>
+            <Eye size={16} />
+          </button>
+          <ApproveRejectActions
+            disabled={row.request.status === 'approved' || row.request.status === 'rejected'}
+            onApprove={() => decideRequest(row.request.id, 'approved', session?.employeeId ?? '')}
+            onReject={() => decideRequest(row.request.id, 'rejected', session?.employeeId ?? '')}
+          />
+        </div>
       ),
     },
   ];
@@ -109,6 +116,23 @@ export function LeaveManagement() {
           <UpcomingLeavePanel />
         </div>
       </div>
+
+      {viewingRow && (
+        <RequestDetailModal
+          title="Leave Request"
+          employee={viewingRow.employee}
+          status={viewingRow.request.status}
+          fields={[
+            { label: 'Leave Type', value: viewingRow.request.leaveType ?? viewingRow.request.type },
+            { label: 'Dates', value: formatDateRange(viewingRow.request.dateFrom, viewingRow.request.dateTo, viewingRow.request.days) },
+          ]}
+          reason={viewingRow.request.reason}
+          attachmentUrl={viewingRow.request.attachmentUrl}
+          onApprove={() => decideRequest(viewingRow.request.id, 'approved', session?.employeeId ?? '')}
+          onReject={() => decideRequest(viewingRow.request.id, 'rejected', session?.employeeId ?? '')}
+          onClose={() => setViewingRow(null)}
+        />
+      )}
     </div>
   );
 }

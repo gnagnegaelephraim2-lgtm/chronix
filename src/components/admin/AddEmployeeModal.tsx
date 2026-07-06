@@ -25,6 +25,8 @@ export function AddEmployeeModal({ onClose }: { onClose: () => void }) {
   const [phone, setPhone] = useState('');
   const [department, setDepartment] = useState('');
   const [employmentType, setEmploymentType] = useState<EmploymentType>('full_time');
+  const [shiftId, setShiftId] = useState('');
+  const [hourlyRate, setHourlyRate] = useState('');
   const [allowedMethods, setAllowedMethods] = useState<CheckInMethod[]>(['gps_face']);
   const [createdPin, setCreatedPin] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -41,14 +43,16 @@ export function AddEmployeeModal({ onClose }: { onClose: () => void }) {
       lastName,
       email,
       phone,
-      avatarUrl: `https://i.pravatar.cc/150?u=${firstName}${lastName}${Date.now()}`,
+      avatarUrl: '',
       role: 'employee',
       department: trimmedDept,
       employmentType,
       joinedAt: localDateString(),
       workLocationId: state.settings.workLocations[0]?.id ?? '',
+      shiftId: shiftId || null,
       allowedCheckInMethods: allowedMethods.length ? allowedMethods : ['gps_face'],
       leaveBalance: 14,
+      hourlyRateMUR: Number(hourlyRate) || 0,
       credential: pin,
       mustChangePassword: true,
     });
@@ -124,6 +128,27 @@ export function AddEmployeeModal({ onClose }: { onClose: () => void }) {
         <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '-0.5rem', marginBottom: '1rem' }}>
           Type a new department name or pick one you've already used — Chronix remembers it for next time.
         </p>
+
+        <div className="responsive-grid-1-1">
+          <FormSelect
+            label="Shift"
+            value={shiftId}
+            onChange={(e) => setShiftId(e.target.value)}
+            options={[
+              { value: '', label: state.settings.shifts.length ? 'No shift assigned' : 'No shifts configured yet' },
+              ...state.settings.shifts.map((s) => ({ value: s.id, label: `${s.name} (${s.start}–${s.end})` })),
+            ]}
+          />
+          <FormField
+            label="Hourly Rate (MUR)"
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="ex: 150"
+            value={hourlyRate}
+            onChange={(e) => setHourlyRate(e.target.value)}
+          />
+        </div>
 
         <div className="form-field">
           <label className="form-label">Allowed Check-In Methods</label>

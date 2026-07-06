@@ -6,6 +6,7 @@ import type {
   ActivityEvent,
   BusinessSettings,
   CheckInMethod,
+  Shift,
 } from '../types';
 import {
   EMPLOYEES,
@@ -51,16 +52,26 @@ function todayIso(): string {
   return localDateString();
 }
 
-function isLate(clockInIso: string): boolean {
+// Late is relative to the employee's own assigned shift + its grace period —
+// never a hardcoded time. If no shift has been assigned (or the business
+// hasn't configured any shifts yet), there is no rule to be late against, so
+// the honest answer is "on time", not a made-up 9:00 AM default.
+function isLate(clockInIso: string, shift: Shift | undefined): boolean {
+  if (!shift) return false;
   const d = new Date(clockInIso);
-  return d.getHours() > 9 || (d.getHours() === 9 && d.getMinutes() > 15);
+  const [startHour, startMinute] = shift.start.split(':').map(Number);
+  const graceEnd = new Date(d);
+  graceEnd.setHours(startHour, startMinute + shift.graceMinutes, 0, 0);
+  return d.getTime() > graceEnd.getTime();
 }
 
 export function reducer(state: StoreState, action: StoreAction): StoreState {
   switch (action.type) {
     case 'CLOCK_IN': {
       const at = nowIso();
-      const late = isLate(at);
+      const employee = state.employees.find((e) => e.id === action.employeeId);
+      const shift = state.settings.shifts.find((s) => s.id === employee?.shiftId);
+      const late = isLate(at, shift);
       const record: AttendanceRecord = {
         id: uid('att'),
         employeeId: action.employeeId,
