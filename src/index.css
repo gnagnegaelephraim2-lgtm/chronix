@@ -285,16 +285,15 @@ button, input, textarea, select {
   background: var(--bg-page);
 }
 .login-left-panel {
-  flex: 1;
+  flex: 0 0 460px;
   min-width: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 2rem 3rem;
+  padding: 2.5rem;
 }
 .login-right-panel {
-  flex: 0 0 44%;
-  background: linear-gradient(160deg, var(--chronix-navy) 0%, #0f2438 100%);
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -80,7 +80,22 @@ export function Hero() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '3.5rem', width: '100%', maxWidth: '1200px', margin: '0 auto', alignItems: 'center', zIndex: 2, position: 'relative' }} className="hero-grid">
-        <div className="hero-copy" style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+        <div className="hero-copy" style={{
+          textAlign: 'left',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          padding: '2.5rem 2.75rem',
+          background: 'rgba(253, 251, 247, 0.75)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255, 255, 255, 0.65)',
+          borderRadius: '24px',
+          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.05)',
+          maxWidth: '620px',
+          width: '100%',
+          boxSizing: 'border-box'
+        }}>
           {/* Top visual Badge */}
           <div style={{ 
             display: 'inline-flex', 
