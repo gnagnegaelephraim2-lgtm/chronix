@@ -21,12 +21,12 @@ export function LiveClockPreview() {
         <img src={logo} alt="Chronix" style={{ height: 65, width: 65, objectFit: 'contain', margin: '-23px 0', display: 'block' }} />
         <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>Time Clock</span>
       </div>
-      <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Welcome back</div>
-      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
+      <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: 600 }}>Welcome back</div>
+      <div style={{ fontSize: '0.75rem', color: 'var(--text-primary)', marginBottom: '0.75rem', fontWeight: 500 }}>
         {clockedIn ? 'Clocked in — redirecting to login…' : 'Ready to clock in'}
       </div>
       <div style={{ fontSize: '2rem', fontWeight: 700 }}>{now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true })}</div>
-      <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
+      <div style={{ fontSize: '0.8rem', color: 'var(--text-primary)', marginBottom: '1rem', fontWeight: 500 }}>
         {now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
       </div>
       <button
