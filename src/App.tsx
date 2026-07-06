@@ -6,6 +6,7 @@ import { EmployeeLayout } from './routes/EmployeeLayout';
 import { MarketingHome } from './pages/marketing/MarketingHome';
 import { LoginPage } from './pages/auth/LoginPage';
 import { SignupPage } from './pages/auth/SignupPage';
+import { ChangePasswordPage } from './pages/auth/ChangePasswordPage';
 import { AboutPage } from './pages/marketing/AboutPage';
 import { ContactPage } from './pages/marketing/ContactPage';
 import { PrivacyPage } from './pages/marketing/PrivacyPage';
@@ -36,6 +37,7 @@ function App() {
         <Route path="/" element={<MarketingHome />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/employee/change-password" element={<ChangePasswordPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />

@@ -30,7 +30,7 @@ export function Dashboard() {
 
   return (
     <div>
-      <div className="topbar" style={{ display: 'flex' }}>
+      <div className="page-header">
         <div>
           <h1 style={{ fontSize: '1.5rem' }}>
             {t('goodMorning')}, {employee?.firstName} 👋

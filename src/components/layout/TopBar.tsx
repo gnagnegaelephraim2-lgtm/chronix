@@ -21,7 +21,7 @@ export function TopBar({ variant, onOpenMobile }: TopBarProps) {
       <button className="icon-btn" onClick={onOpenMobile} aria-label="Open menu" style={{ background: 'transparent', border: 'none', color: '#fff' }}>
         <Menu size={22} />
       </button>
-      <img src={logoWhite} alt="Chronix" style={{ height: 20, display: 'block' }} />
+      <img src={logoWhite} alt="Chronix" style={{ height: 100, width: 100, objectFit: 'contain', margin: '-35px 0', display: 'block' }} />
       <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
         <button className="icon-btn" onClick={toggleLang} style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: '0.75rem', width: 'auto' }}>
           {lang.toUpperCase()}

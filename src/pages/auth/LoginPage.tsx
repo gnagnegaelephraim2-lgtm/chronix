@@ -31,7 +31,16 @@ export function LoginPage() {
       return;
     }
 
+    if (existing.credential !== password) {
+      setError(t('incorrectCredentialsError'));
+      return;
+    }
+
     loginAs(view, existing.id);
+    if (existing.mustChangePassword) {
+      navigate('/employee/change-password');
+      return;
+    }
     navigate(existing.role === 'employee' ? '/employee' : '/admin');
   }
 
@@ -93,10 +102,14 @@ export function LoginPage() {
         </button>
       </form>
 
-      <div style={{ textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.82rem', marginBottom: '1rem' }}>{t('orLoginWith')}</div>
-      <button type="button" className="btn btn-outline" style={{ width: '100%', marginBottom: '1.5rem' }} onClick={() => setShowGoogleModal(true)}>
-        {t('continueWithGoogle')}
-      </button>
+      {view === 'admin' && (
+        <>
+          <div style={{ textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.82rem', marginBottom: '1rem' }}>{t('orLoginWith')}</div>
+          <button type="button" className="btn btn-outline" style={{ width: '100%', marginBottom: '1.5rem' }} onClick={() => setShowGoogleModal(true)}>
+            {t('continueWithGoogle')}
+          </button>
+        </>
+      )}
 
       <p style={{ textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
         {t('dontHaveAccount')} <Link to="/signup" style={{ fontWeight: 600, color: 'var(--chronix-navy)' }}>{t('signUpLinkText')}</Link>

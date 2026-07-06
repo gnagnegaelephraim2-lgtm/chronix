@@ -32,7 +32,7 @@ export function EmployeeHome() {
   return (
     <div>
       <div className="responsive-grid-1-1" style={{ marginBottom: '1.25rem' }}>
-        <StatusCard employee={employee} isClockedIn={isClockedIn} />
+        <StatusCard employee={employee} isClockedIn={isClockedIn} clockInAt={todayRecord?.clockIn ?? null} />
         <WorkLocationCard location={location} />
       </div>
 

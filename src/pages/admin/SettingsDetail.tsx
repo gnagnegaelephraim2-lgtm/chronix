@@ -1,9 +1,11 @@
 // Screen C6 — Admin Settings detail (generic shell keyed by :sectionId)
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Trash2 } from 'lucide-react';
 import { ADMIN_SETTINGS_SECTIONS } from '../../data/settingsSections';
 import { useStore, useStoreActions } from '../../hooks/useStore';
-import type { CheckInMethod } from '../../types';
+import { uid } from '../../store/storeReducer';
+import type { CheckInMethod, Shift } from '../../types';
 
 const CHECK_IN_OPTIONS: Array<{ value: CheckInMethod; label: string }> = [
   { value: 'gps_face', label: 'GPS Check-In' },
@@ -11,18 +13,40 @@ const CHECK_IN_OPTIONS: Array<{ value: CheckInMethod; label: string }> = [
   { value: 'kiosk', label: 'Shared Kiosk Terminal' },
 ];
 
+const emptyShiftDraft = { name: '', start: '09:00', end: '17:00', type: 'general' as Shift['type'], graceMinutes: '10' };
+
 export function AdminSettingsDetail() {
   const { sectionId } = useParams();
   const navigate = useNavigate();
   const { state } = useStore();
   const { updateSettings } = useStoreActions();
   const section = ADMIN_SETTINGS_SECTIONS.find((s) => s.id === sectionId);
+  const [shiftDraft, setShiftDraft] = useState(emptyShiftDraft);
 
   if (!section) return <div className="empty-state">Section not found.</div>;
 
+  function handleAddShift(e: React.FormEvent) {
+    e.preventDefault();
+    if (!shiftDraft.name.trim()) return;
+    const newShift: Shift = {
+      id: uid('shift'),
+      name: shiftDraft.name.trim(),
+      start: shiftDraft.start,
+      end: shiftDraft.end,
+      type: shiftDraft.type,
+      graceMinutes: Number(shiftDraft.graceMinutes) || 0,
+    };
+    updateSettings({ shifts: [...state.settings.shifts, newShift] });
+    setShiftDraft(emptyShiftDraft);
+  }
+
+  function handleRemoveShift(id: string) {
+    updateSettings({ shifts: state.settings.shifts.filter((s) => s.id !== id) });
+  }
+
   return (
     <div>
-      <div className="topbar">
+      <div className="page-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <button className="icon-btn" onClick={() => navigate('/admin/settings')}>
             <ChevronLeft size={18} />
@@ -38,6 +62,9 @@ export function AdminSettingsDetail() {
         {section.id === 'shift-settings' && (
           <div>
             <h3 style={{ marginBottom: '1rem', fontSize: '0.95rem' }}>Shifts</h3>
+            {state.settings.shifts.length === 0 && (
+              <p className="empty-state" style={{ marginBottom: '1rem' }}>No shifts yet — add your first one below.</p>
+            )}
             {state.settings.shifts.map((shift) => (
               <div key={shift.id} className="side-panel-row">
                 <div className="side-panel-row-main">
@@ -47,8 +74,44 @@ export function AdminSettingsDetail() {
                   </div>
                 </div>
                 <span className="status-badge status-badge--in-review">{shift.type}</span>
+                <button type="button" className="icon-btn" aria-label="Remove shift" onClick={() => handleRemoveShift(shift.id)} style={{ marginLeft: '0.5rem' }}>
+                  <Trash2 size={16} />
+                </button>
               </div>
             ))}
+
+            <form onSubmit={handleAddShift} style={{ marginTop: '1.25rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border)' }}>
+              <h4 style={{ fontSize: '0.85rem', marginBottom: '0.75rem' }}>Add a shift</h4>
+              <div className="responsive-grid-1-1">
+                <div className="form-field">
+                  <label className="form-label">Shift Name</label>
+                  <input className="form-input" placeholder="ex: Morning Shift" value={shiftDraft.name} onChange={(e) => setShiftDraft({ ...shiftDraft, name: e.target.value })} />
+                </div>
+                <div className="form-field">
+                  <label className="form-label">Type</label>
+                  <select className="form-select" value={shiftDraft.type} onChange={(e) => setShiftDraft({ ...shiftDraft, type: e.target.value as Shift['type'] })}>
+                    <option value="general">General</option>
+                    <option value="night">Night</option>
+                    <option value="split">Split</option>
+                  </select>
+                </div>
+              </div>
+              <div className="responsive-grid-1-1">
+                <div className="form-field">
+                  <label className="form-label">Start Time</label>
+                  <input className="form-input" type="time" value={shiftDraft.start} onChange={(e) => setShiftDraft({ ...shiftDraft, start: e.target.value })} />
+                </div>
+                <div className="form-field">
+                  <label className="form-label">End Time</label>
+                  <input className="form-input" type="time" value={shiftDraft.end} onChange={(e) => setShiftDraft({ ...shiftDraft, end: e.target.value })} />
+                </div>
+              </div>
+              <div className="form-field">
+                <label className="form-label">Grace Period (minutes)</label>
+                <input className="form-input" type="number" min="0" value={shiftDraft.graceMinutes} onChange={(e) => setShiftDraft({ ...shiftDraft, graceMinutes: e.target.value })} />
+              </div>
+              <button type="submit" className="btn btn-primary-navy">Add Shift</button>
+            </form>
           </div>
         )}
 

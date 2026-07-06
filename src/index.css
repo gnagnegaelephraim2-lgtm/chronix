@@ -233,6 +233,20 @@ button, input, textarea, select {
   flex-wrap: wrap;
 }
 
+/* Per-page title + primary-action header (title on the left, "Add Employee"/
+   "Export"/etc. button on the right). Named separately from .topbar (the
+   layout's search/notifications bar, which intentionally hides under 1024px
+   in favor of the mobile hamburger header) — sharing that class name used to
+   make every page's title and action button vanish on tablet and mobile. */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
 .mobile-top-header {
   display: none;
   align-items: center;
@@ -1407,13 +1421,15 @@ button, input, textarea, select {
   overflow: hidden;
   pointer-events: none;
 }
-/* Scrim to keep the headline legible over the photos */
+/* Scrim to keep the headline legible over the photos. A flat cream scrim at
+   high opacity read as "washed-out pale yellow" rather than a deliberate
+   background — a navy-tinted gradient (heavier at the edges, lighter where
+   the headline sits) reads as intentional brand treatment instead. */
 .hero-marquee::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: var(--bg-page);
-  opacity: 0.8;
+  background: linear-gradient(100deg, rgba(245, 243, 239, 0.94) 0%, rgba(245, 243, 239, 0.75) 45%, rgba(25, 58, 91, 0.35) 100%);
 }
 .hero-marquee-row {
   display: flex;
@@ -1426,8 +1442,8 @@ button, input, textarea, select {
   border-radius: 12px;
   margin-right: 1.25rem;
   flex-shrink: 0;
-  opacity: 0.3;
-  filter: grayscale(30%) blur(0.5px);
+  opacity: 0.65;
+  filter: saturate(1.05);
 }
 @keyframes marquee-left {
   from { transform: translateX(0); }

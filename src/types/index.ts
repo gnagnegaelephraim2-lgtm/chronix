@@ -32,6 +32,8 @@ export interface Employee {
   workLocationId: string;
   allowedCheckInMethods: CheckInMethod[];
   leaveBalance: number; // days remaining
+  credential: string; // password (business owner) or admin-issued temp PIN (employee)
+  mustChangePassword?: boolean; // true for employee accounts until they set their own password
 }
 
 export interface AttendanceRecord {
@@ -112,6 +114,7 @@ export interface BusinessSettings {
   leaveTypes: LeaveType[];
   approvalFlow: ApprovalStepName[];
   notificationChannels: NotificationChannel[];
+  departments: string[];
 }
 
 export interface ActivityEvent {

@@ -41,7 +41,7 @@ export function RequestPage() {
 
   return (
     <div>
-      <div className="topbar">
+      <div className="page-header">
         <div>
           <h1 style={{ fontSize: '1.4rem' }}>{t('requestTitle')}</h1>
         </div>

@@ -1,9 +1,13 @@
+import { useState } from 'react';
 import { Avatar } from '../common/Avatar';
 import { useLanguage } from '../../hooks/useLanguage';
 import type { Employee } from '../../types';
+import { EditProfileModal } from './EditProfileModal';
 
 export function ProfileCard({ employee }: { employee: Employee }) {
   const { t } = useLanguage();
+  const [showEdit, setShowEdit] = useState(false);
+
   return (
     <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
       <div style={{ position: 'relative' }}>
@@ -23,7 +27,8 @@ export function ProfileCard({ employee }: { employee: Employee }) {
           {t('joined')} {employee.joinedAt}
         </div>
       </div>
-      <button className="btn btn-outline">{t('editProfile')}</button>
+      <button className="btn btn-outline" onClick={() => setShowEdit(true)}>{t('editProfile')}</button>
+      {showEdit && <EditProfileModal employee={employee} onClose={() => setShowEdit(false)} />}
     </div>
   );
 }

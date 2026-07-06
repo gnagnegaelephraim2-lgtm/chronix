@@ -22,7 +22,7 @@ export function AuthShell({ children }: AuthShellProps) {
         <div style={{ maxWidth: 380, margin: '0 auto', width: '100%' }}>
           <div className="auth-top-row">
             <Link to="/" aria-label="Back to Chronix home">
-              <img src={logo} alt="Chronix" style={{ height: 32, display: 'block' }} />
+              <img src={logo} alt="Chronix" style={{ height: 110, width: 110, objectFit: 'contain', margin: '-39px 0', display: 'block' }} />
             </Link>
             <button type="button" className="banano-toggle" onClick={toggleTheme}>
               <span>🍌</span>
@@ -35,7 +35,7 @@ export function AuthShell({ children }: AuthShellProps) {
 
       <div className="login-right-panel">
         <div style={{ color: '#fff', textAlign: 'center', maxWidth: 340, position: 'relative', zIndex: 1 }}>
-          <img src={logoWhite} alt="Chronix" style={{ height: 36, display: 'block', margin: '0 auto 1.5rem' }} />
+          <img src={logoWhite} alt="Chronix" style={{ height: 125, width: 125, objectFit: 'contain', margin: '-45px auto -0.25rem', display: 'block' }} />
 
           <div className="auth-mockup-card">
             <div className="auth-mockup-row">

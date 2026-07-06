@@ -82,7 +82,7 @@ export function Reimbursements() {
 
   return (
     <div>
-      <div className="topbar">
+      <div className="page-header">
         <div>
           <h1 style={{ fontSize: '1.5rem' }}>{t('reimbursementsTitle')}</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{t('reimbursementsSubtitle')}</p>

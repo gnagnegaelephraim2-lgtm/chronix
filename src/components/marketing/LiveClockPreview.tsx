@@ -18,7 +18,7 @@ export function LiveClockPreview() {
   return (
     <div className="live-clock-preview">
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-        <img src={logo} alt="Chronix" style={{ height: 18 }} />
+        <img src={logo} alt="Chronix" style={{ height: 65, width: 65, objectFit: 'contain', margin: '-23px 0', display: 'block' }} />
         <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>Time Clock</span>
       </div>
       <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Welcome back</div>

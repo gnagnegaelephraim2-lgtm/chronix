@@ -9,17 +9,12 @@ import type {
   ActivityEvent,
 } from '../types';
 
-export const WORK_LOCATIONS: WorkLocation[] = [
-  { id: 'loc-1', name: 'Main office - Port Louis', address: 'Rue du Gouvernement, Port Louis', lat: -20.1609, lng: 57.5012, radiusMeters: 150 },
-  { id: 'loc-2', name: 'Curepipe Branch', address: 'Sir Winston Churchill St, Curepipe', lat: -20.3159, lng: 57.5218, radiusMeters: 120 },
-  { id: 'loc-3', name: 'Ebène Cybercity Office', address: 'Cybercity, Ebène', lat: -20.2456, lng: 57.4874, radiusMeters: 150 },
-];
+// No pre-seeded locations or shifts — every business defines its own real
+// location (set at signup) and shifts (built from scratch in Settings)
+// instead of inheriting a fictional Port Louis office and generic shifts.
+export const WORK_LOCATIONS: WorkLocation[] = [];
 
-export const SHIFTS: Shift[] = [
-  { id: 'shift-1', name: 'General Shift', start: '09:00', end: '18:00', type: 'general', graceMinutes: 10 },
-  { id: 'shift-2', name: 'Night Shift', start: '20:00', end: '05:00', type: 'night', graceMinutes: 15 },
-  { id: 'shift-3', name: 'Split Shift', start: '08:00', end: '14:00', type: 'split', graceMinutes: 5 },
-];
+export const SHIFTS: Shift[] = [];
 
 // No seeded people or activity — every Employee/AttendanceRecord/Request/
 // Reimbursement/ActivityEvent is created by real sign-ups and real usage.
@@ -39,4 +34,5 @@ export const BUSINESS_SETTINGS: BusinessSettings = {
   leaveTypes: ['annual', 'sick', 'personal'],
   approvalFlow: ['submitted', 'team_lead', 'manager', 'hr'],
   notificationChannels: ['email', 'in_app'],
+  departments: [],
 };

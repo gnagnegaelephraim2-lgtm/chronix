@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, UserPlus, ArrowLeft, X } from 'lucide-react';
-import { useStore, useStoreActions } from '../../hooks/useStore';
+import { useStore } from '../../hooks/useStore';
 import { useSession } from '../../hooks/useSession';
 import { useLanguage } from '../../hooks/useLanguage';
 import type { Employee } from '../../types';
@@ -45,7 +45,6 @@ const googleTranslations = {
 export function GoogleLoginModal({ onClose }: GoogleLoginModalProps) {
   const navigate = useNavigate();
   const { state } = useStore();
-  const { addEmployee } = useStoreActions();
   const { loginAs } = useSession();
   const { lang } = useLanguage();
 
@@ -58,8 +57,11 @@ export function GoogleLoginModal({ onClose }: GoogleLoginModalProps) {
   const [customEmail, setCustomEmail] = useState('');
   const [emailError, setEmailError] = useState('');
 
-  // Get all employees
-  const employees = state.employees || [];
+  // Admin-only quick access — this used to list every employee (letting
+  // whoever opened it sign in as anyone), which is exactly the "admin has
+  // direct access to employee accounts" problem employees' real credential
+  // login (see LoginPage) now replaces. Scope it to admin accounts only.
+  const employees = (state.employees || []).filter((emp) => emp.role === 'admin');
 
   // Filter employees based on search query
   const filteredEmployees = employees.filter((emp) => {
@@ -73,10 +75,6 @@ export function GoogleLoginModal({ onClose }: GoogleLoginModalProps) {
     setSigningInUser(emp);
     setTimeout(() => {
       const targetView: SessionView = ['admin', 'hr', 'supervisor'].includes(emp.role) ? 'admin' : 'employee';
-      // Pass the whole object rather than emp.id — for a freshly-created
-      // employee (see handleCustomEmailSubmit) the store update from
-      // addEmployee hasn't flowed back into this context's state yet, so an
-      // id lookup would still miss it.
       loginAs(targetView, emp);
       navigate(targetView === 'admin' ? '/admin' : '/employee');
     }, 1200);
@@ -87,7 +85,9 @@ export function GoogleLoginModal({ onClose }: GoogleLoginModalProps) {
     const trimmedEmail = customEmail.trim().toLowerCase();
     if (!trimmedEmail) return;
 
-    // Find if employee exists with this email
+    // Only ever sign in to an existing admin account — Google is a quick
+    // access convenience for business owners, not a way to mint new accounts
+    // or reach employee accounts. New businesses go through /signup.
     const match = employees.find((emp) => emp.email.toLowerCase() === trimmedEmail);
     if (match) {
       setEmailError('');
@@ -95,44 +95,7 @@ export function GoogleLoginModal({ onClose }: GoogleLoginModalProps) {
       return;
     }
 
-    // No account yet — create one from the email's local-part rather than
-    // dead-ending with "not registered" (there's no seeded directory anymore).
-    const localPart = trimmedEmail.split('@')[0] || 'new.user';
-    const nameParts = localPart.split(/[._-]+/).filter(Boolean).map((p) => p[0].toUpperCase() + p.slice(1));
-    const firstName = nameParts[0] || 'New';
-    const lastName = nameParts.slice(1).join(' ') || '—';
-
-    const newId = addEmployee({
-      firstName,
-      lastName,
-      avatarUrl: `https://i.pravatar.cc/150?u=${encodeURIComponent(trimmedEmail)}`,
-      email: trimmedEmail,
-      phone: '',
-      role: 'employee',
-      department: '',
-      employmentType: 'full_time',
-      joinedAt: new Date().toISOString().slice(0, 10),
-      workLocationId: state.settings.workLocations[0]?.id ?? '',
-      allowedCheckInMethods: ['gps_face'],
-      leaveBalance: 14,
-    });
-
-    setEmailError('');
-    handleSelectUser({
-      id: newId,
-      firstName,
-      lastName,
-      avatarUrl: `https://i.pravatar.cc/150?u=${encodeURIComponent(trimmedEmail)}`,
-      email: trimmedEmail,
-      phone: '',
-      role: 'employee',
-      department: '',
-      employmentType: 'full_time',
-      joinedAt: new Date().toISOString().slice(0, 10),
-      workLocationId: state.settings.workLocations[0]?.id ?? '',
-      allowedCheckInMethods: ['gps_face'],
-      leaveBalance: 14,
-    });
+    setEmailError(gt.userNotFound);
   };
 
   const getRoleColor = (role: Employee['role']) => {

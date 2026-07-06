@@ -21,7 +21,7 @@ export function EmployeeSettingsDetail() {
 
   return (
     <div>
-      <div className="topbar">
+      <div className="page-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <button className="icon-btn" onClick={() => navigate('/employee/settings')}>
             <ChevronLeft size={18} />
