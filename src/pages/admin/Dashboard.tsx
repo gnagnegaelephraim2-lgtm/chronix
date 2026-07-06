@@ -38,7 +38,6 @@ export function Dashboard() {
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{t('dashboardSubtitle')}</p>
         </div>
-        <button className="btn btn-outline">{t('filters')}</button>
       </div>
 
       <TrialBanner settings={state.settings} />

@@ -1947,3 +1947,25 @@ body.banano-mode .tracker-step--current .tracker-step-dot {
   }
 }
 
+@media (max-width: 900px) {
+  .hero-grid {
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
+    text-align: center !important;
+  }
+  .hero-copy {
+    align-items: center !important;
+    text-align: center !important;
+  }
+  .hero-copy p {
+    margin: 0 auto 2.25rem !important;
+  }
+  .hero-features-row {
+    justify-content: center !important;
+    margin-top: 2rem !important;
+  }
+  .hero-visual {
+    justify-content: center !important;
+  }
+}
+
