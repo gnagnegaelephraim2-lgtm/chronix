@@ -91,14 +91,12 @@ export function Hero() {
         padding: '3.5rem 3rem',
         maxWidth: '820px',
         background: 'transparent',
-        backdropFilter: 'blur(3px)',
-        WebkitBackdropFilter: 'blur(3px)',
         borderRadius: '24px',
       }}>
-        <h1 style={{ fontSize: '3.4rem', lineHeight: 1.1, marginBottom: '1.5rem', textAlign: 'center', letterSpacing: '-1.5px', fontWeight: 800, textShadow: '0 2px 20px rgba(255,255,255,0.95), 0 1px 4px rgba(255,255,255,0.95)' }}>
+        <h1 style={{ fontSize: '3.4rem', lineHeight: 1.1, marginBottom: '1.5rem', textAlign: 'center', letterSpacing: '-1.5px', fontWeight: 800, color: '#000' }}>
           {t('heroHeadlinePrefix')} <span className="amber-text">{t('heroHeadlineAmber')}</span>
         </h1>
-        <p style={{ color: 'var(--text-primary)', fontSize: '1.15rem', marginBottom: '2.25rem', maxWidth: 620, textAlign: 'center', lineHeight: 1.55, fontWeight: 500, textShadow: '0 2px 18px rgba(255,255,255,1), 0 1px 6px rgba(255,255,255,1), 0 0px 2px rgba(255,255,255,1)' }}>{t('heroSubtext')}</p>
+        <p style={{ color: '#000', fontSize: '1.15rem', marginBottom: '2.25rem', maxWidth: 620, textAlign: 'center', lineHeight: 1.55, fontWeight: 500 }}>{t('heroSubtext')}</p>
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
           <button className="btn btn-primary-amber btn-lg" onClick={() => navigate('/signup')} style={{ padding: '0.85rem 2.25rem', fontSize: '1.05rem', fontWeight: 600 }}>
             {t('getStartedNow')}
