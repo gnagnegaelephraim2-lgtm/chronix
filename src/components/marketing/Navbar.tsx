@@ -25,8 +25,8 @@ export function Navbar() {
         <a href="#pricing">{t('navPricing')}</a>
         <a href="#faq">{t('navFaq')}</a>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <a href="#" onClick={(e) => { e.preventDefault(); navigate('/login'); }} style={{ fontWeight: 600, fontSize: '0.9rem' }}>
+      <div className="navbar-actions">
+        <a href="#" className="navbar-login-link" onClick={(e) => { e.preventDefault(); navigate('/login'); }} style={{ fontWeight: 600, fontSize: '0.9rem' }}>
           {t('loginButton')}
         </a>
         <button className="btn btn-primary-amber" onClick={() => navigate('/login')}>

@@ -47,7 +47,7 @@ export function ContactPage() {
             : "Have a question? Want to see Chronix working before you decide? Just reach out — a real person will answer."}
         </p>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.25fr', gap: '3.5rem' }}>
+        <div className="contact-grid">
           {/* Contact Details Column */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -134,7 +134,7 @@ export function ContactPage() {
                     : "Tell us a bit about your business — how many employees, what industry — and we'll show you exactly how Chronix would work for your team."}
                 </p>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div className="contact-form-row">
                   <div className="form-field" style={{ marginBottom: 0 }}>
                     <label className="form-label" style={{ fontSize: '0.8rem' }}>{isFr ? 'Nom complet' : 'Name'}</label>
                     <input 
@@ -157,7 +157,7 @@ export function ContactPage() {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div className="contact-form-row">
                   <div className="form-field" style={{ marginBottom: 0 }}>
                     <label className="form-label" style={{ fontSize: '0.8rem' }}>Email</label>
                     <input 
