@@ -316,7 +316,7 @@ export function AdminSettingsDetail() {
                     <div className="side-panel-row-main">
                       <div className="side-panel-name">{emp.firstName} {emp.lastName}</div>
                       <div className="side-panel-sub">
-                        {emp.department || '—'} · {shift ? shift.name : 'No shift'} · MUR {emp.hourlyRateMUR}/hr
+                        {emp.department || '—'} · {shift ? shift.name : 'No shift'} · MUR {emp.hourlyRateMUR}/hr {emp.allowedCheckInMethods.includes('kiosk') && `· Kiosk PIN: ${emp.kioskPin || emp.credential}`}
                       </div>
                     </div>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>

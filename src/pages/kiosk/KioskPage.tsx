@@ -45,7 +45,7 @@ export function KioskPage() {
       return;
     }
     const emp = state.employees.find(
-      (e) => e.status !== 'terminated' && e.allowedCheckInMethods.includes('kiosk') && e.kioskPin === value
+      (e) => e.status !== 'terminated' && e.allowedCheckInMethods.includes('kiosk') && (e.kioskPin === value || e.credential === value)
     );
     if (!emp) {
       setError(isFr ? 'Code PIN incorrect. Veuillez réessayer.' : 'Invalid PIN. Please check and try again.');
@@ -259,7 +259,7 @@ export function KioskPage() {
         <div className="kiosk-layout-grid">
           {/* Left Column: Greeting copy */}
           <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-            <img src={logoWhite} alt="Chronix" onClick={() => navigate('/')} style={{ height: 100, width: 100, objectFit: 'contain', margin: '-32px 0 1.75rem', cursor: 'pointer', display: 'block' }} />
+            <img src={logoWhite} alt="Chronix" onClick={() => navigate('/')} style={{ height: '36px', width: 'auto', objectFit: 'contain', margin: '0 0 2rem', cursor: 'pointer', display: 'block' }} />
 
             <div style={{ width: '40px', height: '4px', background: 'var(--chronix-amber)', borderRadius: '2px', marginBottom: '1rem' }} />
             
