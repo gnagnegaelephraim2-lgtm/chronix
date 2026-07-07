@@ -992,6 +992,7 @@ button, input, textarea, select {
   justify-content: center;
   z-index: 1100;
   padding: 1rem;
+  animation: modalBackdropIn 0.18s ease-out;
 }
 .modal-panel {
   background: var(--bg-card);
@@ -1002,6 +1003,20 @@ button, input, textarea, select {
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: var(--card-shadow-hover);
+  animation: modalPanelIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes modalBackdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes modalPanelIn {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .modal-backdrop, .modal-panel {
+    animation: none;
+  }
 }
 
 /* ---------- Empty state ---------- */
@@ -1945,5 +1960,78 @@ body.banano-mode .tracker-step--current .tracker-step-dot {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* ---------- Biometric Kiosk Styles ---------- */
+.kiosk-container {
+  min-height: 100vh;
+  background: #040d1a;
+  background-image: radial-gradient(circle at 80% 20%, #0c253f 0%, transparent 55%), radial-gradient(circle at 10% 80%, #0a1b2c 0%, transparent 60%);
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 5%;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+.kiosk-layout-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1.3fr 1.1fr;
+  gap: 3rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: auto;
+  align-items: center;
+  z-index: 2;
+  position: relative;
+}
+@media (max-width: 1024px) {
+  .kiosk-layout-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    text-align: center;
+  }
+}
+.kiosk-keypad-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 600;
+  height: 62px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+.kiosk-keypad-btn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  transform: scale(1.03);
+}
+.kiosk-keypad-btn:active {
+  background: rgba(255, 255, 255, 0.15) !important;
+  transform: scale(0.97);
+}
+.kiosk-dot-indicator {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.kiosk-dot-indicator--filled {
+  border-color: var(--chronix-amber);
+  box-shadow: 0 0 10px rgba(255, 210, 0, 0.25);
 }
 
