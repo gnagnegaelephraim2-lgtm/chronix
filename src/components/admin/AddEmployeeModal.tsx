@@ -4,6 +4,7 @@ import { Modal } from '../common/Modal';
 import { FormField, FormSelect } from '../common/FormField';
 import { useStore, useStoreActions } from '../../hooks/useStore';
 import { localDateString } from '../../utils/format';
+import { generateKioskPin } from '../../utils/kioskPin';
 import type { CheckInMethod, EmploymentType } from '../../types';
 
 const METHOD_LABELS: Record<CheckInMethod, string> = {
@@ -29,7 +30,8 @@ export function AddEmployeeModal({ onClose }: { onClose: () => void }) {
   const [hourlyRate, setHourlyRate] = useState('');
   const [allowedMethods, setAllowedMethods] = useState<CheckInMethod[]>(['gps_face']);
   const [createdPin, setCreatedPin] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [createdKioskPin, setCreatedKioskPin] = useState<string | null>(null);
+  const [copied, setCopied] = useState<'login' | 'kiosk' | null>(null);
 
   const departments = state.settings.departments;
 
@@ -37,6 +39,8 @@ export function AddEmployeeModal({ onClose }: { onClose: () => void }) {
     e.preventDefault();
     const trimmedDept = department.trim();
     const pin = generateTempPin();
+    const kioskPin = generateKioskPin();
+    const methods: CheckInMethod[] = allowedMethods.length ? allowedMethods : ['gps_face'];
 
     addEmployee({
       firstName,
@@ -50,7 +54,7 @@ export function AddEmployeeModal({ onClose }: { onClose: () => void }) {
       joinedAt: localDateString(),
       workLocationId: state.settings.workLocations[0]?.id ?? '',
       shiftId: shiftId || null,
-      allowedCheckInMethods: allowedMethods.length ? allowedMethods : ['gps_face'],
+      allowedCheckInMethods: methods,
       leaveBalance: 14,
       hourlyRateMUR: Number(hourlyRate) || 0,
       credential: pin,
@@ -58,6 +62,7 @@ export function AddEmployeeModal({ onClose }: { onClose: () => void }) {
       status: 'active',
       terminatedAt: null,
       terminationReason: null,
+      kioskPin,
     });
 
     if (trimmedDept && !departments.includes(trimmedDept)) {
@@ -65,13 +70,13 @@ export function AddEmployeeModal({ onClose }: { onClose: () => void }) {
     }
 
     setCreatedPin(pin);
+    if (methods.includes('kiosk')) setCreatedKioskPin(kioskPin);
   }
 
-  function handleCopy() {
-    if (!createdPin) return;
-    navigator.clipboard?.writeText(createdPin).catch(() => {});
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+  function handleCopy(which: 'login' | 'kiosk', value: string) {
+    navigator.clipboard?.writeText(value).catch(() => {});
+    setCopied(which);
+    setTimeout(() => setCopied(null), 1500);
   }
 
   if (createdPin) {
@@ -82,11 +87,27 @@ export function AddEmployeeModal({ onClose }: { onClose: () => void }) {
         </p>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-page)', border: '1px solid var(--border)', borderRadius: 'var(--card-radius)', padding: '1rem 1.25rem', marginBottom: '1.25rem' }}>
           <span style={{ fontSize: '1.6rem', fontWeight: 800, letterSpacing: '4px', color: 'var(--chronix-navy)' }}>{createdPin}</span>
-          <button type="button" className="btn btn-outline" onClick={handleCopy} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            {copied ? <Check size={16} /> : <Copy size={16} />}
-            {copied ? 'Copied' : 'Copy'}
+          <button type="button" className="btn btn-outline" onClick={() => handleCopy('login', createdPin)} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            {copied === 'login' ? <Check size={16} /> : <Copy size={16} />}
+            {copied === 'login' ? 'Copied' : 'Copy'}
           </button>
         </div>
+
+        {createdKioskPin && (
+          <>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem' }}>
+              They'll also use this separate 4-digit PIN to clock in/out at a shared Kiosk terminal. You can view or reset it anytime from Settings &gt; Employee Settings.
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-page)', border: '1px solid var(--border)', borderRadius: 'var(--card-radius)', padding: '1rem 1.25rem', marginBottom: '1.25rem' }}>
+              <span style={{ fontSize: '1.6rem', fontWeight: 800, letterSpacing: '4px', color: 'var(--chronix-amber)' }}>{createdKioskPin}</span>
+              <button type="button" className="btn btn-outline" onClick={() => handleCopy('kiosk', createdKioskPin)} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                {copied === 'kiosk' ? <Check size={16} /> : <Copy size={16} />}
+                {copied === 'kiosk' ? 'Copied' : 'Copy'}
+              </button>
+            </div>
+          </>
+        )}
+
         <button type="button" className="btn btn-primary-navy" style={{ width: '100%' }} onClick={onClose}>
           Done
         </button>

@@ -28,8 +28,8 @@ export function Reports() {
   });
   const [to, setTo] = useState(() => localDateString());
 
-  function handleExportAll() {
-    const rows = state.attendance
+  function allAttendanceRows(): Array<Record<string, string | number>> {
+    return state.attendance
       .filter((r) => r.date >= from && r.date <= to)
       .map((r) => {
         const emp = state.employees.find((e) => e.id === r.employeeId);
@@ -46,7 +46,14 @@ export function Reports() {
           Status: r.status,
         };
       });
-    downloadCsv(`chronix-report-${from}-to-${to}.csv`, rows);
+  }
+
+  function handleExportAll() {
+    downloadCsv(`chronix-report-${from}-to-${to}.csv`, allAttendanceRows());
+  }
+
+  function handleExportAllPdf() {
+    downloadPdf(`chronix-report-${from}-to-${to}.pdf`, `Attendance Report (${from} to ${to})`, allAttendanceRows());
   }
 
   function payrollRows(): Array<Record<string, string | number>> {
@@ -96,9 +103,14 @@ export function Reports() {
           <h1 style={{ fontSize: '1.5rem' }}>{t('reportsTitle')}</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{t('reportsSubtitle')}</p>
         </div>
-        <button className="btn btn-primary-amber" onClick={handleExportAll}>
-          {t('exportCsv')}
-        </button>
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <button className="btn btn-outline" onClick={handleExportAllPdf}>
+            Export PDF
+          </button>
+          <button className="btn btn-primary-amber" onClick={handleExportAll}>
+            {t('exportCsv')}
+          </button>
+        </div>
       </div>
 
       <div className="card" style={{ marginBottom: '1.5rem' }}>

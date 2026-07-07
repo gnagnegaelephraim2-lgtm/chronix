@@ -36,6 +36,8 @@ export interface Employee {
   hourlyRateMUR: number; // hourly pay in Mauritian Rupees, used in payroll-adjacent reports
   credential: string; // password (business owner) or admin-issued temp PIN (employee)
   mustChangePassword?: boolean; // true for employee accounts until they set their own password
+  kioskPin: string; // separate 4-digit PIN for the shared Kiosk terminal — independent of
+  // the login credential so it doesn't silently change/break once the employee sets their own password
   status: 'active' | 'terminated';
   terminatedAt: string | null; // ISO date
   terminationReason: string | null;

@@ -36,11 +36,38 @@ export function KioskPage() {
     return () => window.clearTimeout(tId);
   }, [confirmed]);
 
+  // Shared verification logic — takes the pin value explicitly so it can be
+  // called the instant the 4th digit is typed, without waiting on a state
+  // round-trip (see handleNumberPress).
+  function verifyPin(value: string) {
+    if (value.length < 4) {
+      setError(isFr ? 'Veuillez entrer un PIN à 4 chiffres.' : 'Please enter a 4-digit PIN.');
+      return;
+    }
+    const emp = state.employees.find(
+      (e) => e.status !== 'terminated' && e.allowedCheckInMethods.includes('kiosk') && e.kioskPin === value
+    );
+    if (!emp) {
+      setError(isFr ? 'Code PIN incorrect. Veuillez réessayer.' : 'Invalid PIN. Please check and try again.');
+      setPin('');
+      return;
+    }
+    setActiveEmployee(emp);
+    setError(null);
+  }
+
+  // Handle PIN verification (Verify button / Enter key — reads current state)
+  function handleVerify() {
+    verifyPin(pin);
+  }
+
   // Handle number pad button click
   function handleNumberPress(num: number) {
     if (pin.length >= 4) return;
-    setPin((prev) => prev + String(num));
+    const next = pin + String(num);
+    setPin(next);
     setError(null);
+    if (next.length === 4) verifyPin(next);
   }
 
   // Handle Backspace
@@ -54,31 +81,6 @@ export function KioskPage() {
     setPin('');
     setError(null);
   }
-
-  // Handle PIN verification
-  function handleVerify() {
-    if (pin.length < 4) {
-      setError(isFr ? 'Veuillez entrer un PIN à 4 chiffres.' : 'Please enter a 4-digit PIN.');
-      return;
-    }
-    const emp = state.employees.find(
-      (e) => e.allowedCheckInMethods.includes('kiosk') && e.credential === pin
-    );
-    if (!emp) {
-      setError(isFr ? 'Code PIN incorrect. Veuillez réessayer.' : 'Invalid PIN. Please check and try again.');
-      setPin('');
-      return;
-    }
-    setActiveEmployee(emp);
-    setError(null);
-  }
-
-  // Auto-verify when 4 digits are entered
-  useEffect(() => {
-    if (pin.length === 4) {
-      handleVerify();
-    }
-  }, [pin]);
 
   // Keydown event listener for physical keyboard support
   useEffect(() => {
@@ -257,7 +259,7 @@ export function KioskPage() {
         <div className="kiosk-layout-grid">
           {/* Left Column: Greeting copy */}
           <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-            <img src={logoWhite} alt="Chronix" onClick={() => navigate('/')} style={{ height: 40, marginBottom: '2.5rem', cursor: 'pointer' }} />
+            <img src={logoWhite} alt="Chronix" onClick={() => navigate('/')} style={{ height: 100, width: 100, objectFit: 'contain', margin: '-32px 0 1.75rem', cursor: 'pointer', display: 'block' }} />
 
             <div style={{ width: '40px', height: '4px', background: 'var(--chronix-amber)', borderRadius: '2px', marginBottom: '1rem' }} />
             

@@ -11,6 +11,7 @@ import { useLanguage } from '../../hooks/useLanguage';
 import type { Employee } from '../../types';
 import { uid } from '../../store/storeReducer';
 import { guessCardBrand } from '../../utils/trial';
+import { generateKioskPin } from '../../utils/kioskPin';
 import { AuthShell } from './AuthShell';
 
 export function SignupPage() {
@@ -79,6 +80,7 @@ export function SignupPage() {
       status: 'active',
       terminatedAt: null,
       terminationReason: null,
+      kioskPin: generateKioskPin(),
     };
     const newId = addEmployee(newEmployeeData);
 

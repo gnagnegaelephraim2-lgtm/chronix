@@ -17,6 +17,7 @@ import {
   BUSINESS_SETTINGS,
 } from './mockData';
 import { localDateString } from '../utils/format';
+import { generateKioskPin } from '../utils/kioskPin';
 
 export const STORAGE_KEY = 'chronix_store_v1';
 
@@ -202,11 +203,46 @@ export function reducer(state: StoreState, action: StoreAction): StoreState {
   }
 }
 
+// Fills in any field missing from a persisted employee record — e.g. an
+// employee saved before hourlyRateMUR/status/shiftId existed — with a safe
+// default, instead of leaving it undefined (which silently turns into NaN
+// in payroll/report math).
+function normalizeEmployee(e: Partial<Employee>): Employee {
+  return {
+    ...e,
+    avatarUrl: e.avatarUrl ?? '',
+    department: e.department ?? '',
+    employmentType: e.employmentType ?? 'full_time',
+    workLocationId: e.workLocationId ?? '',
+    shiftId: e.shiftId ?? null,
+    allowedCheckInMethods: e.allowedCheckInMethods ?? ['gps_face'],
+    leaveBalance: e.leaveBalance ?? 0,
+    hourlyRateMUR: e.hourlyRateMUR ?? 0,
+    status: e.status ?? 'active',
+    terminatedAt: e.terminatedAt ?? null,
+    terminationReason: e.terminationReason ?? null,
+    kioskPin: e.kioskPin ?? generateKioskPin(),
+  } as Employee;
+}
+
 export function loadInitialState(): StoreState {
   if (typeof window !== 'undefined') {
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (raw) return JSON.parse(raw) as StoreState;
+      if (raw) {
+        const parsed = JSON.parse(raw) as Partial<StoreState>;
+        return {
+          employees: (parsed.employees ?? EMPLOYEES).map(normalizeEmployee),
+          attendance: parsed.attendance ?? ATTENDANCE_RECORDS,
+          requests: parsed.requests ?? REQUESTS,
+          reimbursements: parsed.reimbursements ?? REIMBURSEMENTS,
+          activity: parsed.activity ?? ACTIVITY_EVENTS,
+          // Merge so any settings field introduced after this business was
+          // created (e.g. defaultReportRangeDays) gets a real default
+          // instead of undefined — which previously turned into NaN dates.
+          settings: { ...BUSINESS_SETTINGS, ...(parsed.settings ?? {}) },
+        };
+      }
     } catch {
       // fall through to seed data
     }

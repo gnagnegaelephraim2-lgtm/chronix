@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { Copy, Check, RotateCw } from 'lucide-react';
 import { Modal } from '../common/Modal';
 import { FormField, FormSelect } from '../common/FormField';
 import { useStore, useStoreActions } from '../../hooks/useStore';
+import { generateKioskPin } from '../../utils/kioskPin';
 import type { CheckInMethod, Employee, EmploymentType } from '../../types';
 
 const METHOD_LABELS: Record<CheckInMethod, string> = {
@@ -18,8 +20,22 @@ export function EditEmployeeModal({ employee, onClose }: { employee: Employee; o
   const [shiftId, setShiftId] = useState(employee.shiftId ?? '');
   const [hourlyRate, setHourlyRate] = useState(String(employee.hourlyRateMUR ?? 0));
   const [allowedMethods, setAllowedMethods] = useState<CheckInMethod[]>(employee.allowedCheckInMethods);
+  const [kioskPin, setKioskPin] = useState(employee.kioskPin);
+  const [copied, setCopied] = useState(false);
 
   const departments = state.settings.departments;
+
+  function handleRegeneratePin() {
+    const next = generateKioskPin();
+    setKioskPin(next);
+    updateEmployee({ ...employee, kioskPin: next });
+  }
+
+  function handleCopyPin() {
+    navigator.clipboard?.writeText(kioskPin).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -101,6 +117,27 @@ export function EditEmployeeModal({ employee, onClose }: { employee: Employee; o
             </label>
           ))}
         </div>
+
+        {allowedMethods.includes('kiosk') && (
+          <div className="form-field">
+            <label className="form-label">Kiosk PIN</label>
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '-0.25rem', marginBottom: '0.5rem' }}>
+              Used only at a shared Kiosk terminal — separate from their login password.
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-page)', border: '1px solid var(--border)', borderRadius: 'var(--card-radius)', padding: '0.75rem 1rem' }}>
+              <span style={{ fontSize: '1.3rem', fontWeight: 800, letterSpacing: '3px', color: 'var(--chronix-navy)' }}>{kioskPin}</span>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button type="button" className="btn btn-outline" onClick={handleCopyPin} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  {copied ? <Check size={16} /> : <Copy size={16} />}
+                  {copied ? 'Copied' : 'Copy'}
+                </button>
+                <button type="button" className="btn btn-outline" onClick={handleRegeneratePin} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <RotateCw size={16} /> Regenerate
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
           <button type="button" className="btn btn-outline" onClick={onClose}>

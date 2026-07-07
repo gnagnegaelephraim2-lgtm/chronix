@@ -7,6 +7,7 @@ import { useLanguage } from '../../hooks/useLanguage';
 import type { SessionView } from '../../types/session';
 import type { Employee } from '../../types';
 import { uid } from '../../store/storeReducer';
+import { generateKioskPin } from '../../utils/kioskPin';
 import { GoogleLoginModal } from './GoogleLoginModal';
 import { AuthShell } from './AuthShell';
 
@@ -62,6 +63,7 @@ export function LoginPage() {
         status: 'active',
         terminatedAt: null,
         terminationReason: null,
+        kioskPin: generateKioskPin(),
       };
 
       const newId = addEmployee(newEmployeeData);
