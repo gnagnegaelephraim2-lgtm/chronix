@@ -285,15 +285,16 @@ button, input, textarea, select {
   background: var(--bg-page);
 }
 .login-left-panel {
-  flex: 0 0 460px;
+  flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 2.5rem;
+  padding: 2rem 3rem;
 }
 .login-right-panel {
-  flex: 1;
+  flex: 0 0 44%;
+  background: linear-gradient(160deg, var(--chronix-navy) 0%, #0f2438 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1115,7 +1116,16 @@ button, input, textarea, select {
 .amber-text {
   color: var(--chronix-amber);
 }
-
+.live-clock-preview {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 320px;
+  box-sizing: border-box;
+}
 @media (max-width: 900px) {
   .hero-clock-widget {
     display: none;
@@ -1934,28 +1944,6 @@ body.banano-mode .tracker-step--current .tracker-step-dot {
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@media (max-width: 900px) {
-  .hero-grid {
-    grid-template-columns: 1fr !important;
-    gap: 2rem !important;
-    text-align: center !important;
-  }
-  .hero-copy {
-    align-items: center !important;
-    text-align: center !important;
-  }
-  .hero-copy p {
-    margin: 0 auto 2.25rem !important;
-  }
-  .hero-features-row {
-    justify-content: center !important;
-    margin-top: 2rem !important;
-  }
-  .hero-visual {
-    justify-content: center !important;
   }
 }
 

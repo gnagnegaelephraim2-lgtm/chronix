@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -18,6 +19,7 @@ import { useStore } from '../../hooks/useStore';
 import { Avatar } from '../common/Avatar';
 import logoWhite from '../../assets/chronix_logo_white.png';
 import { useTheme } from '../../hooks/useTheme';
+import { EditProfileModal } from '../employee/EditProfileModal';
 
 interface SidebarProps {
   variant: 'admin' | 'employee';
@@ -30,6 +32,7 @@ export function Sidebar({ variant, mobileOpen, onCloseMobile }: SidebarProps) {
   const { session, logout } = useSession();
   const { state } = useStore();
   const { theme, toggleTheme } = useTheme();
+  const [showEdit, setShowEdit] = useState(false);
   const employee = state.employees.find((e) => e.id === session?.employeeId);
 
   const adminLinks = [
@@ -79,8 +82,12 @@ export function Sidebar({ variant, mobileOpen, onCloseMobile }: SidebarProps) {
               </button>
             </div>
           )}
-          {variant === 'employee' && employee && (
-            <div className="mini-profile">
+          {employee && (
+            <div 
+              className="mini-profile" 
+              onClick={() => setShowEdit(true)} 
+              style={{ cursor: 'pointer', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}
+            >
               <Avatar src={employee.avatarUrl} name={`${employee.firstName} ${employee.lastName}`} size={36} />
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontSize: '0.85rem', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -108,6 +115,9 @@ export function Sidebar({ variant, mobileOpen, onCloseMobile }: SidebarProps) {
           )}
         </div>
       </aside>
+      {showEdit && employee && (
+        <EditProfileModal employee={employee} onClose={() => setShowEdit(false)} />
+      )}
     </>
   );
 }

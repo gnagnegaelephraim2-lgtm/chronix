@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronDown } from 'lucide-react';
 import { useLanguage } from '../../hooks/useLanguage';
-import { LiveClockPreview } from './LiveClockPreview';
 import { DemoVideoModal } from './DemoVideoModal';
+import { LiveClockPreview } from './LiveClockPreview';
 
 import hospitality1 from '../../assets/industries/hospitality-1.jpg';
 import construction1 from '../../assets/industries/construction-1.jpg';
@@ -19,7 +18,7 @@ import foodbeverage1 from '../../assets/industries/foodbeverage-1.jpg';
 import security1 from '../../assets/industries/security-1.jpg';
 
 export function Hero() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const navigate = useNavigate();
   const [showDemo, setShowDemo] = useState(false);
   const [bgIndex, setBgIndex] = useState(0);
@@ -46,12 +45,8 @@ export function Hero() {
     return () => clearInterval(interval);
   }, [SLIDESHOW_IMAGES.length]);
 
-  function scrollToNext() {
-    document.querySelector('#industries')?.scrollIntoView({ behavior: 'smooth' });
-  }
-
   return (
-    <header className="hero" id="home" style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', overflow: 'hidden', padding: '6.5rem 5% 8.5rem', boxSizing: 'border-box' }}>
+    <header className="hero" id="home" style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', padding: '6.5rem 5% 5rem' }}>
       {/* Full-screen Cross-fading Slideshow Background */}
       <div className="hero-slideshow" aria-hidden="true" style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
         {SLIDESHOW_IMAGES.map((src, i) => (
@@ -63,67 +58,70 @@ export function Hero() {
               backgroundImage: `url(${src})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
-              opacity: i === bgIndex ? 0.85 : 0,
+              opacity: i === bgIndex ? 0.35 : 0,
               transition: 'opacity 1.2s ease-in-out',
             }}
           />
         ))}
-        {/* Soft wash overlay to keep contrast high */}
-        <div 
+        {/* Smooth left-to-right fade overlay to ensure text on the left is highly legible */}
+        <div
           style={{
             position: 'absolute',
             inset: 0,
-            background: 'var(--bg-page)',
-            opacity: 0.32,
+            background: 'linear-gradient(to right, var(--bg-page) 35%, rgba(253, 251, 247, 0.7) 70%, rgba(253, 251, 247, 0.2) 100%)',
             zIndex: 1
           }}
         />
       </div>
 
-      {/* Centered Hero Copy Panel Box */}
-      <div className="hero-copy" style={{
-        textAlign: 'center',
-        margin: '0 auto',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        zIndex: 2,
-        padding: 'clamp(1.5rem, 6vw, 3.5rem) clamp(1.25rem, 5vw, 3rem)',
-        maxWidth: '820px',
-        width: '100%',
-        boxSizing: 'border-box',
-        background: 'rgba(253, 251, 247, 0.75)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        border: '1px solid rgba(255, 255, 255, 0.65)',
-        borderRadius: '24px',
-        boxShadow: '0 20px 50px rgba(0, 0, 0, 0.05)'
-      }}>
-        <h1 style={{ fontSize: 'clamp(1.9rem, 6.5vw, 3.4rem)', lineHeight: 1.15, marginBottom: '1.25rem', textAlign: 'center', letterSpacing: '-1px', fontWeight: 800, color: 'var(--chronix-navy)' }}>
-          {t('heroHeadlinePrefix')} <span className="amber-text">{t('heroHeadlineAmber')}</span>
-        </h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: 'clamp(0.95rem, 2.6vw, 1.15rem)', marginBottom: '1.75rem', maxWidth: 620, textAlign: 'center', lineHeight: 1.55, fontWeight: 500 }}>
-          {t('heroSubtext')}
-        </p>
-        <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-          <button className="btn btn-primary-amber btn-lg" onClick={() => navigate('/signup')} style={{ padding: 'clamp(0.7rem, 2vw, 0.85rem) clamp(1.5rem, 5vw, 2.25rem)', fontSize: 'clamp(0.92rem, 2vw, 1.05rem)', fontWeight: 600 }}>
-            {t('getStartedNow')}
-          </button>
-          <button className="btn btn-primary-navy btn-lg" onClick={() => setShowDemo(true)} style={{ padding: 'clamp(0.7rem, 2vw, 0.85rem) clamp(1.5rem, 5vw, 2.25rem)', fontSize: 'clamp(0.92rem, 2vw, 1.05rem)', fontWeight: 600 }}>
-            {t('watchDemo')}
-          </button>
+      <div style={{ display: 'flex', width: '100%', maxWidth: '1200px', alignItems: 'center', justifyContent: 'space-between', gap: '3rem', zIndex: 2, flexWrap: 'wrap', padding: '0 1rem' }}>
+        {/* Left Column: Copy */}
+        <div style={{ flex: '1 1 500px', textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: '320px' }}>
+          {/* Smart Attendance Badge */}
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255, 210, 0, 0.12)', border: '1px solid rgba(255, 210, 0, 0.3)', borderRadius: '20px', padding: '0.4rem 1rem', marginBottom: '1.5rem', fontSize: '0.82rem', fontWeight: 700, color: 'var(--chronix-navy)' }}>
+            <span>🛡️</span> {lang === 'en' ? 'Smart Attendance. Strong Business.' : 'Présence Intelligente. Entreprise Forte.'}
+          </div>
+
+          <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.4rem)', lineHeight: 1.15, marginBottom: '1.25rem', letterSpacing: '-1px', fontWeight: 800, color: 'var(--chronix-navy)' }}>
+            Manage Your Business <span className="amber-text" style={{ display: 'block' }}>Smarter and Faster</span>
+          </h1>
+          
+          <p style={{ color: 'var(--text-secondary)', fontSize: 'clamp(1rem, 2.6vw, 1.15rem)', marginBottom: '2rem', maxWidth: '520px', lineHeight: 1.6, fontWeight: 500 }}>
+            {t('heroSubtext')}
+          </p>
+
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '2.5rem' }}>
+            <button className="btn btn-primary-amber btn-lg" onClick={() => navigate('/signup')} style={{ padding: 'clamp(0.7rem, 2vw, 0.85rem) clamp(1.5rem, 5vw, 2.25rem)', fontSize: 'clamp(0.92rem, 2vw, 1.05rem)', fontWeight: 600 }}>
+              🚀 {t('getStartedNow')}
+            </button>
+            <button className="btn btn-outline btn-lg" onClick={() => setShowDemo(true)} style={{ padding: 'clamp(0.7rem, 2vw, 0.85rem) clamp(1.5rem, 5vw, 2.25rem)', fontSize: 'clamp(0.92rem, 2vw, 1.05rem)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span>▶</span> {t('watchDemo')}
+            </button>
+          </div>
+
+          {/* Bottom horizontal features list */}
+          <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', borderTop: '1px solid var(--border)', paddingTop: '1.5rem', width: '100%' }}>
+            {[
+              { icon: '🛡️', label: lang === 'en' ? 'Accurate Attendance' : 'Présence Précise' },
+              { icon: '🕒', label: lang === 'en' ? 'Real-Time Tracking' : 'Suivi en Temps Réel' },
+              { icon: '📊', label: lang === 'en' ? 'Payroll-Ready Reports' : 'Rapports Prêts pour la Paie' }
+            ].map((feat) => (
+              <div key={feat.label} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                <span>{feat.icon}</span> {feat.label}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right Column: Clock Preview */}
+        <div style={{ flex: '0 1 340px', minWidth: '300px', display: 'flex', justifyContent: 'center' }}>
+          <LiveClockPreview />
         </div>
       </div>
 
-      {/* Floating Corner Clock Widget */}
-      <div className="hero-clock-widget" style={{ position: 'absolute', bottom: '2.5rem', right: '5%', zIndex: 3 }}>
-        <LiveClockPreview />
-      </div>
+      {/* Smooth upward bottom curve mask */}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '40px', background: 'var(--bg-page)', borderRadius: '100% 100% 0 0', transform: 'scaleX(1.2) translateY(20px)', zIndex: 1 }} />
 
-      <button type="button" className="hero-scroll-cue" onClick={scrollToNext} aria-label="Scroll to explore Chronix" style={{ zIndex: 2 }}>
-        <span>Explore Chronix</span>
-        <ChevronDown size={20} className="hero-scroll-cue-icon" />
-      </button>
       {showDemo && <DemoVideoModal onClose={() => setShowDemo(false)} />}
     </header>
   );
