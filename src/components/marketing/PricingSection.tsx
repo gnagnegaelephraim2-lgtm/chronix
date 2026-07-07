@@ -6,50 +6,54 @@ const PRICING_DATA = {
   en: {
     badge: 'MOST POPULAR',
     starter: {
-      name: 'Starter Plan',
-      price: 'Rs 1,500',
-      period: '/month',
-      desc: 'Perfect for micro-businesses looking to transition from paper logs to a secure, modern digital registry.',
-      limit: 'Flat rate for up to 15 employees',
+      name: 'Starter',
+      price: 'MUR 800',
+      period: '/employee/month',
+      desc: 'Everything a growing Mauritian business needs to track attendance and run shifts properly.',
+      limit: '',
       features: [
-        { text: 'GPS-tagged clock-ins', enabled: true },
-        { text: 'Standard attendance lists', enabled: true },
+        { text: 'QR code clock-in kiosks', enabled: true },
         { text: 'Daily shift scheduler', enabled: true },
-        { text: 'Standard email reports', enabled: true },
-        { text: '1 administrator seat', enabled: true },
-        { text: 'QR code scanning kiosk', enabled: false },
-        { text: 'Reimbursement receipts tracking', enabled: false },
+        { text: 'Attendance registry & standard reports', enabled: true },
+        { text: 'MCB & ABSA payroll CSV exports', enabled: true },
+        { text: 'EN/FR interface', enabled: true },
+        { text: 'Email support', enabled: true },
+        { text: '2 administrator seats', enabled: true },
       ]
     },
     growth: {
-      name: 'Growth Plan',
-      price: 'Rs 100',
+      name: 'Growth',
+      price: 'MUR 1,100',
       period: '/employee/month',
-      desc: 'Connect multiple branches, unlock advanced leave requests, and track reimbursement claims seamlessly.',
-      limit: 'Rs 1,500 minimum monthly charge',
+      desc: 'For multi-branch operations that need proper leave, reimbursement, and team management workflows.',
+      limit: '',
       features: [
-        { text: 'Everything in Starter', enabled: true },
-        { text: 'Unlimited employee count', enabled: true },
-        { text: 'QR code scanning kiosks', enabled: true },
+        { text: 'Everything in Starter, plus:', enabled: true },
+        { text: 'Multi-branch management', enabled: true },
         { text: 'Leave & absence workflows', enabled: true },
         { text: 'Reimbursement claims & receipts', enabled: true },
+        { text: 'Supervisor group clock-in', enabled: true },
+        { text: 'WhatsApp & SMS employee onboarding', enabled: true },
         { text: 'Department performance reports', enabled: true },
-        { text: 'Dedicated payroll format exports', enabled: false },
+        { text: 'Priority email + WhatsApp support', enabled: true },
+        { text: '5 administrator seats', enabled: true },
       ]
     },
     enterprise: {
-      name: 'Enterprise Plan',
-      price: 'Custom',
-      period: '',
-      desc: 'Designed for large hotels, factories, and retail chains requiring customized setups and priority support.',
-      limit: 'Best for businesses with 100+ staff',
+      name: 'Enterprise',
+      price: 'MUR 1,400',
+      period: '/employee/month',
+      desc: 'For large hotels, factories, and retail chains that need white-glove service.',
+      limit: '',
       features: [
-        { text: 'Everything in Growth', enabled: true },
-        { text: 'Custom payroll CSV formatting', enabled: true },
-        { text: 'Priority support & account manager', enabled: true },
-        { text: 'Custom GPS location tagging', enabled: true },
-        { text: 'Guided onboarding & HR training', enabled: true },
-        { text: '99.9% system uptime SLA', enabled: true },
+        { text: 'Everything in Growth, plus:', enabled: true },
+        { text: 'Migrant worker permit tracking with 30-day expiry alerts', enabled: true },
+        { text: 'Custom payroll CSV formats beyond MCB/ABSA', enabled: true },
+        { text: 'Dedicated account manager', enabled: true },
+        { text: '4-hour response SLA', enabled: true },
+        { text: '99.9% uptime SLA', enabled: true },
+        { text: 'Guided onboarding & on-site HR training', enabled: true },
+        { text: 'Unlimited administrator seats', enabled: true },
       ]
     },
     contactSales: 'Contact Sales',
@@ -58,50 +62,54 @@ const PRICING_DATA = {
   fr: {
     badge: 'LE PLUS POPULAIRE',
     starter: {
-      name: 'Plan Débutant',
-      price: 'Rs 1 500',
-      period: '/mois',
-      desc: 'Idéal pour les micro-entreprises souhaitant passer des registres papier à un système numérique sécurisé.',
-      limit: 'Tarif fixe jusqu\'à 15 employés',
+      name: 'Starter',
+      price: 'MUR 800',
+      period: '/employé/mois',
+      desc: 'Tout ce dont une entreprise mauricienne en croissance a besoin pour suivre la présence et gérer les horaires correctement.',
+      limit: '',
       features: [
-        { text: 'Pointage géolocalisé par GPS', enabled: true },
-        { text: 'Listes de présence standard', enabled: true },
+        { text: 'Bornes de pointage par code QR', enabled: true },
         { text: 'Planificateur d\'horaire quotidien', enabled: true },
-        { text: 'Rapports par e-mail standard', enabled: true },
-        { text: '1 compte administrateur', enabled: true },
-        { text: 'Borne de lecture de code QR', enabled: false },
-        { text: 'Suivi des reçus de remboursement', enabled: false },
+        { text: 'Registre de présence & rapports standards', enabled: true },
+        { text: 'Exports CSV de paie MCB & ABSA', enabled: true },
+        { text: 'Interface EN/FR', enabled: true },
+        { text: 'Support par e-mail', enabled: true },
+        { text: '2 comptes administrateur', enabled: true },
       ]
     },
     growth: {
-      name: 'Plan Croissance',
-      price: 'Rs 100',
+      name: 'Growth',
+      price: 'MUR 1 100',
       period: '/employé/mois',
-      desc: 'Connectez plusieurs succursales, débloquez les demandes de congé et gérez les notes de frais.',
-      limit: 'Facturation minimale de Rs 1 500/mois',
+      desc: 'Pour les opérations multi-succursales ayant besoin de vrais flux de congés, remboursements et gestion d\'équipe.',
+      limit: '',
       features: [
-        { text: 'Tout ce qui est dans Débutant', enabled: true },
-        { text: 'Nombre d\'employés illimité', enabled: true },
-        { text: 'Bornes de lecture de code QR', enabled: true },
+        { text: 'Tout ce qui est dans Starter, plus :', enabled: true },
+        { text: 'Gestion multi-succursales', enabled: true },
         { text: 'Flux de congés & absences', enabled: true },
-        { text: 'Notes de frais & reçus photos', enabled: true },
-        { text: 'Rapports par département', enabled: true },
-        { text: 'Exports paie personnalisés', enabled: false },
+        { text: 'Notes de frais & reçus', enabled: true },
+        { text: 'Pointage de groupe par superviseur', enabled: true },
+        { text: 'Intégration des employés par WhatsApp & SMS', enabled: true },
+        { text: 'Rapports de performance par département', enabled: true },
+        { text: 'Support prioritaire e-mail + WhatsApp', enabled: true },
+        { text: '5 comptes administrateur', enabled: true },
       ]
     },
     enterprise: {
-      name: 'Plan Entreprise',
-      price: 'Sur devis',
-      period: '',
-      desc: 'Conçu pour les grands hôtels, usines et chaînes de magasins nécessitant des configurations spécifiques.',
-      limit: 'Idéal pour plus de 100 salariés',
+      name: 'Enterprise',
+      price: 'MUR 1 400',
+      period: '/employé/mois',
+      desc: 'Pour les grands hôtels, usines et chaînes de magasins ayant besoin d\'un service haut de gamme.',
+      limit: '',
       features: [
-        { text: 'Tout ce qui est dans Croissance', enabled: true },
-        { text: 'Formats CSV de paie personnalisés', enabled: true },
-        { text: 'Support prioritaire & gestionnaire', enabled: true },
-        { text: 'Suivi GPS personnalisé par site', enabled: true },
-        { text: 'Formation RH & onboarding guidé', enabled: true },
-        { text: 'Contrat d\'engagement de service SLA', enabled: true },
+        { text: 'Tout ce qui est dans Growth, plus :', enabled: true },
+        { text: 'Suivi des permis de travail des travailleurs migrants avec alertes d\'expiration à 30 jours', enabled: true },
+        { text: 'Formats CSV de paie personnalisés au-delà de MCB/ABSA', enabled: true },
+        { text: 'Gestionnaire de compte dédié', enabled: true },
+        { text: 'SLA de réponse de 4 heures', enabled: true },
+        { text: 'SLA de disponibilité de 99,9 %', enabled: true },
+        { text: 'Onboarding guidé & formation RH sur site', enabled: true },
+        { text: 'Comptes administrateur illimités', enabled: true },
       ]
     },
     contactSales: 'Contacter le Support',
@@ -124,18 +132,16 @@ export function PricingSection() {
       </p>
 
       <div className="pricing-grid">
-        {/* Starter Plan Card */}
-        <div className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0 0 0.5rem 0' }}>{data.starter.name}</h3>
+        {/* Starter Plan Card (Featured) */}
+        <div className="card pricing-card--popular" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <div className="popular-badge">{data.badge}</div>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0.5rem 0 0.5rem 0' }}>{data.starter.name}</h3>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', minHeight: '60px', margin: '0 0 1rem 0' }}>
             {data.starter.desc}
           </p>
           <div style={{ fontSize: '2.25rem', fontWeight: 800, margin: '0 0 0.25rem 0', color: 'var(--chronix-navy)' }}>
             {data.starter.price}
             <span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--text-secondary)' }}>{data.starter.period}</span>
-          </div>
-          <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600, marginBottom: '1.5rem' }}>
-            {data.starter.limit}
           </div>
 
           <ul className="pricing-features-list" style={{ flexGrow: 1 }}>
@@ -146,24 +152,20 @@ export function PricingSection() {
             ))}
           </ul>
 
-          <button className="btn btn-outline" style={{ width: '100%', marginTop: '1.5rem' }} onClick={() => navigate('/signup')}>
+          <button className="btn btn-primary-amber" style={{ width: '100%', marginTop: '1.5rem' }} onClick={() => navigate('/signup')}>
             {data.startTrial}
           </button>
         </div>
 
-        {/* Growth Plan Card (Featured) */}
-        <div className="card pricing-card--popular" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-          <div className="popular-badge">{data.badge}</div>
-          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0.5rem 0 0.5rem 0' }}>{data.growth.name}</h3>
+        {/* Growth Plan Card */}
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0 0 0.5rem 0' }}>{data.growth.name}</h3>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', minHeight: '60px', margin: '0 0 1rem 0' }}>
             {data.growth.desc}
           </p>
           <div style={{ fontSize: '2.25rem', fontWeight: 800, margin: '0 0 0.25rem 0', color: 'var(--chronix-navy)' }}>
             {data.growth.price}
             <span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--text-secondary)' }}>{data.growth.period}</span>
-          </div>
-          <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600, marginBottom: '1.5rem' }}>
-            {data.growth.limit}
           </div>
 
           <ul className="pricing-features-list" style={{ flexGrow: 1 }}>
@@ -174,7 +176,7 @@ export function PricingSection() {
             ))}
           </ul>
 
-          <button className="btn btn-primary-amber" style={{ width: '100%', marginTop: '1.5rem' }} onClick={() => navigate('/signup')}>
+          <button className="btn btn-outline" style={{ width: '100%', marginTop: '1.5rem' }} onClick={() => navigate('/signup')}>
             {data.startTrial}
           </button>
         </div>
@@ -188,9 +190,6 @@ export function PricingSection() {
           <div style={{ fontSize: '2.25rem', fontWeight: 800, margin: '0 0 0.25rem 0', color: 'var(--chronix-navy)' }}>
             {data.enterprise.price}
             <span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--text-secondary)' }}>{data.enterprise.period}</span>
-          </div>
-          <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600, marginBottom: '1.5rem' }}>
-            {data.enterprise.limit}
           </div>
 
           <ul className="pricing-features-list" style={{ flexGrow: 1 }}>

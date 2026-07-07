@@ -90,7 +90,7 @@ export const translations = {
     watchDemo: 'Watch Demo',
     featuresTitle: 'Everything your team needs, in one place',
     pricingTitle: 'Simple, transparent pricing',
-    pricingSubtitle: 'MUR 100 per active employee/month · MUR 1,500 minimum',
+    pricingSubtitle: 'Simple per-employee pricing. No setup fees, cancel anytime.',
     faqTitle: 'Frequently asked questions',
     footerTagline: 'Workforce attendance and management, built for Mauritian businesses.',
 
@@ -318,7 +318,7 @@ export const translations = {
     watchDemo: 'Voir la Démo',
     featuresTitle: 'Tout ce dont votre équipe a besoin, au même endroit',
     pricingTitle: 'Tarification simple et transparente',
-    pricingSubtitle: 'MUR 100 par employé actif/mois · minimum MUR 1 500',
+    pricingSubtitle: 'Tarification simple par employé. Sans frais d\'installation, annulable à tout moment.',
     faqTitle: 'Questions fréquentes',
     footerTagline: 'Gestion de la présence, conçue pour les entreprises mauriciennes.',
     goodMorning: 'Bonjour',
