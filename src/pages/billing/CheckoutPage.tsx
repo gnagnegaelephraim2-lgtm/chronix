@@ -5,7 +5,7 @@ import { useTheme } from '../../hooks/useTheme';
 import { useStore, useStoreActions } from '../../hooks/useStore';
 import logo from '../../assets/chronix_logo.png';
 
-const SUPPORT_PHONE = '23052001234';
+const SUPPORT_PHONE = '23054737793';
 
 type PlanId = 'starter' | 'growth' | 'enterprise';
 type PayMethod = 'juice' | 'bank_transfer';

@@ -87,7 +87,7 @@ export function Footer() {
             </div>
             <div className="footer-contact-row">
               <Phone size={15} />
-              <a href="tel:+23052001234">+230 5200 1234</a>
+              <a href="tel:+23054737793">+230 5473 7793</a>
             </div>
           </div>
 

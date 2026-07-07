@@ -69,8 +69,8 @@ export function ContactPage() {
                 </div>
                 <div>
                   <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase' }}>Phone / WhatsApp</div>
-                  <a href="tel:+23052001234" style={{ fontSize: '1rem', color: 'var(--chronix-navy)', fontWeight: 600, textDecoration: 'none' }}>
-                    +230 5200 1234
+                  <a href="tel:+23054737793" style={{ fontSize: '1rem', color: 'var(--chronix-navy)', fontWeight: 600, textDecoration: 'none' }}>
+                    +230 5473 7793
                   </a>
                 </div>
               </div>
