@@ -55,6 +55,9 @@ export function AddEmployeeModal({ onClose }: { onClose: () => void }) {
       hourlyRateMUR: Number(hourlyRate) || 0,
       credential: pin,
       mustChangePassword: true,
+      status: 'active',
+      terminatedAt: null,
+      terminationReason: null,
     });
 
     if (trimmedDept && !departments.includes(trimmedDept)) {

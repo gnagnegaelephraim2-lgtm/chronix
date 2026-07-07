@@ -23,7 +23,7 @@ export function Reports() {
   const { state } = useStore();
   const [from, setFrom] = useState(() => {
     const d = new Date();
-    d.setDate(d.getDate() - 30);
+    d.setDate(d.getDate() - state.settings.defaultReportRangeDays);
     return localDateString(d);
   });
   const [to, setTo] = useState(() => localDateString());

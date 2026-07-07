@@ -41,7 +41,7 @@ export function getDashboardStats(state: StoreState, range?: DateRange) {
   const today = localDateString();
   const todayRecords = state.attendance.filter((r) => r.date === today);
   const presentToday = todayRecords.filter((r) => r.status !== 'absent').length;
-  const totalEmployees = state.employees.length;
+  const totalEmployees = state.employees.filter((e) => e.status !== 'terminated').length;
 
   return {
     avgHours,

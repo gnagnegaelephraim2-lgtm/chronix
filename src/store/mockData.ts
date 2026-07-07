@@ -38,4 +38,5 @@ export const BUSINESS_SETTINGS: BusinessSettings = {
   trialStartedAt: null,
   trialCancelled: false,
   billingCard: null,
+  defaultReportRangeDays: 30,
 };

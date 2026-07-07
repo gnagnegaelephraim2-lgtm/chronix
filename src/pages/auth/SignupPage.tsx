@@ -76,6 +76,9 @@ export function SignupPage() {
       leaveBalance: 14,
       hourlyRateMUR: 0,
       credential: password,
+      status: 'active',
+      terminatedAt: null,
+      terminationReason: null,
     };
     const newId = addEmployee(newEmployeeData);
 

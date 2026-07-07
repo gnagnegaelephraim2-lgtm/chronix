@@ -38,7 +38,7 @@ export function Attendance() {
       .sort((a, b) => b.record.date.localeCompare(a.record.date));
   }, [state.attendance, state.employees, from, to, department]);
 
-  const totalEmployees = state.employees.length;
+  const totalEmployees = state.employees.filter((e) => e.status !== 'terminated').length;
   const onTimeCount = rows.filter((r) => r.record.status === 'on_time').length;
   const lateCount = rows.filter((r) => r.record.status === 'late').length;
 

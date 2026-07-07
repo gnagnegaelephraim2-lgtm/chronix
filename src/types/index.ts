@@ -36,6 +36,9 @@ export interface Employee {
   hourlyRateMUR: number; // hourly pay in Mauritian Rupees, used in payroll-adjacent reports
   credential: string; // password (business owner) or admin-issued temp PIN (employee)
   mustChangePassword?: boolean; // true for employee accounts until they set their own password
+  status: 'active' | 'terminated';
+  terminatedAt: string | null; // ISO date
+  terminationReason: string | null;
 }
 
 export interface AttendanceRecord {
@@ -126,6 +129,7 @@ export interface BusinessSettings {
   trialStartedAt: string | null; // ISO datetime
   trialCancelled: boolean;
   billingCard: BillingCard | null;
+  defaultReportRangeDays: number;
 }
 
 export interface ActivityEvent {
