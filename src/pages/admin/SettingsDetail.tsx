@@ -231,8 +231,28 @@ export function AdminSettingsDetail() {
           <div>
             {(() => {
               const trial = getTrialStatus(state.settings);
+              const planNames: Record<string, string> = { starter: 'Starter', growth: 'Growth', enterprise: 'Enterprise' };
               return (
                 <>
+                  <h3 style={{ marginBottom: '0.75rem', fontSize: '0.95rem' }}>Chronix Plan</h3>
+                  <div className="side-panel-row" style={{ marginBottom: '1.5rem' }}>
+                    <div className="side-panel-row-main">
+                      <div className="side-panel-name">
+                        {state.settings.plan ? `${planNames[state.settings.plan]} Plan` : 'No plan selected yet'}
+                      </div>
+                      <div className="side-panel-sub">
+                        {state.settings.billingStatus === 'awaiting_confirmation'
+                          ? 'Awaiting payment confirmation'
+                          : state.settings.billingStatus === 'confirmed'
+                            ? 'Payment confirmed'
+                            : 'Currently on your free trial'}
+                      </div>
+                    </div>
+                    <button type="button" className="btn btn-primary-amber" onClick={() => navigate('/billing/checkout')}>
+                      {state.settings.plan ? 'Change Plan' : 'Choose a Plan'}
+                    </button>
+                  </div>
+
                   <h3 style={{ marginBottom: '0.75rem', fontSize: '0.95rem' }}>Trial Status</h3>
                   <div className="side-panel-row">
                     <div className="side-panel-row-main">

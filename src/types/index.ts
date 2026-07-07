@@ -130,6 +130,10 @@ export interface BusinessSettings {
   trialCancelled: boolean;
   billingCard: BillingCard | null;
   defaultReportRangeDays: number;
+  plan: 'starter' | 'growth' | 'enterprise' | null;
+  billingStatus: 'none' | 'awaiting_confirmation' | 'confirmed';
+  paymentMethod: 'juice' | 'bank_transfer' | null;
+  paymentReference: string | null;
 }
 
 export interface ActivityEvent {

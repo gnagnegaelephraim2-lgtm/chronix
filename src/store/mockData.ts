@@ -39,4 +39,8 @@ export const BUSINESS_SETTINGS: BusinessSettings = {
   trialCancelled: false,
   billingCard: null,
   defaultReportRangeDays: 30,
+  plan: null,
+  billingStatus: 'none',
+  paymentMethod: null,
+  paymentReference: null,
 };
