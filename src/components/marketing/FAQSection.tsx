@@ -28,7 +28,7 @@ const FAQ_LEFT_DATA = {
     ctaTitle: 'Need Direct Help?',
     ctaText: 'Speak to a human or write to us for rapid assistance:',
     email: 'chronix.mu@gmail.com',
-    phone: '+230 5700 1234',
+    phone: '+230 5473 7793',
   },
   fr: {
     badge: 'Centre d\'Aide',
@@ -37,7 +37,7 @@ const FAQ_LEFT_DATA = {
     ctaTitle: 'Besoin d\'Aide Directe ?',
     ctaText: 'Échangez avec un conseiller local pour une assistance rapide :',
     email: 'chronix.mu@gmail.com',
-    phone: '+230 5700 1234',
+    phone: '+230 5473 7793',
   }
 } as const;
 

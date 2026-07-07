@@ -265,7 +265,7 @@ export function CheckoutPage() {
                   </h4>
                   {payMethod === 'juice' ? (
                     <>
-                      <CopyField label="Juice number" value="+230 5XXX XXXX" />
+                      <CopyField label="Juice number" value="+230 5473 7793" />
                       <CopyField label="Account name" value="Chronix Ltd" />
                       <CopyField label="Payment reference" value={paymentReference} />
                     </>
