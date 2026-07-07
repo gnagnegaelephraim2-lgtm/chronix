@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   Clock,
@@ -31,6 +31,7 @@ export function Sidebar({ variant, mobileOpen, onCloseMobile }: SidebarProps) {
   const { t } = useLanguage();
   const { session, logout } = useSession();
   const { state } = useStore();
+  const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const [showEdit, setShowEdit] = useState(false);
   const employee = state.employees.find((e) => e.id === session?.employeeId);
@@ -77,7 +78,7 @@ export function Sidebar({ variant, mobileOpen, onCloseMobile }: SidebarProps) {
           {variant === 'admin' && (
             <div className="upsell-card">
               <div style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.5rem' }}>{t('goPremium')}</div>
-              <button className="btn btn-primary-amber" style={{ width: '100%' }}>
+              <button className="btn btn-primary-amber" style={{ width: '100%' }} onClick={() => { onCloseMobile(); navigate('/billing/checkout'); }}>
                 {t('upgradeNow')}
               </button>
             </div>

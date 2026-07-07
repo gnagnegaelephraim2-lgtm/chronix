@@ -64,9 +64,11 @@ export function CheckoutPage() {
   const { updateSettings } = useStoreActions();
   const navigate = useNavigate();
 
+  const realEmployeeCount = state.employees.filter((e) => e.status !== 'terminated').length;
+
   const [step, setStep] = useState(1);
   const [selectedPlan, setSelectedPlan] = useState<PlanId>('starter');
-  const [employeeCount, setEmployeeCount] = useState(String(state.settings.employeeCount || 1));
+  const [employeeCount, setEmployeeCount] = useState(String(realEmployeeCount || 1));
   const [payMethod, setPayMethod] = useState<PayMethod>('juice');
   const [paymentReference] = useState(() => state.settings.paymentReference || generatePaymentReference());
 

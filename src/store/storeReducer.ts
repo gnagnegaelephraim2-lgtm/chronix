@@ -189,7 +189,6 @@ export function reducer(state: StoreState, action: StoreAction): StoreState {
       return {
         ...state,
         employees: [...state.employees, action.payload],
-        settings: { ...state.settings, employeeCount: state.settings.employeeCount + 1 },
       };
     }
     case 'UPDATE_EMPLOYEE': {

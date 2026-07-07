@@ -9,11 +9,10 @@ export function EditBusinessProfileModal({ settings, onClose }: { settings: Busi
   const { updateSettings } = useStoreActions();
   const [companyName, setCompanyName] = useState(settings.companyName);
   const [logoUrl, setLogoUrl] = useState(settings.logoUrl);
-  const [employeeCount, setEmployeeCount] = useState(String(settings.employeeCount));
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    updateSettings({ companyName, logoUrl, employeeCount: Math.max(1, Number(employeeCount) || 1) });
+    updateSettings({ companyName, logoUrl });
     onClose();
   }
 
@@ -24,7 +23,9 @@ export function EditBusinessProfileModal({ settings, onClose }: { settings: Busi
           <AvatarUpload src={logoUrl} name={companyName} size={80} onChange={setLogoUrl} />
         </div>
         <FormField label="Company Name" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />
-        <FormField label="Number of Employees" type="number" min="1" value={employeeCount} onChange={(e) => setEmployeeCount(e.target.value)} required />
+        <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '-0.5rem', marginBottom: '1rem' }}>
+          Employee count is tracked automatically from your team in Settings &gt; Employee Settings.
+        </p>
         <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
           <button type="button" className="btn btn-outline" onClick={onClose}>
             Cancel
