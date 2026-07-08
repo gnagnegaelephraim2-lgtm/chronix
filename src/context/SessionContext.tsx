@@ -1,7 +1,7 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import type { Session, SessionView } from '../types/session';
 import type { Employee } from '../types';
-import { useStore } from '../hooks/useStore';
+import { LEGACY_BUSINESS_ID } from '../store/storeReducer';
 import { SessionContext, type SessionContextValue } from './sessionContextCore';
 
 const STORAGE_KEY = 'chronix_session_v1';
@@ -10,35 +10,27 @@ function loadSession(): Session | null {
   if (typeof window === 'undefined') return null;
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as Session) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<Session>;
+    if (!parsed.employeeId || !parsed.view) return null;
+    // Sessions created before businesses were isolated from each other
+    // didn't carry a businessId — default them to the migrated legacy
+    // business so an existing logged-in user isn't forced to log back in.
+    return { ...parsed, businessId: parsed.businessId ?? LEGACY_BUSINESS_ID } as Session;
   } catch {
     return null;
   }
 }
 
 export function SessionProvider({ children }: { children: ReactNode }) {
-  const { state } = useStore();
   const [session, setSession] = useState<Session | null>(loadSession);
 
   const value = useMemo<SessionContextValue>(
     () => ({
       session,
-      loginAs: (view: SessionView, employeeOrId?: string | Employee) => {
-        let employee: Employee | undefined;
-        if (typeof employeeOrId === 'string') {
-          employee = state.employees.find((e) => e.id === employeeOrId);
-        } else if (employeeOrId) {
-          employee = employeeOrId;
-        }
-        if (!employee) {
-          const wantedRole = view === 'admin' ? 'admin' : 'employee';
-          employee = state.employees.find((e) => e.role === wantedRole) ?? state.employees[0];
-        }
-        if (!employee) return; // nothing to log in as — store has no employees and no override was given
-        const finalView = employeeOrId
-          ? (['admin', 'hr', 'supervisor'].includes(employee.role) ? 'admin' : 'employee')
-          : view;
-        const next: Session = { view: finalView, employeeId: employee.id, loggedInAt: new Date().toISOString() };
+      loginAs: (view: SessionView, employee: Employee, businessId: string) => {
+        const finalView: SessionView = ['admin', 'hr', 'supervisor'].includes(employee.role) ? 'admin' : view === 'admin' ? 'employee' : view;
+        const next: Session = { view: finalView, employeeId: employee.id, businessId, loggedInAt: new Date().toISOString() };
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
         setSession(next);
       },
@@ -47,7 +39,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         setSession(null);
       },
     }),
-    [session, state.employees]
+    [session]
   );
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;

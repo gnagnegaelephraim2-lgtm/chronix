@@ -13,11 +13,11 @@ createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <LanguageProvider>
         <ThemeProvider>
-          <StoreProvider>
-            <SessionProvider>
+          <SessionProvider>
+            <StoreProvider>
               <App />
-            </SessionProvider>
-          </StoreProvider>
+            </StoreProvider>
+          </SessionProvider>
         </ThemeProvider>
       </LanguageProvider>
     </BrowserRouter>

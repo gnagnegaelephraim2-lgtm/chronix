@@ -224,34 +224,74 @@ function normalizeEmployee(e: Partial<Employee>): Employee {
   } as Employee;
 }
 
-export function loadInitialState(): StoreState {
+function normalizeBusinessState(parsed: Partial<StoreState>): StoreState {
+  return {
+    employees: (parsed.employees ?? EMPLOYEES).map(normalizeEmployee),
+    attendance: parsed.attendance ?? ATTENDANCE_RECORDS,
+    requests: parsed.requests ?? REQUESTS,
+    reimbursements: parsed.reimbursements ?? REIMBURSEMENTS,
+    activity: parsed.activity ?? ACTIVITY_EVENTS,
+    // Merge so any settings field introduced after this business was
+    // created (e.g. defaultReportRangeDays) gets a real default instead of
+    // undefined — which previously turned into NaN dates.
+    settings: { ...BUSINESS_SETTINGS, ...(parsed.settings ?? {}) },
+  };
+}
+
+export function emptyBusinessState(): StoreState {
+  return normalizeBusinessState({});
+}
+
+// Every business (one per real-world company that signs up) gets its own
+// fully isolated slice — own employees, own attendance, own settings. This
+// is the fix for signups landing inside a previous business's account: the
+// old shape was a single flat StoreState shared by the entire browser, so
+// every signup just appended another "admin" employee to the one global
+// list and overwrote the one global settings object.
+export interface RootState {
+  businesses: Record<string, StoreState>;
+}
+
+export type RootAction =
+  | { type: 'CREATE_BUSINESS'; businessId: string; initialState: StoreState }
+  | { type: 'SCOPED'; businessId: string; action: StoreAction };
+
+export function rootReducer(root: RootState, action: RootAction): RootState {
+  if (action.type === 'CREATE_BUSINESS') {
+    return { businesses: { ...root.businesses, [action.businessId]: action.initialState } };
+  }
+  const current = root.businesses[action.businessId];
+  if (!current) return root;
+  return { businesses: { ...root.businesses, [action.businessId]: reducer(current, action.action) } };
+}
+
+// Businesses created before this multi-tenant model existed are all
+// bundled under one flat StoreState in localStorage. Migrate that into a
+// single named business so nobody loses existing data — this can't safely
+// un-merge accounts that already got mixed together by the old bug, but it
+// stops any further mixing going forward.
+export const LEGACY_BUSINESS_ID = 'legacy-business';
+
+export function loadInitialRootState(): RootState {
   if (typeof window !== 'undefined') {
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
-        const parsed = JSON.parse(raw) as Partial<StoreState>;
-        return {
-          employees: (parsed.employees ?? EMPLOYEES).map(normalizeEmployee),
-          attendance: parsed.attendance ?? ATTENDANCE_RECORDS,
-          requests: parsed.requests ?? REQUESTS,
-          reimbursements: parsed.reimbursements ?? REIMBURSEMENTS,
-          activity: parsed.activity ?? ACTIVITY_EVENTS,
-          // Merge so any settings field introduced after this business was
-          // created (e.g. defaultReportRangeDays) gets a real default
-          // instead of undefined — which previously turned into NaN dates.
-          settings: { ...BUSINESS_SETTINGS, ...(parsed.settings ?? {}) },
-        };
+        const parsed = JSON.parse(raw) as { businesses?: Record<string, Partial<StoreState>> } & Partial<StoreState>;
+        if (parsed.businesses) {
+          const businesses: Record<string, StoreState> = {};
+          for (const [id, biz] of Object.entries(parsed.businesses)) {
+            businesses[id] = normalizeBusinessState(biz);
+          }
+          return { businesses };
+        }
+        if (parsed.employees) {
+          return { businesses: { [LEGACY_BUSINESS_ID]: normalizeBusinessState(parsed) } };
+        }
       }
     } catch {
-      // fall through to seed data
+      // fall through to empty
     }
   }
-  return {
-    employees: EMPLOYEES,
-    attendance: ATTENDANCE_RECORDS,
-    requests: REQUESTS,
-    reimbursements: REIMBURSEMENTS,
-    activity: ACTIVITY_EVENTS,
-    settings: BUSINESS_SETTINGS,
-  };
+  return { businesses: {} };
 }

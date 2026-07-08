@@ -5,13 +5,14 @@ import { useSession } from '../../hooks/useSession';
 import { useStore } from '../../hooks/useStore';
 import { useLanguage } from '../../hooks/useLanguage';
 import type { SessionView } from '../../types/session';
+import type { Employee } from '../../types';
 import { GoogleLoginModal } from './GoogleLoginModal';
 import { AuthShell } from './AuthShell';
 
 export function LoginPage() {
   const { t } = useLanguage();
   const { loginAs } = useSession();
-  const { state } = useStore();
+  const { root } = useStore();
   const navigate = useNavigate();
   const [view, setView] = useState<SessionView>('admin');
   const [email, setEmail] = useState('');
@@ -24,9 +25,21 @@ export function LoginPage() {
     setError('');
 
     const trimmedEmail = email.trim().toLowerCase();
-    const existing = state.employees.find((emp) => emp.email.toLowerCase() === trimmedEmail);
+    // An email belongs to exactly one business — search across all of them
+    // rather than a single shared list, so logging in always lands you in
+    // your own business, never someone else's.
+    let existing: Employee | undefined;
+    let businessId: string | undefined;
+    for (const [id, biz] of Object.entries(root.businesses)) {
+      const match = biz.employees.find((emp) => emp.email.toLowerCase() === trimmedEmail);
+      if (match) {
+        existing = match;
+        businessId = id;
+        break;
+      }
+    }
 
-    if (!existing) {
+    if (!existing || !businessId) {
       setError(t('noAccountFoundError'));
       return;
     }
@@ -41,7 +54,7 @@ export function LoginPage() {
       return;
     }
 
-    loginAs(view, existing.id);
+    loginAs(view, existing, businessId);
     if (existing.mustChangePassword) {
       navigate('/employee/change-password');
       return;

@@ -44,7 +44,7 @@ const googleTranslations = {
 
 export function GoogleLoginModal({ onClose }: GoogleLoginModalProps) {
   const navigate = useNavigate();
-  const { state } = useStore();
+  const { root } = useStore();
   const { loginAs } = useSession();
   const { lang } = useLanguage();
 
@@ -61,21 +61,26 @@ export function GoogleLoginModal({ onClose }: GoogleLoginModalProps) {
   // whoever opened it sign in as anyone), which is exactly the "admin has
   // direct access to employee accounts" problem employees' real credential
   // login (see LoginPage) now replaces. Scope it to admin accounts only.
-  const employees = (state.employees || []).filter((emp) => emp.role === 'admin');
+  // Search across every business (there's no active session yet at login
+  // time, so a single scoped business isn't available) — each admin still
+  // only ever gets logged into their own business, via businessId below.
+  const employees = Object.entries(root.businesses).flatMap(([businessId, biz]) =>
+    biz.employees.filter((emp) => emp.role === 'admin').map((emp) => ({ emp, businessId }))
+  );
 
   // Filter employees based on search query
-  const filteredEmployees = employees.filter((emp) => {
+  const filteredEmployees = employees.filter(({ emp }) => {
     const fullName = `${emp.firstName} ${emp.lastName}`.toLowerCase();
     const email = emp.email.toLowerCase();
     const query = searchQuery.toLowerCase();
     return fullName.includes(query) || email.includes(query);
   });
 
-  const handleSelectUser = (emp: Employee) => {
+  const handleSelectUser = (emp: Employee, businessId: string) => {
     setSigningInUser(emp);
     setTimeout(() => {
       const targetView: SessionView = ['admin', 'hr', 'supervisor'].includes(emp.role) ? 'admin' : 'employee';
-      loginAs(targetView, emp);
+      loginAs(targetView, emp, businessId);
       navigate(targetView === 'admin' ? '/admin' : '/employee');
     }, 1200);
   };
@@ -88,10 +93,10 @@ export function GoogleLoginModal({ onClose }: GoogleLoginModalProps) {
     // Only ever sign in to an existing admin account — Google is a quick
     // access convenience for business owners, not a way to mint new accounts
     // or reach employee accounts. New businesses go through /signup.
-    const match = employees.find((emp) => emp.email.toLowerCase() === trimmedEmail);
+    const match = employees.find(({ emp }) => emp.email.toLowerCase() === trimmedEmail);
     if (match) {
       setEmailError('');
-      handleSelectUser(match);
+      handleSelectUser(match.emp, match.businessId);
       return;
     }
 
@@ -299,12 +304,12 @@ export function GoogleLoginModal({ onClose }: GoogleLoginModalProps) {
                   }}
                   className="google-account-list"
                 >
-                  {filteredEmployees.map((emp) => {
+                  {filteredEmployees.map(({ emp, businessId }) => {
                     const colors = getRoleColor(emp.role);
                     return (
                       <div
                         key={emp.id}
-                        onClick={() => handleSelectUser(emp)}
+                        onClick={() => handleSelectUser(emp, businessId)}
                         style={{
                           display: 'flex',
                           alignItems: 'center',

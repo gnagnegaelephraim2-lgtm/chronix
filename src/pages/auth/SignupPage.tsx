@@ -10,14 +10,15 @@ import { useStore, useStoreActions } from '../../hooks/useStore';
 import { useLanguage } from '../../hooks/useLanguage';
 import type { Employee } from '../../types';
 import { uid } from '../../store/storeReducer';
+import { BUSINESS_SETTINGS } from '../../store/mockData';
 import { generateKioskPin } from '../../utils/kioskPin';
 import { AuthShell } from './AuthShell';
 
 export function SignupPage() {
   const { t } = useLanguage();
   const { loginAs } = useSession();
-  const { state } = useStore();
-  const { addEmployee, updateSettings } = useStoreActions();
+  const { root } = useStore();
+  const { createBusiness } = useStoreActions();
   const navigate = useNavigate();
 
   const [fullName, setFullName] = useState('');
@@ -34,7 +35,12 @@ export function SignupPage() {
     setError('');
 
     const trimmedEmail = email.trim().toLowerCase();
-    const existing = state.employees.find((emp) => emp.email.toLowerCase() === trimmedEmail);
+    // Check for this email across every existing business, not just one —
+    // each signup must become its own fully isolated business, so nothing
+    // here should ever look at (or reuse) another business's data.
+    const existing = Object.values(root.businesses).some((biz) =>
+      biz.employees.some((emp) => emp.email.toLowerCase() === trimmedEmail)
+    );
     if (existing) {
       setError(t('emailAlreadyRegisteredError'));
       return;
@@ -51,7 +57,9 @@ export function SignupPage() {
 
     const [firstName, ...rest] = fullName.trim().split(/\s+/);
     const lastName = rest.join(' ') || '—';
-    const newEmployeeData: Omit<Employee, 'id'> = {
+    const newId = uid('emp');
+    const newEmployee: Employee = {
+      id: newId,
       firstName: firstName || 'New',
       lastName,
       avatarUrl: '',
@@ -72,21 +80,26 @@ export function SignupPage() {
       terminationReason: null,
       kioskPin: generateKioskPin(),
     };
-    const newId = addEmployee(newEmployeeData);
 
-    updateSettings({
-      companyName: companyName.trim(),
-      employeeCount: Math.max(1, Number(employeeCount) || 1),
-      workLocations: [newLocation],
-      trialStartedAt: new Date().toISOString(),
-      trialCancelled: false,
-      billingCard: null,
+    const businessId = uid('biz');
+    createBusiness(businessId, {
+      employees: [newEmployee],
+      attendance: [],
+      requests: [],
+      reimbursements: [],
+      activity: [],
+      settings: {
+        ...BUSINESS_SETTINGS,
+        companyName: companyName.trim(),
+        employeeCount: Math.max(1, Number(employeeCount) || 1),
+        workLocations: [newLocation],
+        trialStartedAt: new Date().toISOString(),
+        trialCancelled: false,
+        billingCard: null,
+      },
     });
 
-    // Pass the full object, not just the id — the store update from
-    // addEmployee hasn't flowed back into this context yet, so looking the
-    // id up in state.employees right now would still see the old (missing) list.
-    loginAs('admin', { ...newEmployeeData, id: newId });
+    loginAs('admin', newEmployee, businessId);
     navigate('/admin');
   }
 
